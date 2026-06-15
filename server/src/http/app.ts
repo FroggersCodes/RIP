@@ -5,6 +5,9 @@ import { AppError } from '../errors';
 import authRouter from './routes/auth';
 import productsRouter from './routes/products';
 import ripRouter from './routes/rip';
+import dailyRouter from './routes/daily';
+import adminRouter from './routes/admin';
+import leagueRouter from './routes/league';
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
@@ -31,6 +34,9 @@ export function createApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/products', productsRouter);
   app.use('/api/rip', ripRouter);
+  app.use('/api/daily', dailyRouter);
+  app.use('/api/admin', adminRouter);
+  app.use('/api/league', leagueRouter);
 
   app.use(errorHandler);
   return app;
