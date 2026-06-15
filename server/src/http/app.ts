@@ -8,6 +8,11 @@ import ripRouter from './routes/rip';
 import dailyRouter from './routes/daily';
 import adminRouter from './routes/admin';
 import leagueRouter from './routes/league';
+import teamsRouter from './routes/teams';
+import playersRouter from './routes/players';
+import lineupRouter from './routes/lineup';
+import cardsRouter from './routes/cards';
+import battlesRouter from './routes/battles';
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
@@ -37,6 +42,11 @@ export function createApp() {
   app.use('/api/daily', dailyRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/league', leagueRouter);
+  app.use('/api/teams', teamsRouter);
+  app.use('/api/players', playersRouter);
+  app.use('/api/lineup', lineupRouter);
+  app.use('/api/cards', cardsRouter);
+  app.use('/api/battles', battlesRouter);
 
   app.use(errorHandler);
   return app;
