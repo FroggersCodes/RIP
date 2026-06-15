@@ -1,0 +1,267 @@
+// RIP — Prisma schema (PostgreSQL).
+// The uniqueness guarantee lives in CardInstance.@@unique([templateId, serial]).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Position {
+  QB
+  RB
+  WR
+  TE
+}
+
+enum Parallel {
+  BASE
+  BLUE
+  PURPLE
+  GOLD
+  BLACK
+  EMERALD
+  SUPERFRACTOR
+}
+
+enum LineupRole {
+  QB
+  WR1
+  WR2
+  RB
+  TE
+  FLEX
+}
+
+enum OpponentType {
+  BOT
+  USER
+  SNAPSHOT
+}
+
+model User {
+  id               String    @id @default(cuid())
+  username         String    @unique
+  email            String?   @unique
+  passwordHash     String
+  tokens           Int       @default(0)
+  cases            Int       @default(0)
+  dust             Int       @default(0)
+  rating           Int       @default(1000)
+  isBot            Boolean   @default(false)
+  dailyStreak      Int       @default(0)
+  lastDailyClaimAt DateTime?
+  createdAt        DateTime  @default(now())
+
+  cards               CardInstance[]
+  lineupSlots         LineupSlot[]
+  battlesAsChallenger Battle[]          @relation("challenger")
+  battlesAsOpponent   Battle[]          @relation("opponent")
+  battlesWon          Battle[]          @relation("winner")
+  lineupScores        LineupWeekScore[]
+}
+
+model Team {
+  id             String @id @default(cuid())
+  name           String
+  abbreviation   String @unique
+  conference     String
+  division       String
+  primaryColor   String
+  secondaryColor String
+
+  players   Player[]
+  homeGames Game[]   @relation("home")
+  awayGames Game[]   @relation("away")
+}
+
+model Player {
+  id            String   @id @default(cuid())
+  teamId        String
+  team          Team     @relation(fields: [teamId], references: [id])
+  name          String
+  position      Position
+  overallRating Int
+  currentValue  Float
+  isTopPlayer   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  templates    CardTemplate[]
+  gameStats    PlayerGameStat[]
+  valueHistory ValueHistory[]
+
+  @@index([teamId])
+}
+
+model CardTemplate {
+  id              String   @id @default(cuid())
+  playerId        String
+  player          Player   @relation(fields: [playerId], references: [id])
+  parallel        Parallel
+  printRun        Int? // null = unlimited (Base)
+  valueMultiplier Float
+  // Count of serials allocated so far. The atomic UPDATE that increments this
+  // under a row lock is what makes serial allocation race-safe.
+  nextSerial      Int      @default(0)
+
+  instances CardInstance[]
+
+  @@unique([playerId, parallel])
+  @@index([parallel])
+}
+
+model CardInstance {
+  id         String   @id @default(cuid())
+  templateId String
+  template   CardTemplate @relation(fields: [templateId], references: [id])
+  serial     Int? // null for Base. Postgres treats NULLs as distinct, so Base stacks freely.
+  ownerId    String
+  owner      User     @relation(fields: [ownerId], references: [id])
+  pulledAt   DateTime @default(now())
+
+  lineupSlot LineupSlot?
+
+  @@unique([templateId, serial]) // THE uniqueness guarantee for numbered serials
+  @@index([ownerId])
+  @@index([templateId])
+}
+
+model Product {
+  id            String  @id @default(cuid())
+  name          String
+  year          Int
+  entryCost     Int // tokens
+  caseCost      Int     @default(0) // premium currency for chase products
+  tier          String
+  cardsPerPack  Int     @default(5)
+  description   String
+  isActive      Boolean @default(true)
+  pullRates     Json // { "BASE": weight, "BLUE": weight, ... } per-card weights
+  topPlayerBias Float   @default(0) // 0..1, bias hits toward top players
+
+  battles Battle[]
+}
+
+model Battle {
+  id              String       @id @default(cuid())
+  challengerId    String
+  challenger      User         @relation("challenger", fields: [challengerId], references: [id])
+  opponentId      String?
+  opponent        User?        @relation("opponent", fields: [opponentId], references: [id])
+  opponentType    OpponentType @default(BOT)
+  productId       String
+  product         Product      @relation(fields: [productId], references: [id])
+  challengerPull  Json
+  opponentPull    Json
+  challengerTotal Float
+  opponentTotal   Float
+  winnerId        String?
+  winner          User?        @relation("winner", fields: [winnerId], references: [id])
+  tokensWagered   Int
+  createdAt       DateTime     @default(now())
+
+  @@index([challengerId])
+}
+
+model LineupSlot {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  role           LineupRole
+  cardInstanceId String?       @unique
+  cardInstance   CardInstance? @relation(fields: [cardInstanceId], references: [id])
+
+  @@unique([userId, role])
+  @@index([userId])
+}
+
+model LeagueWeek {
+  id          String    @id @default(cuid())
+  season      Int
+  weekNumber  Int
+  simulatedAt DateTime?
+  isCurrent   Boolean   @default(false)
+
+  games        Game[]
+  playerStats  PlayerGameStat[]
+  valueHistory ValueHistory[]
+  lineupScores LineupWeekScore[]
+
+  @@unique([season, weekNumber])
+}
+
+model Game {
+  id         String     @id @default(cuid())
+  weekId     String
+  week       LeagueWeek @relation(fields: [weekId], references: [id])
+  homeTeamId String
+  homeTeam   Team       @relation("home", fields: [homeTeamId], references: [id])
+  awayTeamId String
+  awayTeam   Team       @relation("away", fields: [awayTeamId], references: [id])
+  homeScore  Int        @default(0)
+  awayScore  Int        @default(0)
+  played     Boolean    @default(false)
+
+  stats PlayerGameStat[]
+
+  @@index([weekId])
+}
+
+model PlayerGameStat {
+  id             String     @id @default(cuid())
+  weekId         String
+  week           LeagueWeek @relation(fields: [weekId], references: [id])
+  gameId         String
+  game           Game       @relation(fields: [gameId], references: [id])
+  playerId       String
+  player         Player     @relation(fields: [playerId], references: [id])
+  opponentTeamId String
+
+  passYds       Int @default(0)
+  passTd        Int @default(0)
+  interceptions Int @default(0)
+  rushYds       Int @default(0)
+  rushTd        Int @default(0)
+  receptions    Int @default(0)
+  recYds        Int @default(0)
+  recTd         Int @default(0)
+  fumbles       Int @default(0)
+
+  fantasyPoints    Float
+  performanceScore Float
+
+  @@unique([weekId, playerId])
+  @@index([playerId])
+  @@index([weekId])
+}
+
+model ValueHistory {
+  id          String     @id @default(cuid())
+  playerId    String
+  player      Player     @relation(fields: [playerId], references: [id])
+  weekId      String
+  week        LeagueWeek @relation(fields: [weekId], references: [id])
+  valueBefore Float
+  valueAfter  Float
+  delta       Float
+  createdAt   DateTime   @default(now())
+
+  @@unique([playerId, weekId])
+  @@index([playerId])
+}
+
+model LineupWeekScore {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  weekId    String
+  week      LeagueWeek @relation(fields: [weekId], references: [id])
+  points    Float
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, weekId])
+  @@index([weekId])
+}

@@ -1,0 +1,20 @@
+{
+  "name": "rip",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "server"
+  ],
+  "scripts": {
+    "dev:server": "npm --workspace server run dev",
+    "seed": "npm --workspace server run seed",
+    "migrate": "npm --workspace server run migrate",
+    "sim:advance": "npm --workspace server run sim:advance",
+    "test": "npm --workspace server run test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
