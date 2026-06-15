@@ -3,6 +3,8 @@ import cors from 'cors';
 import { ZodError } from 'zod';
 import { AppError } from '../errors';
 import authRouter from './routes/auth';
+import productsRouter from './routes/products';
+import ripRouter from './routes/rip';
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
@@ -27,6 +29,8 @@ export function createApp() {
   });
 
   app.use('/api/auth', authRouter);
+  app.use('/api/products', productsRouter);
+  app.use('/api/rip', ripRouter);
 
   app.use(errorHandler);
   return app;
