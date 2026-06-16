@@ -5,10 +5,13 @@
   "type": "module",
   "workspaces": [
     "shared",
-    "server"
+    "server",
+    "web"
   ],
   "scripts": {
     "dev:server": "npm --workspace server run dev",
+    "dev:web": "npm --workspace web run dev",
+    "build:web": "npm --workspace web run build",
     "seed": "npm --workspace server run seed",
     "migrate": "npm --workspace server run migrate",
     "sim:advance": "npm --workspace server run sim:advance",
