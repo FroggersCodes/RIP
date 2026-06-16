@@ -146,7 +146,9 @@ per-player box scores, moves player values, writes value history, and scores eve
 lineup. Run it any of three ways — all call the same `advanceWeek()`:
 
 ```bash
-npm run sim:advance                                   # CLI (prints top movers)
+npm run sim:advance                                   # advance one week (prints recap + movers)
+npm run sim:season            # advance a whole season (14 weeks + playoffs, default 17)
+npm run sim:season 17 --workspace server              # explicit count
 ```
 ```bash
 curl -X POST http://localhost:4000/api/admin/advance-week -H 'x-admin-token: dev-admin'
@@ -154,6 +156,15 @@ curl -X POST http://localhost:4000/api/admin/advance-week -H 'x-admin-token: dev
 …or click **Advance week** in the *Dev* panel on the web Home page (admin token
 defaults to `dev-admin`, configurable via `ADMIN_TOKEN`). A real cron can call the same
 function later.
+
+A season is **14 regular-season weeks → an 8-team playoff bracket (Quarterfinal →
+Semifinal → Championship) → a champion**, then it rolls into the next season (player
+values mean-revert toward their rating baseline). Each week also flags a **Game of the
+Week** with an auto recap. Standings, the bracket, champions, and weekly/season stat
+leaders all populate as you advance — see the **Standings** and **Stats** pages.
+
+> Player photos are generated per player by a free image service in the browser, with a
+> monogram fallback. Set `VITE_PORTRAITS=off` to use monograms only.
 
 ---
 
