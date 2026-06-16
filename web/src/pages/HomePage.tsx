@@ -16,6 +16,14 @@ export function HomePage() {
   const { user, setUser } = useAuth();
   const daily = useApi(() => api<DailyStatus>('/daily/status'), []);
   const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
+  const gotw = useApi(
+    () =>
+      api<{
+        week: { weekNumber: number } | null;
+        games: { home: string; away: string; homeScore: number; awayScore: number; isFeatured: boolean; recap: string | null }[];
+      }>('/league/scoreboard'),
+    [],
+  );
   const [reveal, setReveal] = useState<RevealCard[] | null>(null);
   const [revealTitle, setRevealTitle] = useState('');
   const [claiming, setClaiming] = useState(false);
@@ -143,6 +151,24 @@ export function HomePage() {
           <div className="qt-sub">Values & trends</div>
         </Link>
       </div>
+
+      {(() => {
+        const f = gotw.data?.games.find((g) => g.isFeatured);
+        if (!f) return null;
+        return (
+          <div className="panel panel-p gotw">
+            <div className="section-title">Game of the Week{gotw.data?.week ? ` · week ${gotw.data.week.weekNumber}` : ''}</div>
+            <div className="gotw-score">
+              <span className="gotw-team">{f.home}</span>
+              <span className="gotw-num mono">{f.homeScore}</span>
+              <span className="muted">–</span>
+              <span className="gotw-num mono">{f.awayScore}</span>
+              <span className="gotw-team">{f.away}</span>
+            </div>
+            {f.recap && <div className="muted" style={{ marginTop: 6 }}>{f.recap}</div>}
+          </div>
+        );
+      })()}
 
       <div className="home-cols">
         <div className="panel panel-p">

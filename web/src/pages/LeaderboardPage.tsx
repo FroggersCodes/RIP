@@ -9,6 +9,10 @@ interface ScoreGame {
   homeScore: number;
   awayScore: number;
   played: boolean;
+  round: string;
+  isFeatured: boolean;
+  homeSeed: number | null;
+  awaySeed: number | null;
 }
 
 export function LeaderboardPage() {
@@ -72,10 +76,13 @@ export function LeaderboardPage() {
                 return (
                   <div className="score-row" key={i}>
                     <span className={homeWin ? '' : 'muted'}>
+                      {g.isFeatured && <span title="Game of the week">★ </span>}
+                      {g.homeSeed ? `(${g.homeSeed}) ` : ''}
                       {g.home} {g.homeScore}
                     </span>
                     <span className={!homeWin ? '' : 'muted'}>
                       {g.awayScore} {g.away}
+                      {g.awaySeed ? ` (${g.awaySeed})` : ''}
                     </span>
                   </div>
                 );

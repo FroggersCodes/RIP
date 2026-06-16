@@ -158,6 +158,7 @@ export interface PlayerDetail {
   }[];
   valueHistory: { weekNumber: number; value: number; delta: number }[];
   parallels: { parallel: ParallelName; printRun: number; allocated: number; remaining: number }[];
+  totals: { season: PlayerTotals; career: PlayerTotals };
 }
 
 export interface BattleResult {
@@ -177,6 +178,87 @@ export interface LeaderboardEntry {
   rank: number;
   username: string;
   points: number;
+}
+
+export interface StatLeader {
+  id: string;
+  name: string;
+  position: Position | null;
+  team: string;
+  value: number;
+  fantasy?: number;
+  games?: number;
+}
+export interface StatCategory {
+  label: string;
+  unit: string;
+  leaders: StatLeader[];
+}
+export interface WeeklyLeaders {
+  week: { season: number; weekNumber: number } | null;
+  categories: StatCategory[];
+}
+export interface SeasonLeaders {
+  season: number;
+  categories: StatCategory[];
+}
+
+export interface StandingRow {
+  teamId: string;
+  name: string;
+  abbreviation: string;
+  conference: string;
+  division: string;
+  wins: number;
+  losses: number;
+  ties: number;
+  pointsFor: number;
+  pointsAgainst: number;
+  diff: number;
+  rank: number;
+  playoffSeed: number | null;
+}
+export interface Standings {
+  season: number;
+  standings: StandingRow[];
+}
+
+export interface BracketGame {
+  home: string;
+  away: string;
+  homeSeed: number | null;
+  awaySeed: number | null;
+  homeScore: number;
+  awayScore: number;
+  played: boolean;
+}
+export interface Bracket {
+  season: number;
+  rounds: { QF: BracketGame[]; SF: BracketGame[]; FINAL: BracketGame[] };
+}
+
+export interface ChampionRow {
+  season: number;
+  champion: string;
+  championAbbr: string;
+  runnerUp: string;
+  runnerUpAbbr: string;
+  topUser: string | null;
+  topUserPoints: number | null;
+}
+
+export interface PlayerTotals {
+  games: number;
+  passYds: number;
+  passTd: number;
+  interceptions: number;
+  rushYds: number;
+  rushTd: number;
+  receptions: number;
+  recYds: number;
+  recTd: number;
+  fantasyPoints: number;
+  avgFantasy: number;
 }
 
 export interface RipResult {

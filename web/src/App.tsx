@@ -10,6 +10,8 @@ import { CollectionPage } from './pages/CollectionPage';
 import { TeamsPage } from './pages/TeamsPage';
 import { TeamDetailPage } from './pages/TeamDetailPage';
 import { PlayerDetailPage } from './pages/PlayerDetailPage';
+import { StandingsPage } from './pages/StandingsPage';
+import { StatsPage } from './pages/StatsPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 
 export function App() {
@@ -42,6 +44,8 @@ export function App() {
         <Route path="/teams" element={<TeamsPage />} />
         <Route path="/teams/:id" element={<TeamDetailPage />} />
         <Route path="/players/:id" element={<PlayerDetailPage />} />
+        <Route path="/standings" element={<StandingsPage />} />
+        <Route path="/stats" element={<StatsPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

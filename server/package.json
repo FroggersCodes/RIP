@@ -15,6 +15,7 @@
     "seed": "tsx prisma/seed.ts",
     "seed:ifempty": "tsx prisma/seedIfEmpty.ts",
     "sim:advance": "tsx src/cli/advanceWeek.ts",
+    "sim:season": "tsx scripts/simSeason.ts",
     "test": "vitest run"
   },
   "prisma": {

@@ -23,3 +23,11 @@ export function applyValueChange(
   const newValue = Math.max(MIN_VALUE, Math.round(currentValue * (1 + pct) * 100) / 100);
   return { newValue, pct };
 }
+
+// Rating-implied baseline value (mirrors the seed). Used to mean-revert values
+// at season rollover so they move during a season but don't run away over years.
+export function baselineValue(rating: number): number {
+  return Math.round((Math.pow(Math.max(rating - 55, 1) / 44, 2.2) * 75 + 3) * 100) / 100;
+}
+
+export const OFFSEASON_REGRESSION = 0.25;

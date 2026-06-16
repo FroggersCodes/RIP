@@ -82,6 +82,34 @@ export function PlayerDetailPage() {
         </div>
       </div>
 
+      <div className="totals-grid">
+        {([['This season', data.totals.season], ['Career', data.totals.career]] as const).map(([label, t]) => (
+          <div className="panel panel-p" key={label}>
+            <div className="between">
+              <div className="section-title">{label}</div>
+              <span className="muted mono" style={{ fontSize: 12 }}>{t.games} games</span>
+            </div>
+            <div className="row" style={{ gap: 22, marginTop: 8, flexWrap: 'wrap' }}>
+              <div>
+                <div className="kpi gold" style={{ fontSize: 24 }}>{t.fantasyPoints}</div>
+                <div className="muted" style={{ fontSize: 12 }}>fantasy pts</div>
+              </div>
+              <div>
+                <div className="kpi" style={{ fontSize: 24 }}>{t.avgFantasy}</div>
+                <div className="muted" style={{ fontSize: 12 }}>per game</div>
+              </div>
+              <div className="mono muted" style={{ fontSize: 12, lineHeight: 1.7 }}>
+                {player.position === 'QB' && <>{t.passYds} pass yds · {t.passTd} TD · {t.interceptions} INT<br /></>}
+                {(t.rushYds > 0 || player.position === 'RB') && <>{t.rushYds} rush yds · {t.rushTd} TD<br /></>}
+                {(t.recYds > 0 || player.position === 'WR' || player.position === 'TE') && (
+                  <>{t.receptions} rec · {t.recYds} yds · {t.recTd} TD</>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="home-cols" style={{ marginTop: 0 }}>
         <div className="panel panel-p">
           <div className="section-title" style={{ marginBottom: 10 }}>

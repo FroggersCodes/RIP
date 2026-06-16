@@ -9,6 +9,8 @@ const LINKS: [string, string][] = [
   ['/lineup', 'Lineup'],
   ['/collection', 'Collection'],
   ['/teams', 'Teams'],
+  ['/standings', 'Standings'],
+  ['/stats', 'Stats'],
   ['/leaderboard', 'Leaderboard'],
 ];
 

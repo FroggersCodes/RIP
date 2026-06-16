@@ -26,7 +26,39 @@ router.get(
     });
     if (!player) throw new AppError(404, 'Player not found');
 
+    const cur = await prisma.leagueWeek.findFirst({ where: { isCurrent: true }, select: { season: true } });
+    const season = cur?.season ?? 1;
+    const sumFields = {
+      passYds: true,
+      passTd: true,
+      interceptions: true,
+      rushYds: true,
+      rushTd: true,
+      receptions: true,
+      recYds: true,
+      recTd: true,
+      fantasyPoints: true,
+    } as const;
+    const [careerAgg, seasonAgg] = await Promise.all([
+      prisma.playerGameStat.aggregate({ where: { playerId: player.id }, _sum: sumFields, _count: true }),
+      prisma.playerGameStat.aggregate({ where: { playerId: player.id, week: { season } }, _sum: sumFields, _count: true }),
+    ]);
+    const totals = (agg: typeof careerAgg) => ({
+      games: agg._count,
+      passYds: agg._sum.passYds ?? 0,
+      passTd: agg._sum.passTd ?? 0,
+      interceptions: agg._sum.interceptions ?? 0,
+      rushYds: agg._sum.rushYds ?? 0,
+      rushTd: agg._sum.rushTd ?? 0,
+      receptions: agg._sum.receptions ?? 0,
+      recYds: agg._sum.recYds ?? 0,
+      recTd: agg._sum.recTd ?? 0,
+      fantasyPoints: Math.round((agg._sum.fantasyPoints ?? 0) * 10) / 10,
+      avgFantasy: agg._count ? Math.round(((agg._sum.fantasyPoints ?? 0) / agg._count) * 10) / 10 : 0,
+    });
+
     res.json({
+      totals: { season: totals(seasonAgg), career: totals(careerAgg) },
       player: {
         id: player.id,
         name: player.name,

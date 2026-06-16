@@ -76,6 +76,8 @@ model Team {
   players   Player[]
   homeGames Game[]   @relation("home")
   awayGames Game[]   @relation("away")
+  championOf SeasonChampion[] @relation("champion")
+  runnerUpOf SeasonChampion[] @relation("runnerUp")
 }
 
 model Player {
@@ -204,6 +206,12 @@ model Game {
   homeScore  Int        @default(0)
   awayScore  Int        @default(0)
   played     Boolean    @default(false)
+  round      String     @default("REGULAR") // REGULAR | QF | SF | FINAL
+  bracketOrder Int      @default(0) // preserves playoff pairing order
+  homeSeed   Int?
+  awaySeed   Int?
+  isFeatured Boolean    @default(false) // game of the week
+  recap      String?
 
   stats PlayerGameStat[]
 
@@ -264,4 +272,16 @@ model LineupWeekScore {
 
   @@unique([userId, weekId])
   @@index([weekId])
+}
+
+model SeasonChampion {
+  id             String   @id @default(cuid())
+  season         Int      @unique
+  championTeamId String
+  champion       Team     @relation("champion", fields: [championTeamId], references: [id])
+  runnerUpTeamId String
+  runnerUp       Team     @relation("runnerUp", fields: [runnerUpTeamId], references: [id])
+  topUserId      String?
+  topUserPoints  Float?
+  decidedAt      DateTime @default(now())
 }
