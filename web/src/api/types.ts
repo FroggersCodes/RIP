@@ -83,8 +83,8 @@ export interface Collection {
     numbered: number;
     base: number;
     totalValue: number;
-    recyclableBase: number;
-    dustPerBase: number;
+    breakdownable: number;
+    breakdownDust: number;
   };
 }
 

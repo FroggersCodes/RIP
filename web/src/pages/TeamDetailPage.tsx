@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { ValueSparkline } from '../components/ValueSparkline';
+import { PlayerPortrait } from '../components/PlayerPortrait';
 import { money, signed } from '../lib/format';
 import type { TeamDetail } from '../api/types';
 
@@ -51,6 +52,7 @@ export function TeamDetailPage() {
         {topPlayers.map((p, i) => (
           <div className="player-row" key={p.id} onClick={() => nav(`/players/${p.id}`)}>
             <span className="pr-rank">{i + 1}</span>
+            <PlayerPortrait player={{ id: p.id, name: p.name, position: p.position }} size={42} />
             <div>
               <div className="pr-name">
                 {p.name} {p.isTopPlayer && <span className="gold">★</span>}

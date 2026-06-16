@@ -1,9 +1,10 @@
 import { PARALLEL_MAP, type ParallelName, type Position } from '@rip/shared';
 import { money } from '../lib/format';
+import { PlayerPortrait } from './PlayerPortrait';
 import './Card.css';
 
 export interface CardData {
-  player: { name: string; position: Position; teamAbbr: string; overallRating?: number };
+  player: { id: string; name: string; position: Position; teamAbbr: string; overallRating?: number };
   parallel: ParallelName;
   serial: number | null;
   printRun: number | null;
@@ -30,8 +31,11 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
     >
       <div className="card-frame">
         <div className="card-inner">
+          <div className="card-photo">
+            <PlayerPortrait player={card.player} fill />
+          </div>
+          <div className="card-photo-scrim" />
           <div className="sheen" />
-          <div className="card-watermark">{card.player.position}</div>
           <div className="card-head">
             <span className="card-parallel" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
               {shortName}
@@ -40,14 +44,16 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               {card.serial != null ? `#${card.serial}${card.printRun ? '/' + card.printRun : ''}` : 'BASE'}
             </span>
           </div>
-          <div className="card-pos">
-            <span className="pos-badge">{card.player.position}</span>
-            <span className="card-team mono">{card.player.teamAbbr}</span>
-          </div>
-          <div className="card-name">{card.player.name}</div>
-          <div className="card-foot">
-            <span className="card-value mono">{money(card.marketValue)}</span>
-            {card.player.overallRating != null && <span className="card-ovr mono">OVR {card.player.overallRating}</span>}
+          <div className="card-plate">
+            <div className="card-pos">
+              <span className="pos-badge">{card.player.position}</span>
+              <span className="card-team mono">{card.player.teamAbbr}</span>
+            </div>
+            <div className="card-name">{card.player.name}</div>
+            <div className="card-foot">
+              <span className="card-value mono">{money(card.marketValue)}</span>
+              {card.player.overallRating != null && <span className="card-ovr mono">OVR {card.player.overallRating}</span>}
+            </div>
           </div>
         </div>
       </div>

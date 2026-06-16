@@ -1,0 +1,39 @@
+.portrait {
+  --pa: #3b82f6;
+  position: relative;
+  overflow: hidden;
+  flex: none;
+}
+
+/* Team/accent-derived gradient shows while the image loads or as fallback bg. */
+.portrait-bg,
+.portrait-fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 10%, color-mix(in srgb, var(--pa) 55%, #1a212c), #0c0e12);
+}
+
+.portrait-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 2;
+  background: #0c0e12;
+}
+
+.portrait-fallback {
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.portrait-initials {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: color-mix(in srgb, var(--pa) 30%, #ffffff);
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}

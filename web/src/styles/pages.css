@@ -284,6 +284,20 @@
   padding: 2px 8px;
   border-radius: 999px;
 }
+.breakdown-tag {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 6;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--gold);
+  color: #2a1d05;
+  padding: 2px 7px;
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
 
 /* ---------- lineup ---------- */
 .lineup-grid {
@@ -408,7 +422,7 @@
 }
 .player-row {
   display: grid;
-  grid-template-columns: 28px 1fr auto auto auto;
+  grid-template-columns: 26px 42px 1fr auto auto auto;
   align-items: center;
   gap: 14px;
   padding: 12px 14px;
@@ -439,7 +453,7 @@
 }
 .player-hero {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   gap: 18px;
   align-items: center;
   padding: 24px;

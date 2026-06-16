@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Position } from '@rip/shared';
+import { dustForBreakdown, type Position } from '@rip/shared';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
@@ -26,14 +26,15 @@ export function CollectionPage() {
       (filter === 'all' || (filter === 'numbered' && c.serial != null) || (filter === 'base' && c.serial == null)) &&
       (pos === 'ALL' || c.player.position === pos),
   );
-  const dustPer = data?.summary.dustPerBase ?? 5;
+  const selectedCards = cards.filter((c) => sel.has(c.id));
+  const dustPreview = selectedCards.reduce((a, c) => a + dustForBreakdown(c.marketValue), 0);
 
   const onCard = (c: CollectionCard) => {
     if (!selecting) {
       nav(`/players/${c.player.id}`);
       return;
     }
-    if (c.serial != null || c.equippedRole) return; // only unequipped base recyclable
+    if (c.equippedRole) return; // equipped cards can't be broken down
     setSel((s) => {
       const n = new Set(s);
       if (n.has(c.id)) n.delete(c.id);
@@ -42,12 +43,21 @@ export function CollectionPage() {
     });
   };
 
-  const recycle = async () => {
+  const breakdown = async () => {
     const ids = [...sel];
     if (!ids.length) return;
+    const numbered = selectedCards.filter((c) => c.serial != null).length;
+    if (
+      numbered > 0 &&
+      !window.confirm(
+        `Break down ${numbered} numbered card${numbered > 1 ? 's' : ''}? Their serials are retired forever and can never be pulled again.`,
+      )
+    ) {
+      return;
+    }
     setBusy(true);
     try {
-      const r = await api<{ recycled: number; dustGained: number; user: User }>('/cards/recycle', {
+      const r = await api<{ brokenDown: number; dustGained: number; user: User }>('/cards/breakdown', {
         method: 'POST',
         body: { instanceIds: ids },
       });
@@ -65,7 +75,7 @@ export function CollectionPage() {
       <div className="page-head between">
         <div>
           <h1>Collection</h1>
-          <p>Your pulls, valued live off player values. Recycle base filler into dust.</p>
+          <p>Your pulls, valued live off player values. Break cards down into dust — the bigger the card, the more dust.</p>
         </div>
         <button
           className={`btn ${selecting ? 'btn-gold' : ''}`}
@@ -74,7 +84,7 @@ export function CollectionPage() {
             setSel(new Set());
           }}
         >
-          {selecting ? 'Cancel' : 'Recycle base'}
+          {selecting ? 'Cancel' : 'Break down'}
         </button>
       </div>
 
@@ -93,8 +103,8 @@ export function CollectionPage() {
             <div className="chip-v">{money(data.summary.totalValue)}</div>
           </div>
           <div className="chip">
-            <div className="chip-k">Recyclable base</div>
-            <div className="chip-v">{num(data.summary.recyclableBase)}</div>
+            <div className="chip-k">Break-down dust</div>
+            <div className="chip-v">{num(data.summary.breakdownDust)}</div>
           </div>
         </div>
       )}
@@ -122,7 +132,7 @@ export function CollectionPage() {
       ) : (
         <div className="cards-grid">
           {filtered.map((c) => {
-            const selectable = selecting && c.serial == null && !c.equippedRole;
+            const selectable = selecting && !c.equippedRole;
             return (
               <div
                 key={c.id}
@@ -131,6 +141,7 @@ export function CollectionPage() {
               >
                 <Card card={c} size="sm" onClick={() => onCard(c)} />
                 {c.equippedRole && <div className="equipped-tag">{c.equippedRole}</div>}
+                {selecting && selectable && <div className="breakdown-tag">+{dustForBreakdown(c.marketValue)} dust</div>}
               </div>
             );
           })}
@@ -140,13 +151,18 @@ export function CollectionPage() {
       {selecting && (
         <div className="rip-bar">
           <div>
-            <div className="section-title">Recycle</div>
+            <div className="section-title">Break down</div>
             <div className="muted">
-              {sel.size} base card{sel.size === 1 ? '' : 's'} selected → <span className="gold mono">{sel.size * dustPer} dust</span>
+              {sel.size} card{sel.size === 1 ? '' : 's'} → <span className="gold mono">{num(dustPreview)} dust</span>
+              {selectedCards.some((c) => c.serial != null) && (
+                <span className="down" style={{ marginLeft: 8, fontSize: 12 }}>
+                  numbered serials are retired forever
+                </span>
+              )}
             </div>
           </div>
-          <button className="btn btn-gold btn-lg" onClick={recycle} disabled={busy || sel.size === 0}>
-            {busy ? 'Recycling…' : `Recycle ${sel.size}`}
+          <button className="btn btn-gold btn-lg" onClick={breakdown} disabled={busy || sel.size === 0}>
+            {busy ? 'Breaking down…' : `Break down ${sel.size}`}
           </button>
         </div>
       )}

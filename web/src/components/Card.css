@@ -13,8 +13,8 @@
   cursor: pointer;
 }
 .card.faded {
-  opacity: 0.55;
-  filter: saturate(0.7);
+  opacity: 0.6;
+  filter: saturate(0.75);
 }
 
 /* gradient-border technique: frame is the (animated) border, inner is opaque */
@@ -34,35 +34,34 @@
   position: relative;
   overflow: hidden;
   border-radius: 12px;
-  background: linear-gradient(180deg, var(--surface-2), var(--bg-2));
-  padding: 11px 12px 12px;
+  background: #0c0e12;
   aspect-ratio: 5 / 7;
-  display: flex;
-  flex-direction: column;
 }
 
-.card-watermark {
+/* player photo fills the card; text plates sit on top */
+.card-photo {
   position: absolute;
-  right: -10px;
-  bottom: -22px;
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 120px;
-  line-height: 1;
-  color: color-mix(in srgb, var(--accent) 16%, transparent);
-  pointer-events: none;
+  inset: 0;
+  z-index: 1;
 }
-.card-sm .card-watermark {
-  font-size: 96px;
+.card-photo-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(8, 10, 14, 0.55) 0%, transparent 22%, transparent 45%, rgba(8, 10, 14, 0.85) 88%);
 }
 
 .card-head {
+  position: absolute;
+  z-index: 4;
+  top: 9px;
+  left: 11px;
+  right: 11px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  position: relative;
-  z-index: 2;
 }
 .card-parallel {
   font-family: var(--font-mono);
@@ -70,73 +69,76 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 .card-serial {
   font-size: 11px;
-  color: var(--muted);
   font-weight: 600;
+  color: #e7ebf1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
+.card-plate {
+  position: absolute;
+  z-index: 4;
+  left: 12px;
+  right: 12px;
+  bottom: 11px;
+}
 .card-pos {
-  position: relative;
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: auto;
 }
 .pos-badge {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 13px;
+  font-size: 12px;
   color: #0c0e12;
   background: var(--accent);
-  padding: 2px 8px;
+  padding: 1px 7px;
   border-radius: 6px;
 }
 .card-team {
   font-size: 12px;
-  color: var(--muted);
+  color: #d6dce5;
   font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
-
 .card-name {
-  position: relative;
-  z-index: 2;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 16px;
-  line-height: 1.1;
-  margin-top: 6px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  line-height: 1.05;
+  margin-top: 5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 .card-sm .card-name {
   font-size: 14px;
 }
-
 .card-foot {
-  position: relative;
-  z-index: 2;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 .card-value {
   font-size: 15px;
   font-weight: 700;
   color: var(--gold);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
 .card-ovr {
   font-size: 10px;
-  color: var(--muted-2);
+  color: #c3cbd6;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 /* ---------- specular sheen ---------- */
 .sheen {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   pointer-events: none;
   border-radius: 12px;
   background: linear-gradient(
@@ -167,11 +169,6 @@
   background-size: 320% 320%;
   animation: holo-shift 6s linear infinite;
   box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadow-card);
-}
-.card.refractor .card-inner {
-  background:
-    radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.07), transparent 60%),
-    linear-gradient(180deg, #11161f, #0a0d13);
 }
 .card.refractor .sheen {
   opacity: 1;

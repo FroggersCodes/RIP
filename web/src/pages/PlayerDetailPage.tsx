@@ -3,6 +3,7 @@ import { PARALLEL_MAP, type Position } from '@rip/shared';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { ValueSparkline } from '../components/ValueSparkline';
+import { PlayerPortrait } from '../components/PlayerPortrait';
 import { money } from '../lib/format';
 import type { PlayerDetail } from '../api/types';
 
@@ -53,6 +54,7 @@ export function PlayerDetailPage() {
         ← {player.team.name}
       </Link>
       <div className="player-hero">
+        <PlayerPortrait player={{ id: player.id, name: player.name, position: player.position }} size={108} round={false} />
         <div>
           <div className="row" style={{ gap: 10 }}>
             <h1>{player.name}</h1>

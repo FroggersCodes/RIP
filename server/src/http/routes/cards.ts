@@ -1,12 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { dustForBreakdown } from '@rip/shared';
 import { prisma } from '../../prisma';
 import { requireAuth, userId, type AuthedRequest } from '../middleware';
 import { asyncHandler } from '../asyncHandler';
 import { publicUser } from '../serialize';
 import { cardInclude, cardView } from '../../cards/cardView';
-
-const DUST_PER_BASE = 5;
 
 const router = Router();
 
@@ -23,6 +22,8 @@ router.get(
     const cards = instances.map(cardView).sort((a, b) => b.marketValue - a.marketValue);
     const numbered = cards.filter((c) => c.serial !== null).length;
     const totalValue = Math.round(cards.reduce((a, c) => a + c.marketValue, 0) * 100) / 100;
+    const breakdownable = cards.filter((c) => c.equippedRole === null);
+    const breakdownDust = breakdownable.reduce((a, c) => a + dustForBreakdown(c.marketValue), 0);
     res.json({
       cards,
       summary: {
@@ -30,40 +31,37 @@ router.get(
         numbered,
         base: cards.length - numbered,
         totalValue,
-        recyclableBase: cards.filter((c) => c.serial === null && c.equippedRole === null).length,
-        dustPerBase: DUST_PER_BASE,
+        breakdownable: breakdownable.length,
+        breakdownDust,
       },
     });
   }),
 );
 
-const recycleSchema = z.object({ instanceIds: z.array(z.string()).min(1).max(1000) });
+const breakdownSchema = z.object({ instanceIds: z.array(z.string()).min(1).max(1000) });
 
-// Base cards are filler; recycle them into dust (spendable toward a pack).
+// Break down any owned, unequipped card into dust (value-scaled). Numbered serials
+// are RETIRED FOREVER: the instance is deleted and the template's nextSerial counter
+// is left untouched, so that exact serial can never be pulled again — preserving the
+// "one owner, ever" guarantee.
 router.post(
-  '/recycle',
+  '/breakdown',
   requireAuth,
   asyncHandler(async (req: AuthedRequest, res) => {
     const uid = userId(req);
-    const { instanceIds } = recycleSchema.parse(req.body);
+    const { instanceIds } = breakdownSchema.parse(req.body);
 
     const result = await prisma.$transaction(async (tx) => {
-      const eligible = await tx.cardInstance.findMany({
-        where: {
-          id: { in: instanceIds },
-          ownerId: uid,
-          serial: null,
-          lineupSlot: { is: null },
-          template: { is: { parallel: 'BASE' } },
-        },
-        select: { id: true },
+      const instances = await tx.cardInstance.findMany({
+        where: { id: { in: instanceIds }, ownerId: uid, lineupSlot: { is: null } },
+        include: cardInclude,
       });
-      if (eligible.length === 0) return { recycled: 0, dustGained: 0 };
-      const ids = eligible.map((e) => e.id);
-      await tx.cardInstance.deleteMany({ where: { id: { in: ids } } });
-      const dustGained = eligible.length * DUST_PER_BASE;
+      if (instances.length === 0) return { brokenDown: 0, dustGained: 0 };
+
+      const dustGained = instances.reduce((a, inst) => a + dustForBreakdown(cardView(inst).marketValue), 0);
+      await tx.cardInstance.deleteMany({ where: { id: { in: instances.map((i) => i.id) } } });
       await tx.user.update({ where: { id: uid }, data: { dust: { increment: dustGained } } });
-      return { recycled: eligible.length, dustGained };
+      return { brokenDown: instances.length, dustGained };
     });
 
     const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });

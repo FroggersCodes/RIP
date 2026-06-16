@@ -122,3 +122,9 @@ export function normalizeOdds(weights: Record<string, number>): Record<string, n
   for (const [k, v] of Object.entries(weights)) out[k] = v / total;
   return out;
 }
+
+// Dust returned when a card is broken down — scales with its market value, so
+// breaking down a hit pays far more than base filler. Used by server and client.
+export function dustForBreakdown(marketValue: number): number {
+  return Math.max(3, Math.round(marketValue * 0.3));
+}
