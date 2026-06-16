@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { api } from '../api/client';
+import { api, API_BASE } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { RipReveal, type RevealCard } from '../components/RipReveal';
 import { countdown, num } from '../lib/format';
@@ -48,7 +48,7 @@ export function HomePage() {
     setAdvancing(true);
     setAdvanceMsg(null);
     try {
-      const res = await fetch('/api/admin/advance-week', { method: 'POST', headers: { 'x-admin-token': adminToken } });
+      const res = await fetch(`${API_BASE}/api/admin/advance-week`, { method: 'POST', headers: { 'x-admin-token': adminToken } });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || 'Failed');
       setAdvanceMsg(`Simulated week ${d.weekNumber}: ${d.statsRecorded} box-score lines, ${d.playersRevalued} players revalued.`);

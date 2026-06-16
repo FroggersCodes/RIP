@@ -1,0 +1,28 @@
+# Render blueprint: one web service (the whole app on a single port) + Postgres.
+# Deploy: Render dashboard -> New -> Blueprint -> connect this repo -> Apply.
+# You get a permanent URL like https://rip-xxxx.onrender.com (free tier).
+databases:
+  - name: rip-db
+    plan: free
+    databaseName: rip
+    user: rip
+
+services:
+  - type: web
+    name: rip
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rip-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: SERVE_WEB
+        value: "true"

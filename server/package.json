@@ -13,6 +13,7 @@
     "migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push --skip-generate",
     "seed": "tsx prisma/seed.ts",
+    "seed:ifempty": "tsx prisma/seedIfEmpty.ts",
     "sim:advance": "tsx src/cli/advanceWeek.ts",
     "test": "vitest run"
   },

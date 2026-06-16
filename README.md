@@ -61,6 +61,33 @@ Advance a league week from the Codespace terminal with `npm run sim:advance` (or
 **Dev** panel on the Home page). For live-reload development, run `npm run dev` and open
 the forwarded port **5173** instead.
 
+## Deploy a permanent public link
+
+RIP is Node + PostgreSQL, so it needs an always-on host. Cloudflare can't run that
+backend without a Workers/D1 rewrite — but you can still get a permanent **Cloudflare
+`*.pages.dev`** link with no domain by hosting the frontend on Cloudflare Pages and the
+backend on a free always-on host. The single Docker image already serves the whole app on
+one port, and on boot it migrates + seeds itself (only if the DB is empty).
+
+**A) Easiest single link — Render (free, permanent `*.onrender.com`):**
+1. Render dashboard → **New ▸ Blueprint** → connect this repo → pick the branch → **Apply**.
+   `render.yaml` provisions Postgres + the web service, builds the Docker image, runs
+   migrations + seed, and deploys.
+2. Open the resulting `https://rip-xxxx.onrender.com` and log in with `demo` / `demo1234`.
+
+**B) A Cloudflare `*.pages.dev` link (frontend on Cloudflare Pages):**
+1. Deploy the API first via step A; note its URL.
+2. Cloudflare → **Workers & Pages ▸ Create ▸ Pages ▸ Connect to Git** → select this repo/branch.
+3. Build command: `npm install && npm --workspace web run build` · Output directory:
+   `web/dist` · Environment variable: `VITE_API_URL = https://rip-xxxx.onrender.com`.
+4. Deploy → share `https://rip-xxxx.pages.dev`. (CORS and SPA routing are already handled.)
+
+Notes: Render's free web service sleeps after ~15 min idle (first request after is slow),
+and free Postgres is time-limited — for a long-lived database, create a free
+[Neon](https://neon.tech) Postgres and set `DATABASE_URL` to its connection string
+(append `?sslmode=require`). The same `Dockerfile` runs on Fly.io or any Docker host.
+A full Cloudflare-only build (Workers + D1 + Pages) is possible but a larger rewrite.
+
 ## Prerequisites
 
 - Node.js 20+ (built and tested on Node 22)

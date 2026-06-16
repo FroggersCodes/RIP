@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { pathToFileURL } from 'node:url';
 import { PARALLELS, type Position } from '@rip/shared';
 import { prisma } from '../src/prisma';
 
@@ -116,7 +117,7 @@ function buildRoster(teamAbbr: string): PlayerSeed[] {
   return roster;
 }
 
-async function main() {
+export async function seed() {
   console.log('Clearing existing data...');
   await prisma.lineupSlot.deleteMany();
   await prisma.lineupWeekScore.deleteMany();
@@ -229,11 +230,15 @@ async function main() {
   console.log('Demo login -> username: demo  password: demo1234');
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Run only when invoked directly (not when imported by seedIfEmpty).
+const invokedDirectly = import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
+if (invokedDirectly) {
+  seed()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
