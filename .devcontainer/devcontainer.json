@@ -1,0 +1,18 @@
+{
+  "name": "RIP",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [4000, 5173],
+  "portsAttributes": {
+    "4000": { "label": "RIP", "onAutoForward": "openBrowser" },
+    "5173": { "label": "RIP (vite dev)", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start-app.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": ["Prisma.prisma", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  }
+}

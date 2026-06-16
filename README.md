@@ -44,6 +44,23 @@ Parallels and print runs (largest numbered run capped at 5000):
 
 ---
 
+## Open it on GitHub — Codespaces (no local setup)
+
+RIP is a real full-stack app (Node + PostgreSQL), so GitHub Pages can't host it — but a
+**GitHub Codespace** runs the whole thing in the cloud and forwards it to your browser:
+
+1. On the repo: **Code ▸ Codespaces ▸ Create codespace on `claude/quirky-allen-m8fexv`**.
+   Direct link: `https://codespaces.new/froggerscodes/rip/tree/claude/quirky-allen-m8fexv`
+2. Wait ~1–2 minutes the first time while it installs, runs migrations, seeds the league,
+   and builds the web app (all automatic via `.devcontainer`).
+3. It auto-starts and forwards **port 4000**; a toast offers **Open in Browser**. (If you
+   miss it, open the **Ports** tab and click the globe icon on port 4000.)
+4. Log in with `demo` / `demo1234`.
+
+Advance a league week from the Codespace terminal with `npm run sim:advance` (or the
+**Dev** panel on the Home page). For live-reload development, run `npm run dev` and open
+the forwarded port **5173** instead.
+
 ## Prerequisites
 
 - Node.js 20+ (built and tested on Node 22)
@@ -89,6 +106,9 @@ password: demo1234
 ```
 
 (Or create a new account — new users get 1,000 tokens + 2 cases to start.)
+
+**One-port alternative:** `npm start` builds the web app and serves it together with the
+API on **http://localhost:4000** (this is what the Codespace runs).
 
 ---
 

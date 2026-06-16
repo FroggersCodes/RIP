@@ -1,0 +1,33 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    environment:
+      DATABASE_URL: "postgresql://rip:rip@db:5432/rip?schema=public&connection_limit=20"
+      TEST_DATABASE_URL: "postgresql://rip:rip@db:5432/rip_test?schema=public&connection_limit=30"
+      JWT_SECRET: "dev-secret-change-me"
+      ADMIN_TOKEN: "dev-admin"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rip
+      POSTGRES_PASSWORD: rip
+      POSTGRES_DB: rip
+    volumes:
+      - rip-pgdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rip -d rip"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  rip-pgdata:

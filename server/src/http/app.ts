@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express, { type ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import { ZodError } from 'zod';
@@ -47,6 +50,17 @@ export function createApp() {
   app.use('/api/lineup', lineupRouter);
   app.use('/api/cards', cardsRouter);
   app.use('/api/battles', battlesRouter);
+
+  // Optionally serve the built web app from the same port (single-port deploy,
+  // e.g. GitHub Codespaces). In dev the Vite server handles the frontend instead.
+  const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/dist');
+  if (process.env.SERVE_WEB === 'true' || fs.existsSync(path.join(webDist, 'index.html'))) {
+    app.use(express.static(webDist));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      res.sendFile(path.join(webDist, 'index.html'));
+    });
+  }
 
   app.use(errorHandler);
   return app;
