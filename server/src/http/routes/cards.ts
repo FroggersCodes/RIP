@@ -54,7 +54,7 @@ router.post(
 
     const result = await prisma.$transaction(async (tx) => {
       const instances = await tx.cardInstance.findMany({
-        where: { id: { in: instanceIds }, ownerId: uid, lineupSlot: { is: null } },
+        where: { id: { in: instanceIds }, ownerId: uid, lineupSlot: { is: null }, listing: { is: null } },
         include: cardInclude,
       });
       if (instances.length === 0) return { brokenDown: 0, dustGained: 0 };

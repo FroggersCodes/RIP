@@ -622,6 +622,26 @@
   font-size: 13px;
 }
 
+/* ---------- marketplace ---------- */
+.market-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+.market-sell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.listed-tag {
+  border-color: var(--blue) !important;
+  color: var(--blue) !important;
+  bottom: 30px !important;
+}
+
 /* ---------- missions ---------- */
 .mission-row {
   display: flex;

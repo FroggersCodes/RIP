@@ -34,7 +34,7 @@ export function CollectionPage() {
       nav(`/players/${c.player.id}`);
       return;
     }
-    if (c.equippedRole) return; // equipped cards can't be broken down
+    if (c.equippedRole || c.listed) return; // equipped/listed cards can't be broken down
     setSel((s) => {
       const n = new Set(s);
       if (n.has(c.id)) n.delete(c.id);
@@ -132,7 +132,7 @@ export function CollectionPage() {
       ) : (
         <div className="cards-grid">
           {filtered.map((c) => {
-            const selectable = selecting && !c.equippedRole;
+            const selectable = selecting && !c.equippedRole && !c.listed;
             return (
               <div
                 key={c.id}
@@ -141,6 +141,7 @@ export function CollectionPage() {
               >
                 <Card card={c} size="sm" onClick={() => onCard(c)} />
                 {c.equippedRole && <div className="equipped-tag">{c.equippedRole}</div>}
+                {c.listed && <div className="equipped-tag listed-tag">listed · {c.listPrice}</div>}
                 {selecting && selectable && <div className="breakdown-tag">+{dustForBreakdown(c.marketValue)} dust</div>}
               </div>
             );

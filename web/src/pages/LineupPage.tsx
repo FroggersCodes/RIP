@@ -36,7 +36,7 @@ export function LineupPage() {
 
   const myScore = lb.data?.entries.find((e) => e.username === user?.username);
   const eligible = picking
-    ? (collection.data?.cards ?? []).filter((c) => picking.eligiblePositions.includes(c.player.position))
+    ? (collection.data?.cards ?? []).filter((c) => picking.eligiblePositions.includes(c.player.position) && !c.listed)
     : [];
 
   return (

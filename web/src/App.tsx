@@ -7,6 +7,7 @@ import { RipPage } from './pages/RipPage';
 import { BattlePage } from './pages/BattlePage';
 import { LineupPage } from './pages/LineupPage';
 import { CollectionPage } from './pages/CollectionPage';
+import { MarketPage } from './pages/MarketPage';
 import { TeamsPage } from './pages/TeamsPage';
 import { TeamDetailPage } from './pages/TeamDetailPage';
 import { PlayerDetailPage } from './pages/PlayerDetailPage';
@@ -41,6 +42,7 @@ export function App() {
         <Route path="/battle" element={<BattlePage />} />
         <Route path="/lineup" element={<LineupPage />} />
         <Route path="/collection" element={<CollectionPage />} />
+        <Route path="/market" element={<MarketPage />} />
         <Route path="/teams" element={<TeamsPage />} />
         <Route path="/teams/:id" element={<TeamDetailPage />} />
         <Route path="/players/:id" element={<PlayerDetailPage />} />

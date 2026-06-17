@@ -65,6 +65,8 @@ export interface CollectionCard {
   refractor: boolean;
   pulledAt: string;
   equippedRole: LineupRoleName | null;
+  listed: boolean;
+  listPrice: number | null;
   player: {
     id: string;
     name: string;

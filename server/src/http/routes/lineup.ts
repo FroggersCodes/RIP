@@ -55,9 +55,10 @@ router.put(
 
     const inst = await prisma.cardInstance.findUnique({
       where: { id: cardInstanceId },
-      include: { template: { include: { player: { select: { position: true } } } } },
+      include: { template: { include: { player: { select: { position: true } } } }, listing: { select: { id: true } } },
     });
     if (!inst || inst.ownerId !== uid) throw new AppError(404, 'Card not found in your collection');
+    if (inst.listing) throw new AppError(409, 'Card is listed on the market; cancel the listing to equip it');
     const position = inst.template.player.position;
     if (!isEligibleForRole(role, position)) {
       throw new AppError(400, `A ${position} is not eligible for the ${role} slot`);
