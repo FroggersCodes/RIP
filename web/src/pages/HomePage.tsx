@@ -48,6 +48,8 @@ export function HomePage() {
   const [adminToken, setAdminToken] = useState('dev-admin');
   const [advancing, setAdvancing] = useState(false);
   const [advanceMsg, setAdvanceMsg] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -83,6 +85,32 @@ export function HomePage() {
       setAdvanceMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
       setAdvancing(false);
+    }
+  };
+
+  const importNfl = async () => {
+    if (
+      !window.confirm(
+        'Import real NFL players? This WIPES all data (including your account) and starts a fresh real-NFL league. You will log in again as demo / demo1234.',
+      )
+    ) {
+      return;
+    }
+    setImporting(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/import-nfl`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({}),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      setImportMsg(`Imported ${d.players} real players across ${d.teams} teams (season ${d.season}). Log in as demo / demo1234.`);
+    } catch (e) {
+      setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -264,8 +292,12 @@ export function HomePage() {
             <button className="btn" onClick={advance} disabled={advancing}>
               {advancing ? 'Simulating…' : 'Advance week'}
             </button>
+            <button className="btn" onClick={importNfl} disabled={importing}>
+              {importing ? 'Importing…' : 'Import real NFL players'}
+            </button>
           </div>
           {advanceMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{advanceMsg}</div>}
+          {importMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{importMsg}</div>}
         </div>
         <div className="panel panel-p">
           <div className="section-title">Around the league</div>

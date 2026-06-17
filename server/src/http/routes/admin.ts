@@ -4,6 +4,7 @@ import { requireAdmin } from '../middleware';
 import { asyncHandler } from '../asyncHandler';
 import { advanceWeek } from '../../league/advanceWeek';
 import { maybeAdvance, updateClock } from '../../league/clock';
+import { importNflData } from '../../data/importNfl';
 
 const router = Router();
 
@@ -40,4 +41,15 @@ router.put(
   }),
 );
 
+// DESTRUCTIVE: wipe the league and reseed with real NFL players from open data.
+router.post(
+  '/import-nfl',
+  requireAdmin,
+  asyncHandler(async (req, res) => {
+    const season = typeof req.body?.season === 'string' ? req.body.season : undefined;
+    res.json(await importNflData(season));
+  }),
+);
+
 export default router;
+
