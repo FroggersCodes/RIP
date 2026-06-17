@@ -11,6 +11,7 @@ export function RipPage() {
   const { data, loading } = useApi(() => api<{ products: Product[] }>('/products'), []);
   const [selected, setSelected] = useState<string | null>(null);
   const [reveal, setReveal] = useState<RevealCard[] | null>(null);
+  const [revealPackSize, setRevealPackSize] = useState(5);
   const [packName, setPackName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +27,7 @@ export function RipPage() {
       const r = await api<RipResult>('/rip', { method: 'POST', body: { productId: sel.id, pay } });
       setUser(r.user);
       setPackName(r.product.name);
+      setRevealPackSize(sel.packsPerBox > 1 ? sel.cardsPerPack : r.cards.length);
       setReveal(r.cards as RevealCard[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed');
@@ -42,8 +44,9 @@ export function RipPage() {
       {reveal && (
         <RipReveal
           cards={reveal}
+          packSize={revealPackSize}
           title={packName}
-          subtitle={`${reveal.length}-card pack`}
+          subtitle={revealPackSize < reveal.length ? `${reveal.length / revealPackSize}-pack box` : `${reveal.length}-card pack`}
           onClose={() => setReveal(null)}
         />
       )}

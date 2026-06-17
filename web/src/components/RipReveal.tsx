@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { PARALLEL_MAP, PARALLELS_BY_RARITY_DESC } from '@rip/shared';
 import { Card, type CardData } from './Card';
 import { money } from '../lib/format';
@@ -10,22 +10,33 @@ export interface RevealCard extends CardData {
 
 interface Props {
   cards: RevealCard[];
+  /** Cards per pack — for boxes this drives the pack-by-pack flow. Defaults to one pack. */
+  packSize?: number;
   title?: string;
   subtitle?: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
 }
 
-export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
+export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }: Props) {
+  const size = packSize && packSize > 0 ? packSize : cards.length || 1;
+  const packCount = Math.max(1, Math.ceil(cards.length / size));
+
   const [opened, setOpened] = useState(false);
   const [tearing, setTearing] = useState(false);
-  const [revealed, setRevealed] = useState(0);
+  const [shown, setShown] = useState(0); // index of the card on top of the stack
+  const [finished, setFinished] = useState(false);
+  const [betweenPacks, setBetweenPacks] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const [flash, setFlash] = useState(false);
   const [tally, setTally] = useState(0);
-  const timers = useRef<number[]>([]);
+  const startRef = useRef<{ x: number; moved: boolean } | null>(null);
+  const dragXRef = useRef(0);
   const targetRef = useRef(0);
+  const timers = useRef<number[]>([]);
 
-  // The pack glows in the color of the best card inside — rainbow for a refractor.
+  // The sealed pack glows in the color of the best card inside (rainbow for a refractor).
   const order = PARALLELS_BY_RARITY_DESC;
   let bestIdx = order.length;
   let anyRefractor = false;
@@ -34,8 +45,7 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
     if (i >= 0 && i < bestIdx) bestIdx = i;
     if (c.refractor) anyRefractor = true;
   }
-  const bestParallel = order[bestIdx] ?? 'BASE';
-  const glowColor = PARALLEL_MAP[bestParallel]?.color ?? '#8b94a3';
+  const glowColor = PARALLEL_MAP[order[bestIdx] ?? 'BASE']?.color ?? '#8b94a3';
 
   const rip = () => {
     if (tearing || opened) return;
@@ -43,32 +53,17 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
     timers.current.push(window.setTimeout(() => setOpened(true), 950));
   };
 
-  // Reveal the cards one at a time once the pack is torn open.
+  // Flash the screen when the card now on top is a rare hit.
   useEffect(() => {
-    if (!opened) return;
-    setRevealed(0);
-    setTally(0);
-    // Reveal faster for big openings (a 30-card box) so it stays exciting, not endless.
-    const stagger = cards.length > 12 ? 110 : cards.length > 6 ? 240 : 600;
-    const hitLinger = cards.length > 12 ? 520 : cards.length > 6 ? 760 : 1150;
-    let i = 0;
-    const step = () => {
-      i += 1;
-      setRevealed(i);
-      const c = cards[i - 1];
-      if (c?.isHit) {
-        setFlash(true);
-        window.setTimeout(() => setFlash(false), 700);
-      }
-      if (i < cards.length) timers.current.push(window.setTimeout(step, c?.isHit ? hitLinger : stagger));
-    };
-    timers.current.push(window.setTimeout(step, 350));
-    return () => {
-      timers.current.forEach(clearTimeout);
-      timers.current = [];
-    };
-  }, [opened, cards]);
+    if (!opened || finished) return;
+    if (cards[shown]?.isHit) {
+      setFlash(true);
+      const t = window.setTimeout(() => setFlash(false), 700);
+      return () => clearTimeout(t);
+    }
+  }, [opened, shown, finished, cards]);
 
+  // Ease the running pack value up toward the revealed total.
   useEffect(() => {
     let raf = 0;
     const tick = () => {
@@ -82,13 +77,84 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
-  targetRef.current = cards.slice(0, revealed).reduce((a, c) => a + c.marketValue, 0);
+  const tallyCount = finished ? cards.length : Math.min(shown + 1, cards.length);
+  targetRef.current = cards.slice(0, tallyCount).reduce((a, c) => a + c.marketValue, 0);
 
-  const allDone = revealed >= cards.length;
-  const revealAll = () => {
-    timers.current.forEach(clearTimeout);
-    setRevealed(cards.length);
+  const advance = () => {
+    if (betweenPacks) return;
+    if (shown >= cards.length - 1) {
+      setFinished(true);
+      return;
+    }
+    const lastOfPack = shown % size === size - 1;
+    if (lastOfPack && packCount > 1) {
+      setBetweenPacks(true);
+      return;
+    }
+    setShown((s) => s + 1);
   };
+  const continuePack = () => {
+    setBetweenPacks(false);
+    setShown((s) => s + 1);
+  };
+  const revealAll = () => {
+    setBetweenPacks(false);
+    setFinished(true);
+  };
+
+  const flyAndAdvance = (dir: number) => {
+    dragXRef.current = dir * 700;
+    setDragX(dir * 700);
+    timers.current.push(
+      window.setTimeout(() => {
+        setDragX(0);
+        dragXRef.current = 0;
+        advance();
+      }, 230),
+    );
+  };
+
+  // Drag-to-swipe on the top card.
+  useEffect(() => {
+    if (!dragging) return;
+    const move = (e: PointerEvent) => {
+      if (!startRef.current) return;
+      const dx = e.clientX - startRef.current.x;
+      if (Math.abs(dx) > 6) startRef.current.moved = true;
+      dragXRef.current = dx;
+      setDragX(dx);
+    };
+    const up = () => {
+      setDragging(false);
+      const moved = startRef.current?.moved;
+      const dx = dragXRef.current;
+      startRef.current = null;
+      if (Math.abs(dx) > 90) flyAndAdvance(dx > 0 ? 1 : -1);
+      else if (!moved) flyAndAdvance(1); // a tap counts as a swipe
+      else {
+        setDragX(0);
+        dragXRef.current = 0;
+      }
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dragging]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const onDown = (e: ReactPointerEvent) => {
+    if (finished || betweenPacks) return;
+    startRef.current = { x: e.clientX, moved: false };
+    setDragging(true);
+  };
+
+  const currentPack = Math.floor(shown / size) + 1;
+  const posInPack = shown % size;
 
   return (
     <div className="reveal-overlay">
@@ -114,54 +180,103 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
           {!tearing && (
             <>
               <button className="btn btn-gold btn-lg" onClick={rip} style={{ marginTop: 28 }}>
-                Rip it open
+                {packCount > 1 ? 'Open the box' : 'Rip it open'}
               </button>
               {subtitle && <div className="reveal-sub muted" style={{ marginTop: 10 }}>{subtitle}</div>}
             </>
           )}
         </div>
-      ) : (
+      ) : finished ? (
         <div className="reveal-stage">
           <div className="reveal-top">
             <div>
-              <div className="reveal-title">{title ?? 'Pack opened'}</div>
-              {subtitle && <div className="reveal-sub muted">{subtitle}</div>}
+              <div className="reveal-title">{title ?? 'Opened'}</div>
+              <div className="reveal-sub muted">{cards.length} cards{packCount > 1 ? ` · ${packCount} packs` : ''}</div>
             </div>
             <div className="reveal-tally">
-              <span className="muted">Pack value</span>
+              <span className="muted">Total value</span>
               <span className="mono tally-num">{money(tally)}</span>
             </div>
           </div>
-
           <div className={`reveal-grid count-${cards.length} ${cards.length > 6 ? 'box' : ''}`}>
             {cards.map((c, idx) => (
-              <div key={idx} className={`flip ${idx < revealed ? 'is-revealed' : ''} ${c.isHit ? 'is-hit' : ''}`}>
+              <div className={`flip is-revealed ${c.isHit ? 'is-hit' : ''}`} key={idx}>
                 <div className="flip-card">
-                  <div className="flip-back">
-                    <span className="flip-logo">RIP<span className="gold">.</span></span>
-                  </div>
+                  <div className="flip-back" />
                   <div className="flip-front">
                     <Card card={c} size="sm" />
-                    {c.isHit && idx < revealed && <div className="hit-badge">HIT</div>}
+                    {c.isHit && <div className="hit-badge">HIT</div>}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-
           <div className="reveal-actions">
-            {!allDone ? (
-              <button className="btn btn-ghost" onClick={revealAll}>
-                Reveal all
+            {footer}
+            <button className="btn btn-gold btn-lg" onClick={onClose}>
+              Continue
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="swipe-stage">
+          <div className="swipe-top">
+            <div className="swipe-counter">
+              {packCount > 1 && <span className="pack-pill">Pack {currentPack}/{packCount}</span>}
+              <span className="muted mono">
+                card {posInPack + 1}/{size}
+              </span>
+            </div>
+            <div className="reveal-tally">
+              <span className="muted">Value</span>
+              <span className="mono tally-num">{money(tally)}</span>
+            </div>
+          </div>
+
+          {betweenPacks ? (
+            <div className="pack-gate">
+              <div className="pack-gate-title">Pack {currentPack} done</div>
+              <button className="btn btn-gold btn-lg" onClick={continuePack}>
+                Open pack {currentPack + 1} of {packCount}
               </button>
-            ) : (
-              <>
-                {footer}
-                <button className="btn btn-gold btn-lg" onClick={onClose}>
-                  Continue
-                </button>
-              </>
-            )}
+            </div>
+          ) : (
+            <div className="stack">
+              {[2, 1].map((d) => {
+                const c = cards[shown + d];
+                if (!c || posInPack + d >= size) return null;
+                return (
+                  <div
+                    className="stack-card stack-behind"
+                    key={`b${d}`}
+                    style={{ transform: `translateY(${d * 12}px) scale(${1 - d * 0.05})`, zIndex: 3 - d }}
+                  >
+                    <div className="stack-back">
+                      <span className="flip-logo">RIP<span className="gold">.</span></span>
+                    </div>
+                  </div>
+                );
+              })}
+              <div
+                className={`stack-card stack-top ${dragging ? 'dragging' : ''}`}
+                style={{ transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`, transition: dragging ? 'none' : 'transform 0.23s ease' }}
+                onPointerDown={onDown}
+              >
+                <div className="stack-pop" key={shown}>
+                  <Card card={cards[shown]!} size="md" />
+                  {cards[shown]?.isHit && <div className="hit-badge">HIT</div>}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!betweenPacks && (
+            <div className="swipe-hint muted">swipe or tap the card →</div>
+          )}
+          <div className="reveal-actions">
+            <button className="btn btn-ghost" onClick={revealAll}>
+              Reveal all
+            </button>
           </div>
         </div>
       )}
