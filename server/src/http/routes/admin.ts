@@ -5,6 +5,7 @@ import { asyncHandler } from '../asyncHandler';
 import { advanceWeek } from '../../league/advanceWeek';
 import { maybeAdvance, updateClock } from '../../league/clock';
 import { importNflData } from '../../data/importNfl';
+import { seed } from '../../../prisma/seed';
 
 const router = Router();
 
@@ -48,6 +49,16 @@ router.post(
   asyncHandler(async (req, res) => {
     const season = typeof req.body?.season === 'string' ? req.body.season : undefined;
     res.json(await importNflData(season));
+  }),
+);
+
+// DESTRUCTIVE: wipe and reseed the generated (fictional) league.
+router.post(
+  '/reset-fictional',
+  requireAdmin,
+  asyncHandler(async (_req, res) => {
+    await seed();
+    res.json({ reset: true });
   }),
 );
 

@@ -9,6 +9,7 @@ export type ParallelName =
   | 'PURPLE'
   | 'GOLD'
   | 'BLACK'
+  | 'AUTOGRAPH'
   | 'EMERALD'
   | 'SUPERFRACTOR';
 export type LineupRoleName = 'QB' | 'WR1' | 'WR2' | 'RB' | 'TE' | 'FLEX';
@@ -21,6 +22,8 @@ export interface ParallelDef {
   valueMultiplier: number;
   /** Holographic refractor treatment — reserved for the rarest pulls only. */
   refractor: boolean;
+  /** Autograph treatment (signature flourish). */
+  signed?: boolean;
   color: string;
 }
 
@@ -31,6 +34,7 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'PURPLE', displayName: 'Purple /999', printRun: 999, valueMultiplier: 6, refractor: false, color: '#a855f7' },
   { name: 'GOLD', displayName: 'Gold /250', printRun: 250, valueMultiplier: 15, refractor: false, color: '#f5b53d' },
   { name: 'BLACK', displayName: 'Black /50', printRun: 50, valueMultiplier: 50, refractor: true, color: '#0c0e12' },
+  { name: 'AUTOGRAPH', displayName: 'Autograph /25', printRun: 25, valueMultiplier: 120, refractor: false, signed: true, color: '#e8c87a' },
   { name: 'EMERALD', displayName: 'Emerald /10', printRun: 10, valueMultiplier: 150, refractor: true, color: '#10b981' },
   { name: 'SUPERFRACTOR', displayName: 'Superfractor 1/1', printRun: 1, valueMultiplier: 600, refractor: true, color: '#f5b53d' },
 ];
@@ -50,7 +54,13 @@ export function isRefractor(parallel: ParallelName): boolean {
 
 /** Parallels considered a "HIT" worthy of the screen-flash reveal moment. */
 export function isHit(parallel: ParallelName): boolean {
-  return parallel === 'GOLD' || parallel === 'BLACK' || parallel === 'EMERALD' || parallel === 'SUPERFRACTOR';
+  return (
+    parallel === 'GOLD' ||
+    parallel === 'BLACK' ||
+    parallel === 'AUTOGRAPH' ||
+    parallel === 'EMERALD' ||
+    parallel === 'SUPERFRACTOR'
+  );
 }
 
 export const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];

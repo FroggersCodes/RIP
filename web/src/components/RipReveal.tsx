@@ -48,6 +48,9 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
     if (!opened) return;
     setRevealed(0);
     setTally(0);
+    // Reveal faster for big openings (a 30-card box) so it stays exciting, not endless.
+    const stagger = cards.length > 12 ? 110 : cards.length > 6 ? 240 : 600;
+    const hitLinger = cards.length > 12 ? 520 : cards.length > 6 ? 760 : 1150;
     let i = 0;
     const step = () => {
       i += 1;
@@ -57,7 +60,7 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
         setFlash(true);
         window.setTimeout(() => setFlash(false), 700);
       }
-      if (i < cards.length) timers.current.push(window.setTimeout(step, c?.isHit ? 1150 : 600));
+      if (i < cards.length) timers.current.push(window.setTimeout(step, c?.isHit ? hitLinger : stagger));
     };
     timers.current.push(window.setTimeout(step, 350));
     return () => {
@@ -130,7 +133,7 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
             </div>
           </div>
 
-          <div className={`reveal-grid count-${cards.length}`}>
+          <div className={`reveal-grid count-${cards.length} ${cards.length > 6 ? 'box' : ''}`}>
             {cards.map((c, idx) => (
               <div key={idx} className={`flip ${idx < revealed ? 'is-revealed' : ''} ${c.isHit ? 'is-hit' : ''}`}>
                 <div className="flip-card">

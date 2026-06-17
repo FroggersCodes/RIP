@@ -91,6 +91,16 @@
 .reveal-grid.count-6 {
   grid-template-columns: repeat(6, 1fr);
 }
+.reveal-grid.box {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 62vh;
+  overflow-y: auto;
+  padding: 4px;
+}
+.reveal-grid.box .flip {
+  max-width: 116px;
+}
 
 /* flip */
 .flip {

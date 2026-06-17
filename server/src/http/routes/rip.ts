@@ -47,8 +47,9 @@ router.post(
             ownerId: uid,
             pullRates: product.pullRates as Record<string, number>,
             topPlayerBias: product.topPlayerBias,
-            count: product.cardsPerPack,
+            count: product.cardsPerPack * product.packsPerBox,
             pool,
+            guaranteeNumbered: product.guaranteeNumbered,
           });
           const user = await tx.user.findUniqueOrThrow({ where: { id: uid } });
           return { cards, user };

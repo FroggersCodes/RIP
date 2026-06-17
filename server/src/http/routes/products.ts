@@ -28,6 +28,8 @@ export function productView(p: Product) {
     caseCost: p.caseCost,
     tier: p.tier,
     cardsPerPack: p.cardsPerPack,
+    packsPerBox: p.packsPerBox,
+    guaranteeNumbered: p.guaranteeNumbered,
     description: p.description,
     topPlayerBias: p.topPlayerBias,
     odds,

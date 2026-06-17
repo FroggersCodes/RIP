@@ -79,9 +79,14 @@ export function RipPage() {
                       {num(p.entryCost)} tokens{p.caseCost ? ` + ${p.caseCost} case` : ''}
                     </span>
                     <span className="muted mono" style={{ fontSize: 12 }}>
-                      {p.cardsPerPack} cards
+                      {p.packsPerBox > 1 ? `${p.packsPerBox} packs · ${p.cardsPerPack * p.packsPerBox} cards` : `${p.cardsPerPack} cards`}
                     </span>
                   </div>
+                  {p.guaranteeNumbered && (
+                    <div className="tag" style={{ color: 'var(--gold)', borderColor: 'var(--gold-dim)', marginTop: 6, display: 'inline-block' }}>
+                      📦 guaranteed numbered
+                    </div>
+                  )}
                   <div className="odds">
                     {p.odds.map((o) => (
                       <div className="odds-row" key={o.parallel}>
@@ -126,7 +131,7 @@ export function RipPage() {
                   </button>
                 )}
                 <button className="btn btn-gold btn-lg" onClick={() => rip('tokens')} disabled={busy || !canTokens}>
-                  {busy ? 'Ripping…' : canTokens ? 'RIP PACK' : 'Not enough'}
+                  {busy ? 'Opening…' : !canTokens ? 'Not enough' : sel.packsPerBox > 1 ? 'OPEN BOX' : 'RIP PACK'}
                 </button>
               </div>
             </div>

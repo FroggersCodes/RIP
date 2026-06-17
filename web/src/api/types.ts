@@ -50,6 +50,8 @@ export interface Product {
   caseCost: number;
   tier: string;
   cardsPerPack: number;
+  packsPerBox: number;
+  guaranteeNumbered: boolean;
   description: string;
   topPlayerBias: number;
   odds: OddsRow[];

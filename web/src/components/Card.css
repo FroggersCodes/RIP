@@ -163,6 +163,50 @@
   animation: sheen-move 3.8s ease-in-out infinite;
 }
 
+/* ---------- autograph (signed) ---------- */
+.card.tier-auto .card-frame {
+  background: linear-gradient(135deg, #6b4f1a, #e8c87a, #fff4d6, #e8c87a, #6b4f1a);
+  background-size: 200% 200%;
+  animation: holo-shift 8s linear infinite;
+}
+.card.tier-auto .sheen {
+  opacity: 1;
+  animation: sheen-move 4s ease-in-out infinite;
+}
+.card-sig {
+  position: absolute;
+  z-index: 4;
+  left: 12px;
+  right: 12px;
+  top: 44%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+.card-sig-name {
+  font-family: 'Brush Script MT', 'Segoe Script', cursive;
+  font-size: 30px;
+  color: #fff;
+  transform: rotate(-6deg);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+  opacity: 0.92;
+}
+.card-sm .card-sig-name {
+  font-size: 24px;
+}
+.auto-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #2a1d05;
+  background: linear-gradient(180deg, #ffe7a8, #e8c87a);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
 /* ---------- holographic refractor — rarest pulls only ---------- */
 .card.refractor .card-frame {
   background: linear-gradient(125deg, #ff4d4d, #ffb84d, #ffe24d, #4dff88, #4de1ff, #4d7bff, #b84dff, #ff4dd2);

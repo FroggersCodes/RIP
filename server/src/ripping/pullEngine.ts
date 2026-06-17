@@ -186,12 +186,50 @@ export async function allocateWithFallback(
   throw new Error('Allocation fell through without reaching Base');
 }
 
+/** Weighted roll restricted to numbered parallels (used for box guarantees). */
+export function rollNumberedParallel(pullRates: Record<string, number>): ParallelName {
+  const entries = PARALLEL_NAMES.filter((n) => n !== 'BASE')
+    .map((n) => [n, pullRates[n] ?? 0] as const)
+    .filter(([, w]) => w > 0);
+  const total = entries.reduce((a, [, w]) => a + w, 0);
+  if (total <= 0) return 'BLUE';
+  let r = Math.random() * total;
+  for (const [name, w] of entries) {
+    r -= w;
+    if (r <= 0) return name;
+  }
+  return entries[entries.length - 1]![0];
+}
+
+function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation): PulledCard {
+  return {
+    instanceId: resolved.instanceId,
+    player: {
+      id: player.id,
+      name: player.name,
+      position: player.position,
+      currentValue: player.currentValue,
+      teamName: player.teamName,
+      teamAbbr: player.teamAbbr,
+    },
+    parallel: resolved.parallel,
+    serial: resolved.serial,
+    printRun: resolved.printRun,
+    valueMultiplier: resolved.valueMultiplier,
+    marketValue: computeMarketValue(player.currentValue, resolved.valueMultiplier, resolved.serial, resolved.printRun),
+    isHit: isHit(resolved.parallel),
+    refractor: PARALLEL_MAP[resolved.parallel]?.refractor ?? false,
+  };
+}
+
 export interface OpenPackArgs {
   ownerId: string;
   pullRates: Record<string, number>;
   topPlayerBias: number;
   count: number;
   pool: PlayerPoolEntry[];
+  /** Box guarantee: ensure at least one numbered card in the whole opening. */
+  guaranteeNumbered?: boolean;
 }
 
 /** Roll and allocate `count` cards to ownerId. Must be called inside a transaction. */
@@ -201,30 +239,17 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
     const rolled = rollParallel(args.pullRates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId);
-    const marketValue = computeMarketValue(
-      player.currentValue,
-      resolved.valueMultiplier,
-      resolved.serial,
-      resolved.printRun,
-    );
-    cards.push({
-      instanceId: resolved.instanceId,
-      player: {
-        id: player.id,
-        name: player.name,
-        position: player.position,
-        currentValue: player.currentValue,
-        teamName: player.teamName,
-        teamAbbr: player.teamAbbr,
-      },
-      parallel: resolved.parallel,
-      serial: resolved.serial,
-      printRun: resolved.printRun,
-      valueMultiplier: resolved.valueMultiplier,
-      marketValue,
-      isHit: isHit(resolved.parallel),
-      refractor: PARALLEL_MAP[resolved.parallel]?.refractor ?? false,
-    });
+    cards.push(buildPulledCard(player, resolved));
+  }
+
+  // Box guarantee: if nothing numbered came out, upgrade one card to a numbered pull.
+  if (args.guaranteeNumbered && cards.length > 0 && !cards.some((c) => c.serial !== null)) {
+    const idx = cards.length - 1;
+    await tx.cardInstance.delete({ where: { id: cards[idx]!.instanceId } });
+    const rolled = rollNumberedParallel(args.pullRates);
+    const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
+    const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId);
+    cards[idx] = buildPulledCard(player, resolved);
   }
   return cards;
 }

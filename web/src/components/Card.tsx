@@ -21,7 +21,13 @@ interface Props {
 
 export function Card({ card, size = 'md', faded, onClick }: Props) {
   const def = PARALLEL_MAP[card.parallel];
-  const tier = card.refractor ? 'refractor' : card.parallel === 'GOLD' ? 'tier-gold' : 'tier-plain';
+  const tier = card.refractor
+    ? 'refractor'
+    : card.parallel === 'AUTOGRAPH'
+      ? 'tier-auto'
+      : card.parallel === 'GOLD'
+        ? 'tier-gold'
+        : 'tier-plain';
   const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
   return (
     <div
@@ -36,6 +42,12 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
           </div>
           <div className="card-photo-scrim" />
           <div className="sheen" />
+          {card.parallel === 'AUTOGRAPH' && (
+            <div className="card-sig">
+              <span className="card-sig-name">{card.player.name.split(' ')[0]}</span>
+              <span className="auto-badge">✒ AUTO</span>
+            </div>
+          )}
           <div className="card-head">
             <span className="card-parallel" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
               {shortName}

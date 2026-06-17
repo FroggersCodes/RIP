@@ -49,6 +49,7 @@ export function HomePage() {
   const [advancing, setAdvancing] = useState(false);
   const [advanceMsg, setAdvanceMsg] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
@@ -111,6 +112,32 @@ export function HomePage() {
       setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
       setImporting(false);
+    }
+  };
+
+  const resetFictional = async () => {
+    if (
+      !window.confirm(
+        'Reset to generated (fictional) players? This WIPES all data and reseeds the made-up league (with autographs + boxes). Log in again as demo / demo1234.',
+      )
+    ) {
+      return;
+    }
+    setResetting(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/reset-fictional`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: '{}',
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      setImportMsg('Reset to the generated league. Log in as demo / demo1234.');
+    } catch (e) {
+      setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -294,6 +321,9 @@ export function HomePage() {
             </button>
             <button className="btn" onClick={importNfl} disabled={importing}>
               {importing ? 'Importing…' : 'Import real NFL players'}
+            </button>
+            <button className="btn" onClick={resetFictional} disabled={resetting}>
+              {resetting ? 'Resetting…' : 'Reset to generated players'}
             </button>
           </div>
           {advanceMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{advanceMsg}</div>}
