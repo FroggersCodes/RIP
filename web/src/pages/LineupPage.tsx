@@ -3,14 +3,16 @@ import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { Card } from '../components/Card';
-import { money } from '../lib/format';
-import type { Collection, Lineup, LeaderboardEntry, LineupSlotView } from '../api/types';
+import { money, countdown } from '../lib/format';
+import type { ClockInfo, Collection, Lineup, LeaderboardEntry, LineupSlotView } from '../api/types';
 
 export function LineupPage() {
   const { user } = useAuth();
   const lineup = useApi(() => api<Lineup>('/lineup'), []);
   const collection = useApi(() => api<Collection>('/cards'), []);
   const lb = useApi(() => api<{ week: { weekNumber: number } | null; entries: LeaderboardEntry[] }>('/league/leaderboard'), []);
+  const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
+  const locked = clock.data?.locked ?? false;
   const [picking, setPicking] = useState<LineupSlotView | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -60,6 +62,12 @@ export function LineupPage() {
         </div>
       </div>
 
+      {locked && (
+        <div className="lock-banner">
+          🔒 Lineups are locked — kickoff is imminent{clock.data ? ` (next slate ${countdown(clock.data.nextAdvanceAt)})` : ''}. Changes reopen after the next sim.
+        </div>
+      )}
+
       {lineup.loading ? (
         <div className="center" style={{ padding: 60 }}>
           <div className="spin" />
@@ -76,17 +84,17 @@ export function LineupPage() {
                 <>
                   <Card card={slot.card} size="sm" />
                   <div className="row" style={{ gap: 8 }}>
-                    <button className="btn btn-sm" onClick={() => setPicking(slot)}>
+                    <button className="btn btn-sm" disabled={locked} onClick={() => setPicking(slot)}>
                       Change
                     </button>
-                    <button className="btn btn-sm btn-ghost" onClick={() => unequip(slot.role)}>
+                    <button className="btn btn-sm btn-ghost" disabled={locked} onClick={() => unequip(slot.role)}>
                       Remove
                     </button>
                   </div>
                 </>
               ) : (
-                <div className="slot-empty" onClick={() => setPicking(slot)}>
-                  + Equip
+                <div className="slot-empty" onClick={locked ? undefined : () => setPicking(slot)}>
+                  {locked ? '🔒 Locked' : '+ Equip'}
                 </div>
               )}
             </div>

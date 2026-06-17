@@ -4,8 +4,16 @@ import { prisma } from '../../prisma';
 import { asyncHandler } from '../asyncHandler';
 import { ROUND_LABEL, REGULAR_SEASON_WEEKS, playoffRoundForWeek } from '../../league/constants';
 import { computeStandings } from '../../league/standings';
+import { getClock } from '../../league/clock';
 
 const router = Router();
+
+router.get(
+  '/clock',
+  asyncHandler(async (_req, res) => {
+    res.json(await getClock());
+  }),
+);
 
 async function latestSimulatedWeek() {
   return prisma.leagueWeek.findFirst({

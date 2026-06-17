@@ -5,7 +5,7 @@ import { api, API_BASE } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { RipReveal, type RevealCard } from '../components/RipReveal';
 import { countdown, num } from '../lib/format';
-import type { DailyStatus, DailyClaimResult } from '../api/types';
+import type { ClockInfo, DailyStatus, DailyClaimResult } from '../api/types';
 
 interface LeagueCurrent {
   current: { season: number; weekNumber: number } | null;
@@ -16,6 +16,7 @@ export function HomePage() {
   const { user, setUser } = useAuth();
   const daily = useApi(() => api<DailyStatus>('/daily/status'), []);
   const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
+  const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
   const gotw = useApi(
     () =>
       api<{
@@ -187,6 +188,19 @@ export function HomePage() {
               </div>
             </div>
           </div>
+          {clock.data && (
+            <div style={{ marginTop: 10 }}>
+              {clock.data.locked ? (
+                <span className="lock-tag">🔒 Lineups locked — kickoff imminent</span>
+              ) : (
+                <span className="muted">
+                  Next kickoff in{' '}
+                  <span className="mono" style={{ color: 'var(--text)' }}>{countdown(clock.data.nextAdvanceAt)}</span>
+                  {' · '}auto-sim {clock.data.autoAdvance ? 'on' : 'off'}
+                </span>
+              )}
+            </div>
+          )}
           <hr className="divider" style={{ margin: '14px 0' }} />
           <div className="section-title">Dev · advance week</div>
           <div className="row" style={{ marginTop: 8 }}>

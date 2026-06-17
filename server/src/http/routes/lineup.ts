@@ -6,8 +6,15 @@ import { requireAuth, userId, type AuthedRequest } from '../middleware';
 import { asyncHandler } from '../asyncHandler';
 import { AppError } from '../../errors';
 import { cardInclude, cardView } from '../../cards/cardView';
+import { isLineupLocked } from '../../league/clock';
 
 const router = Router();
+
+async function assertUnlocked() {
+  if (await isLineupLocked()) {
+    throw new AppError(423, 'Lineups are locked — kickoff is imminent. Set them before the next slate.');
+  }
+}
 
 async function getLineup(uid: string) {
   const slots = await prisma.lineupSlot.findMany({
@@ -40,6 +47,7 @@ router.put(
   requireAuth,
   asyncHandler(async (req: AuthedRequest, res) => {
     const uid = userId(req);
+    await assertUnlocked();
     const role = req.params.role.toUpperCase() as LineupRoleName;
     if (!LINEUP_ROLES.includes(role)) throw new AppError(400, 'Invalid lineup role');
     const { cardInstanceId } = equipSchema.parse(req.body);
@@ -73,6 +81,7 @@ router.delete(
   requireAuth,
   asyncHandler(async (req: AuthedRequest, res) => {
     const uid = userId(req);
+    await assertUnlocked();
     const role = req.params.role.toUpperCase() as LineupRoleName;
     if (!LINEUP_ROLES.includes(role)) throw new AppError(400, 'Invalid lineup role');
     await prisma.lineupSlot.updateMany({ where: { userId: uid, role }, data: { cardInstanceId: null } });

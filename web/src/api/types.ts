@@ -247,6 +247,17 @@ export interface ChampionRow {
   topUserPoints: number | null;
 }
 
+export interface ClockInfo {
+  autoAdvance: boolean;
+  cadenceHours: number;
+  lockMinutes: number;
+  lastAdvanceAt: string;
+  nextAdvanceAt: string;
+  locked: boolean;
+  msToKickoff: number;
+  msToLock: number;
+}
+
 export interface PlayerTotals {
   games: number;
   passYds: number;
