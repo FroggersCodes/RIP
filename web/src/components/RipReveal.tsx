@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { PARALLEL_MAP, PARALLELS_BY_RARITY_DESC } from '@rip/shared';
 import { Card, type CardData } from './Card';
 import { money } from '../lib/format';
 import './RipReveal.css';
@@ -16,14 +17,35 @@ interface Props {
 }
 
 export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
+  const [opened, setOpened] = useState(false);
+  const [tearing, setTearing] = useState(false);
   const [revealed, setRevealed] = useState(0);
   const [flash, setFlash] = useState(false);
   const [tally, setTally] = useState(0);
   const timers = useRef<number[]>([]);
   const targetRef = useRef(0);
 
-  // Reveal cards one at a time; hits linger and flash the screen.
+  // The pack glows in the color of the best card inside — rainbow for a refractor.
+  const order = PARALLELS_BY_RARITY_DESC;
+  let bestIdx = order.length;
+  let anyRefractor = false;
+  for (const c of cards) {
+    const i = order.indexOf(c.parallel);
+    if (i >= 0 && i < bestIdx) bestIdx = i;
+    if (c.refractor) anyRefractor = true;
+  }
+  const bestParallel = order[bestIdx] ?? 'BASE';
+  const glowColor = PARALLEL_MAP[bestParallel]?.color ?? '#8b94a3';
+
+  const rip = () => {
+    if (tearing || opened) return;
+    setTearing(true);
+    timers.current.push(window.setTimeout(() => setOpened(true), 950));
+  };
+
+  // Reveal the cards one at a time once the pack is torn open.
   useEffect(() => {
+    if (!opened) return;
     setRevealed(0);
     setTally(0);
     let i = 0;
@@ -35,20 +57,15 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
         setFlash(true);
         window.setTimeout(() => setFlash(false), 700);
       }
-      if (i < cards.length) {
-        const t = window.setTimeout(step, c?.isHit ? 1150 : 600);
-        timers.current.push(t);
-      }
+      if (i < cards.length) timers.current.push(window.setTimeout(step, c?.isHit ? 1150 : 600));
     };
-    const t0 = window.setTimeout(step, 450);
-    timers.current.push(t0);
+    timers.current.push(window.setTimeout(step, 350));
     return () => {
       timers.current.forEach(clearTimeout);
       timers.current = [];
     };
-  }, [cards]);
+  }, [opened, cards]);
 
-  // Count the running pack value up smoothly toward the revealed total.
   useEffect(() => {
     let raf = 0;
     const tick = () => {
@@ -73,51 +90,78 @@ export function RipReveal({ cards, title, subtitle, footer, onClose }: Props) {
   return (
     <div className="reveal-overlay">
       <div className={`reveal-flash ${flash ? 'on' : ''}`} />
-      <div className="reveal-stage">
-        <div className="reveal-top">
-          <div>
-            <div className="reveal-title">{title ?? 'Pack opened'}</div>
-            {subtitle && <div className="reveal-sub muted">{subtitle}</div>}
-          </div>
-          <div className="reveal-tally">
-            <span className="muted">Pack value</span>
-            <span className="mono tally-num">{money(tally)}</span>
-          </div>
-        </div>
 
-        <div className={`reveal-grid count-${cards.length}`}>
-          {cards.map((c, idx) => (
-            <div key={idx} className={`flip ${idx < revealed ? 'is-revealed' : ''} ${c.isHit ? 'is-hit' : ''}`}>
-              <div className="flip-card">
-                <div className="flip-back">
-                  <span className="flip-logo">
-                    RIP<span className="gold">.</span>
-                  </span>
-                </div>
-                <div className="flip-front">
-                  <Card card={c} size="sm" />
-                  {c.isHit && idx < revealed && <div className="hit-badge">HIT</div>}
-                </div>
+      {!opened ? (
+        <div className="pack-stage" style={{ ['--glow' as string]: glowColor }}>
+          <div className={`pack ${anyRefractor ? 'holo' : ''} ${tearing ? 'tearing' : ''}`} onClick={rip}>
+            <div className="pack-half pack-top">
+              <div className="pack-art">
+                <span className="pack-logo">RIP<span className="gold">.</span></span>
+                <span className="pack-name">{title ?? 'Pack'}</span>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="reveal-actions">
-          {!allDone ? (
-            <button className="btn btn-ghost" onClick={revealAll}>
-              Reveal all
-            </button>
-          ) : (
+            <div className="pack-half pack-bottom">
+              <div className="pack-art">
+                <span className="pack-logo">RIP<span className="gold">.</span></span>
+                <span className="pack-name">{title ?? 'Pack'}</span>
+              </div>
+            </div>
+            <div className="pack-burst" />
+          </div>
+          {!tearing && (
             <>
-              {footer}
-              <button className="btn btn-gold btn-lg" onClick={onClose}>
-                Continue
+              <button className="btn btn-gold btn-lg" onClick={rip} style={{ marginTop: 28 }}>
+                Rip it open
               </button>
+              {subtitle && <div className="reveal-sub muted" style={{ marginTop: 10 }}>{subtitle}</div>}
             </>
           )}
         </div>
-      </div>
+      ) : (
+        <div className="reveal-stage">
+          <div className="reveal-top">
+            <div>
+              <div className="reveal-title">{title ?? 'Pack opened'}</div>
+              {subtitle && <div className="reveal-sub muted">{subtitle}</div>}
+            </div>
+            <div className="reveal-tally">
+              <span className="muted">Pack value</span>
+              <span className="mono tally-num">{money(tally)}</span>
+            </div>
+          </div>
+
+          <div className={`reveal-grid count-${cards.length}`}>
+            {cards.map((c, idx) => (
+              <div key={idx} className={`flip ${idx < revealed ? 'is-revealed' : ''} ${c.isHit ? 'is-hit' : ''}`}>
+                <div className="flip-card">
+                  <div className="flip-back">
+                    <span className="flip-logo">RIP<span className="gold">.</span></span>
+                  </div>
+                  <div className="flip-front">
+                    <Card card={c} size="sm" />
+                    {c.isHit && idx < revealed && <div className="hit-badge">HIT</div>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="reveal-actions">
+            {!allDone ? (
+              <button className="btn btn-ghost" onClick={revealAll}>
+                Reveal all
+              </button>
+            ) : (
+              <>
+                {footer}
+                <button className="btn btn-gold btn-lg" onClick={onClose}>
+                  Continue
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

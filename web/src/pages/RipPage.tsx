@@ -43,7 +43,7 @@ export function RipPage() {
         <RipReveal
           cards={reveal}
           title={packName}
-          subtitle={`${reveal.length} cards · pack value ${money(reveal.reduce((a, c) => a + c.marketValue, 0))}`}
+          subtitle={`${reveal.length}-card pack`}
           onClose={() => setReveal(null)}
         />
       )}
