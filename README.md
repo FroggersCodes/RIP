@@ -163,8 +163,29 @@ values mean-revert toward their rating baseline). Each week also flags a **Game 
 Week** with an auto recap. Standings, the bracket, champions, and weekly/season stat
 leaders all populate as you advance — see the **Standings** and **Stats** pages.
 
-> Player photos are generated per player by a free image service in the browser, with a
-> monogram fallback. Set `VITE_PORTRAITS=off` to use monograms only.
+### Player photos
+
+Portraits are **baked once** into `web/public/players/<slug>.jpg` and served as static
+files (reliable, no runtime image service). Generate them from the **Actions** tab →
+**Bake player portraits** → **Run workflow** (free by default; choose `openai` and set an
+`OPENAI_API_KEY` secret for higher quality). The action commits the images; redeploy to
+pick them up. Until baked, players show a monogram. Set `VITE_PORTRAITS=off` to force
+monograms.
+
+### Live league clock
+
+The season auto-advances every `cadenceHours` (default 24h) and **lineups lock** in the
+`lockMinutes` window before each kickoff. An in-process timer drives it while the server
+runs; for hosts that sleep, the scheduled **League tick** action pokes `/api/admin/tick`
+hourly — set repo secrets `APP_URL` (your deployed URL) and `ADMIN_TOKEN`. Tune the clock
+without redeploying: `PUT /api/admin/clock { "cadenceHours": 2, "lockMinutes": 15 }`
+(use the `x-admin-token` header). Set a short cadence for a fast demo.
+
+### Earn paths & marketplace
+
+Players earn tokens/dust from **daily missions** (Home), the daily pack, battles, and
+**selling cards** on the **Market** (instant sell-to-house at 80% of value, or list to
+other managers). Breaking down cards still yields dust.
 
 ---
 
