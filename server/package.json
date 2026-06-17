@@ -16,6 +16,7 @@
     "seed:ifempty": "tsx prisma/seedIfEmpty.ts",
     "sim:advance": "tsx src/cli/advanceWeek.ts",
     "sim:season": "tsx scripts/simSeason.ts",
+    "bake:portraits": "tsx scripts/bakePortraits.ts",
     "test": "vitest run"
   },
   "prisma": {

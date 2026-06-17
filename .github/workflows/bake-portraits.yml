@@ -1,0 +1,46 @@
+name: Bake player portraits
+
+# Generates a photo for every player and commits them to web/public/players.
+# Run it from the GitHub "Actions" tab → "Bake player portraits" → "Run workflow".
+# Free by default (pollinations); choose "openai" + set an OPENAI_API_KEY secret
+# for higher quality.
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: 'Image provider'
+        type: choice
+        options: [pollinations, openai]
+        default: pollinations
+
+permissions:
+  contents: write
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Bake portraits
+        working-directory: server
+        env:
+          IMAGE_PROVIDER: ${{ inputs.provider }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BAKE_CONCURRENCY: '4'
+        run: npm run bake:portraits
+      - name: Commit portraits
+        run: |
+          git config user.name "rip-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add web/public/players
+          if git diff --cached --quiet; then
+            echo "No new portraits to commit."
+          else
+            git commit -m "Bake player portraits (run ${GITHUB_RUN_NUMBER})"
+            git push
+          fi

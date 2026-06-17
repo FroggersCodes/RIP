@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Position } from '@rip/shared';
-import { PORTRAITS_ENABLED, accentFromId, initials, portraitUrl } from '../lib/portrait';
+import { PORTRAITS_ENABLED, accentFromId, initials, portraitFile } from '../lib/portrait';
 import './PlayerPortrait.css';
 
 interface Props {
@@ -24,7 +24,7 @@ export function PlayerPortrait({ player, fill, size = 48, round = true }: Props)
       {!failed && (
         <img
           className="portrait-img"
-          src={portraitUrl(player)}
+          src={portraitFile(player.name)}
           alt={player.name}
           loading="lazy"
           onError={() => setFailed(true)}
