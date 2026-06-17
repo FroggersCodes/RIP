@@ -8,6 +8,7 @@ import { withTxRetry } from '../../db/withTxRetry';
 import { loadPlayerPool, openPack } from '../../ripping/pullEngine';
 import { spendDust, spendTokensAndCases } from '../../economy/wallet';
 import { publicUser } from '../serialize';
+import { bumpMission } from '../../missions/missions';
 
 const router = Router();
 
@@ -54,6 +55,12 @@ router.post(
         { timeout: 20000 },
       ),
     );
+
+    try {
+      await bumpMission(uid, 'rip', 1);
+    } catch {
+      /* missions are best-effort */
+    }
 
     res.json({
       product: { id: product.id, name: product.name },

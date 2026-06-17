@@ -247,6 +247,19 @@ export interface ChampionRow {
   topUserPoints: number | null;
 }
 
+export interface Mission {
+  key: string;
+  label: string;
+  period: 'DAILY' | 'ONCE';
+  target: number;
+  progress: number;
+  claimed: boolean;
+  claimable: boolean;
+  rewardTokens: number;
+  rewardDust: number;
+  rewardCases: number;
+}
+
 export interface ClockInfo {
   autoAdvance: boolean;
   cadenceHours: number;

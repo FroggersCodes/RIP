@@ -6,6 +6,7 @@ import { requireAuth, userId, type AuthedRequest } from '../middleware';
 import { asyncHandler } from '../asyncHandler';
 import { publicUser } from '../serialize';
 import { cardInclude, cardView } from '../../cards/cardView';
+import { bumpMission } from '../../missions/missions';
 
 const router = Router();
 
@@ -63,6 +64,14 @@ router.post(
       await tx.user.update({ where: { id: uid }, data: { dust: { increment: dustGained } } });
       return { brokenDown: instances.length, dustGained };
     });
+
+    if (result.brokenDown > 0) {
+      try {
+        await bumpMission(uid, 'breakdown', result.brokenDown);
+      } catch {
+        /* best-effort */
+      }
+    }
 
     const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });
     res.json({ ...result, user: publicUser(user) });

@@ -16,6 +16,7 @@ import playersRouter from './routes/players';
 import lineupRouter from './routes/lineup';
 import cardsRouter from './routes/cards';
 import battlesRouter from './routes/battles';
+import missionsRouter from './routes/missions';
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
@@ -50,6 +51,7 @@ export function createApp() {
   app.use('/api/lineup', lineupRouter);
   app.use('/api/cards', cardsRouter);
   app.use('/api/battles', battlesRouter);
+  app.use('/api/missions', missionsRouter);
 
   // Optionally serve the built web app from the same port (single-port deploy,
   // e.g. GitHub Codespaces). In dev the Vite server handles the frontend instead.

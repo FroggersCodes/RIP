@@ -622,6 +622,42 @@
   font-size: 13px;
 }
 
+/* ---------- missions ---------- */
+.mission-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.mission-row:last-child {
+  border-bottom: 0;
+}
+.mission-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+.mission-bar {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  overflow: hidden;
+  margin-top: 6px;
+  max-width: 320px;
+}
+.mission-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.mission-done {
+  color: var(--green);
+  font-weight: 700;
+  font-size: 13px;
+}
+
 /* ---------- league clock ---------- */
 .lock-tag {
   color: var(--gold);

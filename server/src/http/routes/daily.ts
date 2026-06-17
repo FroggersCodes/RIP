@@ -8,6 +8,7 @@ import { withTxRetry } from '../../db/withTxRetry';
 import { loadPlayerPool, openPack } from '../../ripping/pullEngine';
 import { grant } from '../../economy/wallet';
 import { publicUser } from '../serialize';
+import { bumpMission } from '../../missions/missions';
 import {
   DAILY_COOLDOWN_MS,
   STREAK_RESET_WINDOW_MS,
@@ -86,6 +87,12 @@ router.post(
         { timeout: 20000 },
       ),
     );
+
+    try {
+      await bumpMission(uid, 'daily', 1);
+    } catch {
+      /* best-effort */
+    }
 
     res.json({
       claimed: true,

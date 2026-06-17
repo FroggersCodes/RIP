@@ -7,6 +7,7 @@ import { asyncHandler } from '../asyncHandler';
 import { AppError } from '../../errors';
 import { cardInclude, cardView } from '../../cards/cardView';
 import { isLineupLocked } from '../../league/clock';
+import { bumpMission } from '../../missions/missions';
 
 const router = Router();
 
@@ -71,6 +72,12 @@ router.put(
         update: { cardInstanceId },
       });
     });
+
+    try {
+      await bumpMission(uid, 'equip', 1);
+    } catch {
+      /* best-effort */
+    }
 
     res.json(await getLineup(uid));
   }),

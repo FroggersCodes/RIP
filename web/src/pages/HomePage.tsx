@@ -5,7 +5,7 @@ import { api, API_BASE } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { RipReveal, type RevealCard } from '../components/RipReveal';
 import { countdown, num } from '../lib/format';
-import type { ClockInfo, DailyStatus, DailyClaimResult } from '../api/types';
+import type { ClockInfo, DailyStatus, DailyClaimResult, Mission, User } from '../api/types';
 
 interface LeagueCurrent {
   current: { season: number; weekNumber: number } | null;
@@ -17,6 +17,21 @@ export function HomePage() {
   const daily = useApi(() => api<DailyStatus>('/daily/status'), []);
   const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
   const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
+  const missions = useApi(() => api<{ missions: Mission[] }>('/missions'), []);
+
+  const claimMission = async (key: string) => {
+    try {
+      const r = await api<{ user: User }>(`/missions/${key}/claim`, { method: 'POST' });
+      setUser(r.user);
+      missions.reload();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed');
+    }
+  };
+  const rewardText = (m: Mission) =>
+    [m.rewardTokens && `${m.rewardTokens} tokens`, m.rewardDust && `${m.rewardDust} dust`, m.rewardCases && `${m.rewardCases} case`]
+      .filter(Boolean)
+      .join(' + ');
   const gotw = useApi(
     () =>
       api<{
@@ -170,6 +185,38 @@ export function HomePage() {
           </div>
         );
       })()}
+
+      {missions.data && (
+        <div className="panel panel-p" style={{ marginTop: 16 }}>
+          <div className="section-title">Missions · earn tokens &amp; dust</div>
+          <div style={{ marginTop: 8 }}>
+            {missions.data.missions.map((m) => (
+              <div className="mission-row" key={m.key}>
+                <div className="grow">
+                  <div className="mission-label">
+                    {m.label} {m.period === 'ONCE' && <span className="tag">one-time</span>}
+                  </div>
+                  <div className="mission-bar">
+                    <span style={{ width: `${Math.min(100, (m.progress / m.target) * 100)}%` }} />
+                  </div>
+                  <div className="muted mono" style={{ fontSize: 11, marginTop: 3 }}>
+                    {m.progress}/{m.target} · {rewardText(m)}
+                  </div>
+                </div>
+                {m.claimed ? (
+                  <span className="mission-done">✓ claimed</span>
+                ) : m.claimable ? (
+                  <button className="btn btn-sm btn-gold" onClick={() => claimMission(m.key)}>
+                    Claim
+                  </button>
+                ) : (
+                  <span className="muted" style={{ fontSize: 12 }}>in progress</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="home-cols">
         <div className="panel panel-p">

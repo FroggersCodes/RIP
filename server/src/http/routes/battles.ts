@@ -5,6 +5,7 @@ import { requireAuth, userId, type AuthedRequest } from '../middleware';
 import { asyncHandler } from '../asyncHandler';
 import { publicUser } from '../serialize';
 import { resolveBattleVsBot } from '../../battle/resolveBattle';
+import { bumpMission } from '../../missions/missions';
 
 const router = Router();
 
@@ -17,6 +18,12 @@ router.post(
     const uid = userId(req);
     const { productId } = battleSchema.parse(req.body);
     const outcome = await resolveBattleVsBot(uid, productId);
+    try {
+      await bumpMission(uid, 'battle', 1);
+      if (outcome.result === 'win') await bumpMission(uid, 'battle_win', 1);
+    } catch {
+      /* best-effort */
+    }
     const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });
     res.json({ ...outcome, user: publicUser(user) });
   }),
