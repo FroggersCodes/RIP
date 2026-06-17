@@ -1,0 +1,37 @@
+name: Import NFL data
+
+# Replaces the fictional league with REAL NFL players + last-season stats pulled
+# from open data (Sleeper). Writes to your deployed database, so set the
+# DATABASE_URL secret to your DB's connection string (Render: the EXTERNAL URL,
+# append ?sslmode=require). Deploy the latest app first so the schema is migrated.
+#
+# Reminder: real NFL names/logos/likenesses are licensed IP — this open-data path
+# is for personal/development use; shipping commercially needs an NFL/NFLPA license.
+
+on:
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'NFL season for stats (e.g. 2024)'
+        default: '2024'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Import real NFL data
+        working-directory: server
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NFL_SEASON: ${{ inputs.season }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Set the DATABASE_URL secret to your deployed DB (external connection string)."
+            exit 1
+          fi
+          npm run import:nfl

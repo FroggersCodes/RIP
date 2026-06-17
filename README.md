@@ -181,6 +181,19 @@ hourly — set repo secrets `APP_URL` (your deployed URL) and `ADMIN_TOKEN`. Tun
 without redeploying: `PUT /api/admin/clock { "cadenceHours": 2, "lockMinutes": 15 }`
 (use the `x-admin-token` header). Set a short cadence for a fast demo.
 
+### Real NFL players (optional)
+
+By default the league is **fictional** (brief-compliant, licensable). To switch to
+**real NFL players + last-season stats** from open data (Sleeper): deploy the latest app
+(so the schema is migrated), then run the **Import NFL data** Action (set a `DATABASE_URL`
+repo secret to your DB's external connection string) — or locally,
+`NFL_SEASON=2024 npm run import:nfl`. It reseeds 32 real teams with stat-driven ratings;
+the sim still drives ongoing weeks. Real players show **monograms** (real photos are
+licensed; the AI bake is only for the fictional set).
+
+> ⚠️ Real NFL names/logos/likenesses are licensed IP. This open-data path is for
+> personal/development use; a commercial release needs an NFL/NFLPA license.
+
 ### Earn paths & marketplace
 
 Players earn tokens/dust from **daily missions** (Home), the daily pack, battles, and

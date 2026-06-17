@@ -17,6 +17,7 @@
     "sim:advance": "tsx src/cli/advanceWeek.ts",
     "sim:season": "tsx scripts/simSeason.ts",
     "bake:portraits": "tsx scripts/bakePortraits.ts",
+    "import:nfl": "tsx scripts/importNfl.ts",
     "test": "vitest run"
   },
   "prisma": {
