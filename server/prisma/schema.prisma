@@ -325,6 +325,19 @@ model Listing {
   @@index([sellerId])
 }
 
+// Global activity feed: rare pulls, marketplace sales, weekly winners, champions.
+model FeedEvent {
+  id          String   @id @default(cuid())
+  type        String // PULL | SALE | WEEK | CHAMPION
+  username    String
+  text        String
+  parallel    String?
+  marketValue Float?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model SeasonChampion {
   id             String   @id @default(cuid())
   season         Int      @unique

@@ -8,6 +8,7 @@ import { withTxRetry } from '../../db/withTxRetry';
 import { loadPlayerPool, openPack } from '../../ripping/pullEngine';
 import { spendDust, spendTokensAndCases } from '../../economy/wallet';
 import { publicUser } from '../serialize';
+import { recordPullHits } from '../../feed/feed';
 import { bumpMission } from '../../missions/missions';
 
 const router = Router();
@@ -58,8 +59,9 @@ router.post(
 
     try {
       await bumpMission(uid, 'rip', 1);
+      await recordPullHits(result.user.username, result.cards);
     } catch {
-      /* missions are best-effort */
+      /* missions / feed are best-effort */
     }
 
     res.json({

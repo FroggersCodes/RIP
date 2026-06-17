@@ -3,6 +3,7 @@ import { withTxRetry } from '../db/withTxRetry';
 import { roundRobinWeek } from './schedule';
 import { simulateGame } from './simulateGame';
 import { applyValueChange, baselineValue, expectedFantasy, OFFSEASON_REGRESSION } from './valuation';
+import { grant } from '../economy/wallet';
 import { PLAYOFF_TEAMS, ROUND_LABEL, type Round, playoffRoundForWeek } from './constants';
 import { computeStandings, seedMap } from './standings';
 
@@ -200,6 +201,35 @@ export async function advanceWeek(): Promise<AdvanceResult> {
           });
         }
 
+        // Ranked: weekly token/case payouts + rating-ladder movement.
+        const ranked = [...pointsByUser.entries()].sort((a, b) => b[1] - a[1]);
+        const PAYOUTS = [
+          { tokens: 600, cases: 2 },
+          { tokens: 350, cases: 1 },
+          { tokens: 200, cases: 1 },
+        ];
+        for (let i = 0; i < ranked.length; i++) {
+          const [uid] = ranked[i]!;
+          const pay = PAYOUTS[i] ?? (i < 10 ? { tokens: 80, cases: 0 } : { tokens: 0, cases: 0 });
+          if (pay.tokens || pay.cases) await grant(tx, uid, pay);
+          const frac = ranked.length > 1 ? i / (ranked.length - 1) : 0;
+          const dr = frac <= 0.34 ? 12 : frac >= 0.66 ? -8 : 2;
+          await tx.user.update({ where: { id: uid }, data: { rating: { increment: dr } } });
+        }
+        if (ranked.length > 0) {
+          const [winnerId, winPts] = ranked[0]!;
+          const w = await tx.user.findUnique({ where: { id: winnerId }, select: { username: true } });
+          if (w) {
+            await tx.feedEvent.create({
+              data: {
+                type: 'WEEK',
+                username: w.username,
+                text: `${w.username} won week ${week.weekNumber} with ${Math.round(winPts * 10) / 10} lineup pts`,
+              },
+            });
+          }
+        }
+
         // ---- advance the pointer (handle end of season) ----
         await tx.leagueWeek.update({ where: { id: week.id }, data: { simulatedAt: new Date(), isCurrent: false } });
 
@@ -236,6 +266,13 @@ export async function advanceWeek(): Promise<AdvanceResult> {
             update: { championTeamId: champId, runnerUpTeamId: runnerId, topUserId, topUserPoints },
           });
           champion = { team: teamAbbr.get(champId)!, runnerUp: teamAbbr.get(runnerId)! };
+          await tx.feedEvent.create({
+            data: {
+              type: 'CHAMPION',
+              username: champion.team,
+              text: `🏆 ${champion.team} won the Season ${week.season} championship, beating ${champion.runnerUp}`,
+            },
+          });
 
           // Offseason: mean-revert values toward baseline so they don't run away.
           for (const p of players) {

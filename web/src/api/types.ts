@@ -249,6 +249,15 @@ export interface ChampionRow {
   topUserPoints: number | null;
 }
 
+export interface FeedEvent {
+  id: string;
+  type: 'PULL' | 'SALE' | 'WEEK' | 'CHAMPION';
+  text: string;
+  parallel: string | null;
+  marketValue: number | null;
+  createdAt: string;
+}
+
 export interface Mission {
   key: string;
   label: string;

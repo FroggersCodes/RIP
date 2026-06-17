@@ -6,6 +6,7 @@ import { TEAMS, buildAllPlayers } from '../src/data/roster';
 
 export async function seed() {
   console.log('Clearing existing data...');
+  await prisma.feedEvent.deleteMany();
   await prisma.listing.deleteMany();
   await prisma.missionProgress.deleteMany();
   await prisma.seasonChampion.deleteMany();

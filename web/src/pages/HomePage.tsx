@@ -4,8 +4,9 @@ import { useAuth } from '../auth/AuthContext';
 import { api, API_BASE } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { RipReveal, type RevealCard } from '../components/RipReveal';
+import { division } from '@rip/shared';
 import { countdown, num } from '../lib/format';
-import type { ClockInfo, DailyStatus, DailyClaimResult, Mission, User } from '../api/types';
+import type { ClockInfo, DailyStatus, DailyClaimResult, FeedEvent, Mission, User } from '../api/types';
 
 interface LeagueCurrent {
   current: { season: number; weekNumber: number } | null;
@@ -18,6 +19,7 @@ export function HomePage() {
   const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
   const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
   const missions = useApi(() => api<{ missions: Mission[] }>('/missions'), []);
+  const feed = useApi(() => api<{ events: FeedEvent[] }>('/feed'), []);
 
   const claimMission = async (key: string) => {
     try {
@@ -88,9 +90,16 @@ export function HomePage() {
   return (
     <>
       {reveal && <RipReveal cards={reveal} title={revealTitle} onClose={() => setReveal(null)} />}
-      <div className="page-head">
-        <h1>Welcome back, {user?.username}</h1>
-        <p>Claim your daily, rip a pack, and build a lineup that wins the week.</p>
+      <div className="page-head between">
+        <div>
+          <h1>Welcome back, {user?.username}</h1>
+          <p>Claim your daily, rip a pack, and build a lineup that wins the week.</p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div className="muted" style={{ fontSize: 12 }}>Rank</div>
+          <div className="kpi gold" style={{ fontSize: 22 }}>{division(user?.rating ?? 1000)}</div>
+          <div className="muted mono" style={{ fontSize: 11 }}>{num(user?.rating ?? 1000)} rating</div>
+        </div>
       </div>
 
       <div className="home-hero">
@@ -259,14 +268,22 @@ export function HomePage() {
           {advanceMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{advanceMsg}</div>}
         </div>
         <div className="panel panel-p">
-          <div className="section-title">How it works</div>
-          <ul className="muted" style={{ lineHeight: 1.8, marginTop: 8, paddingLeft: 18 }}>
-            <li>Numbered cards are finite — one owner per serial, forever.</li>
-            <li>Each simulated week moves player values from real box scores.</li>
-            <li>Your equipped lineup scores from those same stats.</li>
-            <li>Recycle base cards into dust, then spend dust on packs.</li>
-          </ul>
-          <Link to="/leaderboard" className="btn btn-ghost" style={{ marginTop: 6, alignSelf: 'flex-start' }}>
+          <div className="section-title">Around the league</div>
+          <div style={{ marginTop: 8 }}>
+            {feed.data?.events.length ? (
+              feed.data.events.slice(0, 12).map((e) => (
+                <div className="feed-row" key={e.id}>
+                  <span className="feed-ic">
+                    {e.type === 'PULL' ? '✦' : e.type === 'SALE' ? '$' : e.type === 'CHAMPION' ? '🏆' : '★'}
+                  </span>
+                  <span className="feed-text">{e.text}</span>
+                </div>
+              ))
+            ) : (
+              <div className="muted">No activity yet — rip a pack or make a sale to get the feed going.</div>
+            )}
+          </div>
+          <Link to="/leaderboard" className="btn btn-ghost" style={{ marginTop: 10, alignSelf: 'flex-start' }}>
             View leaderboard →
           </Link>
         </div>

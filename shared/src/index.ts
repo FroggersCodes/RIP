@@ -128,3 +128,12 @@ export function normalizeOdds(weights: Record<string, number>): Record<string, n
 export function dustForBreakdown(marketValue: number): number {
   return Math.max(3, Math.round(marketValue * 0.3));
 }
+
+// Competitive rank ladder derived from rating.
+export function division(rating: number): string {
+  if (rating >= 1600) return 'Diamond';
+  if (rating >= 1400) return 'Platinum';
+  if (rating >= 1200) return 'Gold';
+  if (rating >= 1050) return 'Silver';
+  return 'Bronze';
+}

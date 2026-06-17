@@ -6,6 +6,7 @@ import { asyncHandler } from '../asyncHandler';
 import { publicUser } from '../serialize';
 import { resolveBattleVsBot } from '../../battle/resolveBattle';
 import { bumpMission } from '../../missions/missions';
+import { recordPullHits } from '../../feed/feed';
 
 const router = Router();
 
@@ -25,6 +26,11 @@ router.post(
       /* best-effort */
     }
     const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });
+    try {
+      await recordPullHits(user.username, outcome.challengerCards);
+    } catch {
+      /* feed is best-effort */
+    }
     res.json({ ...outcome, user: publicUser(user) });
   }),
 );

@@ -8,6 +8,7 @@ import { AppError } from '../../errors';
 import { publicUser } from '../serialize';
 import { cardInclude, cardView } from '../../cards/cardView';
 import { grant, spendTokensAndCases } from '../../economy/wallet';
+import { recordSale } from '../../feed/feed';
 
 const HOUSE_SELL_RATE = 0.8; // tokens you get selling to the house, vs market value
 const MARKET_FEE = 0.05; // taken from the sale price as a token sink
@@ -140,9 +141,15 @@ router.post(
       await tx.lineupSlot.updateMany({ where: { cardInstanceId: listing.cardInstanceId }, data: { cardInstanceId: null } });
       await tx.cardInstance.update({ where: { id: listing.cardInstanceId }, data: { ownerId: uid } });
       await tx.listing.delete({ where: { id: listing.id } });
-      return { card: cardView(listing.cardInstance), proceeds, price: listing.priceTokens };
+      return { card: cardView(listing.cardInstance), proceeds, price: listing.priceTokens, sellerId: listing.sellerId };
     });
     const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });
+    try {
+      const seller = await prisma.user.findUnique({ where: { id: result.sellerId }, select: { username: true } });
+      await recordSale(user.username, seller?.username ?? 'someone', result.card, result.price);
+    } catch {
+      /* feed is best-effort */
+    }
     res.json({ bought: true, card: result.card, paid: result.price, user: publicUser(user) });
   }),
 );

@@ -9,6 +9,7 @@ import { loadPlayerPool, openPack } from '../../ripping/pullEngine';
 import { grant } from '../../economy/wallet';
 import { publicUser } from '../serialize';
 import { bumpMission } from '../../missions/missions';
+import { recordPullHits } from '../../feed/feed';
 import {
   DAILY_COOLDOWN_MS,
   STREAK_RESET_WINDOW_MS,
@@ -90,6 +91,7 @@ router.post(
 
     try {
       await bumpMission(uid, 'daily', 1);
+      await recordPullHits(result.user.username, result.cards);
     } catch {
       /* best-effort */
     }

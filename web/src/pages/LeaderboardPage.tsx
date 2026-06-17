@@ -25,7 +25,7 @@ export function LeaderboardPage() {
       <div className="page-head">
         <h1>Leaderboard</h1>
         <p>
-          Weekly lineup scores from real simulated stats.
+          Weekly lineup scores from real simulated stats. Top 3 each week earn tokens + a case, and your rating moves with your finish.
           {lb.data?.week ? ` Showing week ${lb.data.week.weekNumber}.` : ' No week simulated yet.'}
         </p>
       </div>

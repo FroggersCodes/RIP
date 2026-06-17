@@ -622,6 +622,29 @@
   font-size: 13px;
 }
 
+/* ---------- activity feed ---------- */
+.feed-row {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 13px;
+}
+.feed-row:last-child {
+  border-bottom: 0;
+}
+.feed-ic {
+  color: var(--gold);
+  font-weight: 800;
+  width: 16px;
+  text-align: center;
+  flex: none;
+}
+.feed-text {
+  color: var(--text);
+}
+
 /* ---------- marketplace ---------- */
 .market-foot {
   display: flex;
