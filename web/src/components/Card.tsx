@@ -122,9 +122,9 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
             </div>
           )}
 
-          {/* RPA — right column: patch window (top) + signature (bottom) */}
+          {/* RPA — patch floats upper-right, sig spans full width above the name */}
           {isRpa && sig && (
-            <div className="card-rpa-side">
+            <>
               <div className="card-rpa-patch">
                 <div className="card-patch-window">
                   <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
@@ -149,7 +149,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                 </svg>
                 <span className="auto-badge">✒ RPA</span>
               </div>
-            </div>
+            </>
           )}
 
           <div className="card-head">
