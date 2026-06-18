@@ -54,6 +54,7 @@ export function HomePage() {
   const [luckInput, setLuckInput] = useState('5');
   const [settingLuck, setSettingLuck] = useState(false);
   const [settingForce, setSettingForce] = useState(false);
+  const [backfilling, setBackfilling] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
@@ -90,6 +91,20 @@ export function HomePage() {
       setAdvanceMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
       setAdvancing(false);
+    }
+  };
+
+  const backfillTemplates = async () => {
+    setBackfilling(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/backfill-templates`, { method: 'POST', headers: { 'x-admin-token': adminToken } });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      setAdvanceMsg(`Backfill done — ${d.created} new template(s) created.`);
+    } catch (e) {
+      setAdvanceMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
+    } finally {
+      setBackfilling(false);
     }
   };
 
@@ -400,6 +415,9 @@ export function HomePage() {
             </button>
             <button className="btn btn-gold" onClick={grantMe} disabled={granting}>
               {granting ? 'Granting…' : 'Give me tokens + cases'}
+            </button>
+            <button className="btn" onClick={backfillTemplates} disabled={backfilling}>
+              {backfilling ? 'Backfilling…' : 'Backfill missing templates'}
             </button>
           </div>
           <div className="row wrap" style={{ marginTop: 8, gap: 8 }}>
