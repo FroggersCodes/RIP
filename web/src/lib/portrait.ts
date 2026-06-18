@@ -23,6 +23,10 @@ export function portraitFile(name: string): string {
   return `/players/${nameSlug(name)}.jpg`;
 }
 
+export function portraitFallbackUrl(name: string): string {
+  return `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(nameSlug(name))}&backgroundColor=0f172a&scale=120`;
+}
+
 export function initials(name: string): string {
   return name
     .split(/\s+/)

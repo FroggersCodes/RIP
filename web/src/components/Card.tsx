@@ -91,25 +91,21 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
           )}
           {patch && (
             <div className="card-patch">
-              <svg className="card-patch-swatch" viewBox="0 0 88 56" xmlns="http://www.w3.org/2000/svg">
-                {/* Base fabric */}
-                <rect width="88" height="56" rx="4" fill={patch.primary} />
-                {/* Jersey number stripe bands */}
-                <rect y="14" width="88" height="11" fill={patch.secondary} opacity="0.85" />
-                <rect y="31" width="88" height="11" fill={patch.secondary} opacity="0.85" />
-                {/* Horizontal knit-stitch lines */}
-                {[6, 13, 20, 27, 34, 41, 48].map((y) => (
-                  <line key={y} x1="2" y1={y} x2="86" y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" strokeDasharray="3,3" />
-                ))}
-                {/* Seam stitching on stripe edges */}
-                <line x1="0" y1="14" x2="88" y2="14" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
-                <line x1="0" y1="25" x2="88" y2="25" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
-                <line x1="0" y1="31" x2="88" y2="31" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
-                <line x1="0" y1="42" x2="88" y2="42" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
-                {/* Border frame */}
-                <rect width="88" height="56" rx="4" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-              </svg>
-              <span className="patch-badge">⬛ PATCH</span>
+              <div className="card-patch-window">
+                <svg className="card-patch-swatch" viewBox="0 0 88 56" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="88" height="56" fill={patch.primary} />
+                  <rect y="14" width="88" height="11" fill={patch.secondary} opacity="0.85" />
+                  <rect y="31" width="88" height="11" fill={patch.secondary} opacity="0.85" />
+                  {[5, 12, 19, 26, 33, 40, 47, 54].map((y) => (
+                    <line key={y} x1="0" y1={y} x2="88" y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth="0.7" strokeDasharray="3,3" />
+                  ))}
+                  <line x1="0" y1="14" x2="88" y2="14" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+                  <line x1="0" y1="25" x2="88" y2="25" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+                  <line x1="0" y1="31" x2="88" y2="31" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+                  <line x1="0" y1="42" x2="88" y2="42" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+                </svg>
+              </div>
+              <span className="patch-badge">PATCH</span>
             </div>
           )}
           <div className="card-head">
