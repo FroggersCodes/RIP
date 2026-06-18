@@ -61,13 +61,20 @@ const TEAM_ABBRS = new Set(NFL_TEAMS.map((t) => t.abbr));
 
 const SPARK         = { BASE: 7200, BLUE: 1460, GOLD: 270, PATCH: 260, AUTOGRAPH: 210 };
 const MOMENTUM      = { BASE: 6200, BLUE: 800, PURPLE: 800, GOLD: 500, PATCH: 400, BLACK: 200, AUTOGRAPH: 300 };
-const ARTISTRY      = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, PATCH_AUTO: 30, EMERALD: 100 };
+const ARTISTRY      = {
+  BASE: 5000,
+  ART_RED: 1400, ART_BLUE: 1000, ART_GREEN: 700,
+  ART_BLUE_ICE: 220, ART_RAINBOW: 150, ART_PURPLE_ICE: 110, ART_GOLD: 60, ART_WHITE: 18, ART_BLACK: 2,
+  ART_RED_AUTO: 120, ART_BLUE_AUTO: 90, ART_GREEN_AUTO: 70, ART_BLUE_ICE_AUTO: 40,
+  ART_RAINBOW_AUTO: 28, ART_PURPLE_ICE_AUTO: 20, ART_GOLD_AUTO: 12, ART_WHITE_AUTO: 5, ART_BLACK_AUTO: 1,
+  ART_RPA_50: 30, ART_RPA_35: 20, ART_RPA_25: 14, ART_RPA_10: 8, ART_RPA_3: 3, ART_RPA_1: 1,
+};
 const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
 const RELIQUARY     = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, PATCH_AUTO: 400, EMERALD: 700, SUPERFRACTOR: 150 };
 const PRODUCTS = [
   { name: 'Spark', year: 2026, entryCost: 80, caseCost: 0, tier: 'spark', setKey: 'spark', cardsPerPack: 6, topPlayerBias: 0.35, pullRates: SPARK, description: 'Entry-level 6-card rip. Electric blue foil, crackling static aesthetic. ~70% color parallel, ~25% hit per box.' },
   { name: 'Momentum', year: 2026, entryCost: 200, caseCost: 0, tier: 'momentum', setKey: 'momentum', cardsPerPack: 4, packsPerBox: 2, minHits: 1, topPlayerBias: 0.45, pullRates: MOMENTUM, description: '2-pack box (8 cards). Motion-blur speed-line design. Guaranteed ≥1 hit per box.' },
-  { name: 'Artistry', year: 2026, entryCost: 500, caseCost: 0, tier: 'artistry', setKey: 'artistry', cardsPerPack: 5, packsPerBox: 2, minHits: 2, topPlayerBias: 0.55, pullRates: ARTISTRY, description: '2-pack box (10 cards). Canvas-texture gallery aesthetic. Guaranteed ≥2 hits, strong auto odds.' },
+  { name: 'Artistry', year: 2026, entryCost: 500, caseCost: 0, tier: 'artistry', setKey: 'artistry', cardsPerPack: 5, packsPerBox: 2, minHits: 2, topPlayerBias: 0.55, pullRates: ARTISTRY, description: '2-pack box (10 cards). Canvas-texture gallery aesthetic with its own numbered rainbow (Red /299 → Black 1/1), on-card base autographs, and a Rookie Patch Auto chase. Guaranteed ≥2 hits.' },
   { name: 'Gold Standard', year: 2026, entryCost: 1000, caseCost: 1, tier: 'gold-standard', setKey: 'gold-standard', cardsPerPack: 8, minHits: 2, guaranteeNumbered: true, topPlayerBias: 0.65, pullRates: GOLD_STANDARD, description: 'Matte-black, embossed gold foil. 8-card premium box. Costs a case. All cards numbered, ≥2 hits guaranteed.' },
   { name: 'Reliquary', year: 2026, entryCost: 2500, caseCost: 2, tier: 'reliquary', setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY, description: 'Vault-door ultra-premium. 8-card rip. Costs 2 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.' },
 ];

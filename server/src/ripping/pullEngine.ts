@@ -1,5 +1,5 @@
 import {
-  PARALLELS_BY_RARITY_DESC,
+  rarityDescForSet,
   PARALLEL_NAMES,
   PARALLEL_MAP,
   computeMarketValue,
@@ -117,14 +117,14 @@ export function rollParallel(pullRates: Record<string, number>): ParallelName {
   return entries[entries.length - 1]![0];
 }
 
-/** Base cards pick any player uniformly; hits bias toward top players; PATCH_AUTO always picks a rookie. */
+/** Base cards pick any player uniformly; hits bias toward top players; RPA always picks a rookie. */
 export function pickPlayer(
   parallel: ParallelName,
   topPlayerBias: number,
   pool: PlayerPoolEntry[],
 ): PlayerPoolEntry {
   // Rookie Patch Autos always feature a rookie player.
-  if (parallel === 'PATCH_AUTO') {
+  if (PARALLEL_MAP[parallel]?.rpa) {
     const rookies = pool.filter((p) => p.isRookie);
     if (rookies.length > 0) return rookies[Math.floor(Math.random() * rookies.length)]!;
   }
@@ -195,7 +195,7 @@ export async function allocateWithFallback(
   ownerId: string,
   setKey: string,
 ): Promise<ResolvedAllocation> {
-  const order = PARALLELS_BY_RARITY_DESC; // rarest -> Base
+  const order = rarityDescForSet(setKey); // rarest -> Base, restricted to this set's lineup
   let idx = order.indexOf(rolled);
   if (idx < 0) idx = order.length - 1; // unknown -> base
   for (; idx < order.length; idx++) {
@@ -254,10 +254,11 @@ export function rollNumberedParallel(pullRates: Record<string, number>): Paralle
   return entries[entries.length - 1]![0];
 }
 
-/** Weighted roll restricted to hit-quality parallels (GOLD and rarer). */
+/** Weighted roll restricted to the hit-quality parallels this product can yield. */
 export function rollHitParallel(pullRates: Record<string, number>): ParallelName {
-  const hitNames: ParallelName[] = ['GOLD', 'PATCH', 'BLACK', 'AUTOGRAPH', 'EMERALD', 'SUPERFRACTOR'];
-  const entries = hitNames.map((n) => [n, pullRates[n] ?? 0] as const).filter(([, w]) => w > 0);
+  const entries = PARALLEL_NAMES.filter((n) => isHit(n))
+    .map((n) => [n, pullRates[n] ?? 0] as const)
+    .filter(([, w]) => w > 0);
   const total = entries.reduce((a, [, w]) => a + w, 0);
   if (total <= 0) return 'GOLD';
   let r = Math.random() * total;

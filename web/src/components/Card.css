@@ -568,6 +568,69 @@
   border-radius: 999px;
 }
 
+/* ---------- colored numbered parallel (Base/Blue/Purple/Emerald + Artistry Red/Blue/Green) ---------- */
+.card.tier-plain .card-frame {
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--accent) 72%, #10141b),
+    color-mix(in srgb, var(--accent) 34%, #1c222c) 50%,
+    color-mix(in srgb, var(--accent) 66%, #0b0e13)
+  );
+}
+
+/* ---------- cracked ice (Artistry Blue/Purple Cracked Ice) ---------- */
+.card.finish-ice .card-frame {
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--accent) 55%, #eaffff),
+    color-mix(in srgb, var(--accent) 78%, #c4eef7) 48%,
+    color-mix(in srgb, var(--accent) 52%, #7fb4c4)
+  );
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 38%, transparent), var(--shadow-card);
+}
+.card.finish-ice .card-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(58deg,  transparent 0 45%, rgba(255, 255, 255, 0.55) 45% 46.2%, transparent 46.2%),
+    linear-gradient(112deg, transparent 0 59%, rgba(220, 245, 255, 0.45) 59% 60%, transparent 60%),
+    linear-gradient(18deg,  transparent 0 30%, rgba(255, 255, 255, 0.4)  30% 31%, transparent 31%),
+    linear-gradient(150deg, transparent 0 71%, rgba(220, 245, 255, 0.35) 71% 72%, transparent 72%),
+    linear-gradient(84deg,  transparent 0 22%, rgba(255, 255, 255, 0.3)  22% 22.8%, transparent 22.8%);
+}
+.card.finish-ice .sheen {
+  opacity: 0.6;
+  animation: sheen-move 4.6s ease-in-out infinite;
+}
+
+/* ---------- white (Artistry White /3) — bright silver foil ---------- */
+.card.finish-white .card-frame {
+  background: linear-gradient(140deg, #f4f7fb, #c8d2e0 46%, #ffffff 54%, #aeb9c8);
+  box-shadow: 0 0 0 1px #e8edf5, var(--shadow-card);
+}
+.card.finish-white .sheen {
+  opacity: 0.7;
+  animation: sheen-move 4.4s ease-in-out infinite;
+}
+
+/* ---------- black finite (Artistry Black 1/1) — deep matte black ---------- */
+.card.finish-black .card-frame {
+  background: linear-gradient(140deg, #05060a, #181c24 48%, #2a2f3a 52%, #05060a);
+  box-shadow: 0 0 0 1px #000000, var(--shadow-card);
+}
+.card.finish-black .card-inner {
+  background: #06070b;
+}
+.card.finish-black .sheen {
+  opacity: 0.5;
+  animation: sheen-move 5.2s ease-in-out infinite;
+}
+
 /* ---------- RC rookie badge ---------- */
 .card-rc-badge {
   font-family: var(--font-display);

@@ -28,6 +28,33 @@ enum Parallel {
   PATCH_AUTO
   EMERALD
   SUPERFRACTOR
+  // Artistry set — numbered rainbow
+  ART_RED
+  ART_BLUE
+  ART_GREEN
+  ART_BLUE_ICE
+  ART_RAINBOW
+  ART_PURPLE_ICE
+  ART_GOLD
+  ART_WHITE
+  ART_BLACK
+  // Artistry base autographs
+  ART_RED_AUTO
+  ART_BLUE_AUTO
+  ART_GREEN_AUTO
+  ART_BLUE_ICE_AUTO
+  ART_RAINBOW_AUTO
+  ART_PURPLE_ICE_AUTO
+  ART_GOLD_AUTO
+  ART_WHITE_AUTO
+  ART_BLACK_AUTO
+  // Artistry rookie patch autos
+  ART_RPA_50
+  ART_RPA_35
+  ART_RPA_25
+  ART_RPA_10
+  ART_RPA_3
+  ART_RPA_1
 }
 
 enum LineupRole {

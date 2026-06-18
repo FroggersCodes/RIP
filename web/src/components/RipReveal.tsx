@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
-import { PARALLEL_MAP, PARALLELS_BY_RARITY_DESC, SETS } from '@rip/shared';
+import { PARALLEL_MAP, rarityDescForSet, SETS } from '@rip/shared';
 import { Card, type CardData } from './Card';
 import { money } from '../lib/format';
 import './RipReveal.css';
@@ -37,7 +37,7 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
   const timers = useRef<number[]>([]);
 
   // The sealed pack glows in the color of the best card inside (rainbow for a refractor).
-  const order = PARALLELS_BY_RARITY_DESC;
+  const order = rarityDescForSet(cards[0]?.setKey);
   let bestIdx = order.length;
   let anyRefractor = false;
   for (const c of cards) {
