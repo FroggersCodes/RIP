@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PARALLEL_MAP, setOf, type ParallelName, type Position } from '@rip/shared';
 import { money } from '../lib/format';
 import { signaturePath } from '../lib/signature';
@@ -48,6 +49,8 @@ function PatchSwatch({ primary, secondary }: { primary: string; secondary: strin
 }
 
 export function Card({ card, size = 'md', faded, onClick }: Props) {
+  const [flipped, setFlipped] = useState(false);
+
   const def = PARALLEL_MAP[card.parallel];
   const isRpa = card.parallel === 'PATCH_AUTO';
   const tier = card.refractor
@@ -70,113 +73,142 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
   const teamSecondary = card.player.teamSecondaryColor ?? '#0c1422';
   const hasPatch = card.parallel === 'PATCH' || isRpa;
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      setFlipped((f) => !f);
+    }
+  };
+
+  const sigSvg = sig ? (
+    <svg
+      className="card-sig-svg"
+      viewBox={`0 0 ${sig.width} 100`}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ transform: `rotate(${sig.slant}deg)` }}
+    >
+      <path
+        d={sig.d}
+        fill="none"
+        stroke={sig.ink}
+        strokeWidth={sig.strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ) : null;
+
+  const cssVars = {
+    ['--accent' as string]: def.color,
+    ['--team-primary' as string]: teamPrimary,
+    ['--team-secondary' as string]: teamSecondary,
+  };
+
   return (
     <div
-      className={`card card-${size} ${tier} set-${set.key} ${faded ? 'faded' : ''} ${onClick ? 'clickable' : ''}`}
-      style={{
-        ['--accent' as string]: def.color,
-        ['--team-primary' as string]: teamPrimary,
-        ['--team-secondary' as string]: teamSecondary,
-      }}
-      onClick={onClick}
+      className={`card card-${size} ${tier} set-${set.key} ${faded ? 'faded' : ''} ${flipped ? 'is-flipped' : ''} ${onClick ? 'clickable' : ''}`}
+      style={cssVars}
     >
-      <div className="card-frame">
-        <div className="card-inner">
-          <div className="card-set-bg" />
-          <div className="card-photo">
-            <PlayerPortrait player={card.player} fill />
-          </div>
-          <div className="card-photo-scrim" />
-          <div className="card-set-fx" />
-          <div className="sheen" />
+      <div className="card-flip-inner" onClick={handleClick}>
 
-          {/* Patch swatch — standalone PATCH cards only */}
-          {hasPatch && !isRpa && (
-            <div className="card-patch">
-              <div className="card-patch-window">
-                <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+        {/* ── FRONT ── clean: photo + name + position + serial + hit type badges */}
+        <div className="card-face card-face-front">
+          <div className="card-frame">
+            <div className="card-inner">
+              <div className="card-set-bg" />
+              <div className="card-photo">
+                <PlayerPortrait player={card.player} fill />
               </div>
-              <span className="patch-badge">PATCH</span>
-            </div>
-          )}
-
-          {/* Autograph — standalone AUTO cards only */}
-          {sig && !isRpa && (
-            <div className="card-sig">
-              <svg
-                className="card-sig-svg"
-                viewBox={`0 0 ${sig.width} 100`}
-                preserveAspectRatio="xMidYMid meet"
-                style={{ transform: `rotate(${sig.slant}deg)` }}
-              >
-                <path
-                  d={sig.d}
-                  fill="none"
-                  stroke={sig.ink}
-                  strokeWidth={sig.strokeWidth}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="auto-badge">✒ AUTO</span>
-            </div>
-          )}
-
-          {/* RPA — patch floats upper-right, sig spans full width above the name */}
-          {isRpa && sig && (
-            <>
-              <div className="card-rpa-patch">
-                <div className="card-patch-window">
-                  <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+              <div className="card-photo-scrim" />
+              <div className="card-set-fx" />
+              <div className="sheen" />
+              {hasPatch && !isRpa && (
+                <div className="card-patch">
+                  <div className="card-patch-window">
+                    <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+                  </div>
+                  <span className="patch-badge">PATCH</span>
                 </div>
-                <span className="patch-badge">PATCH</span>
-              </div>
-              <div className="card-rpa-sig">
-                <svg
-                  className="card-sig-svg"
-                  viewBox={`0 0 ${sig.width} 100`}
-                  preserveAspectRatio="xMidYMid meet"
-                  style={{ transform: `rotate(${sig.slant}deg)` }}
-                >
-                  <path
-                    d={sig.d}
-                    fill="none"
-                    stroke={sig.ink}
-                    strokeWidth={sig.strokeWidth}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="auto-badge">✒ RPA</span>
-              </div>
-            </>
-          )}
+              )}
 
-          <div className="card-head">
-            <span className="card-setmark">
-              {set.wordmark} <span className="card-setyear">· '26</span>
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              {card.player.isRookie && <span className="card-rc-badge">RC</span>}
-              <span className="card-parallel-pill" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
-                {shortName}
-              </span>
-            </div>
-          </div>
-          <div className="card-plate">
-            <div className="card-name">{card.player.name}</div>
-            <div className="card-sub">
-              {card.player.position} · {card.player.teamAbbr}
-              {card.player.overallRating != null ? ` · OVR ${card.player.overallRating}` : ''}
-            </div>
-            <div className="card-plate-row">
-              <span className="card-serial mono">
-                {card.serial != null ? `#${card.serial}${card.printRun ? '/' + card.printRun : ''}` : 'BASE'}
-              </span>
-              <span className="card-value-pill mono">{money(card.marketValue)}</span>
+              {sig && !isRpa && (
+                <div className="card-sig">
+                  {sigSvg}
+                  <span className="auto-badge">✒ AUTO</span>
+                </div>
+              )}
+
+              {isRpa && sig && (
+                <>
+                  <div className="card-rpa-patch">
+                    <div className="card-patch-window">
+                      <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+                    </div>
+                    <span className="patch-badge">PATCH</span>
+                  </div>
+                  <div className="card-rpa-sig">
+                    {sigSvg}
+                    <span className="auto-badge">✒ RPA</span>
+                  </div>
+                </>
+              )}
+
+              <div className="card-head">
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {card.player.isRookie && <span className="card-rc-badge">RC</span>}
+                </div>
+              </div>
+              <div className="card-plate">
+                <div className="card-name">{card.player.name}</div>
+                <div className="card-sub">{card.player.position} · {card.player.teamAbbr}</div>
+                <div className="card-plate-row">
+                  <span className="card-serial mono">
+                    {card.serial != null ? `#${card.serial}${card.printRun ? '/' + card.printRun : ''}` : 'BASE'}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ── BACK ── full detail: set info, patch, sig, value */}
+        <div className="card-face card-face-back">
+          <div className="card-frame">
+            <div className="card-inner">
+              <div className="card-set-bg" />
+              <div className="card-set-fx" />
+              <div className="sheen" />
+
+              <div className="card-head">
+                <span className="card-setmark">
+                  {set.wordmark} <span className="card-setyear">· '26</span>
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  {card.player.isRookie && <span className="card-rc-badge">RC</span>}
+                  <span className="card-parallel-pill" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
+                    {shortName}
+                  </span>
+                </div>
+              </div>
+
+              <div className="card-plate">
+                <div className="card-name">{card.player.name}</div>
+                <div className="card-sub">
+                  {card.player.position} · {card.player.teamAbbr}
+                  {card.player.overallRating != null ? ` · OVR ${card.player.overallRating}` : ''}
+                </div>
+                <div className="card-plate-row">
+                  <span className="card-serial mono">
+                    {card.serial != null ? `#${card.serial}${card.printRun ? '/' + card.printRun : ''}` : 'BASE'}
+                  </span>
+                  <span className="card-value-pill mono">{money(card.marketValue)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

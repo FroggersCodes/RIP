@@ -2,6 +2,7 @@
   --accent: #8b94a3;
   width: 184px;
   user-select: none;
+  perspective: 900px;
 }
 .card-sm {
   width: 152px;
@@ -9,12 +10,45 @@
 .card-lg {
   width: 230px;
 }
-.card.clickable {
+.card.clickable .card-flip-inner {
   cursor: pointer;
 }
 .card.faded {
   opacity: 0.6;
   filter: saturate(0.75);
+}
+
+/* ---------- 3D flip ---------- */
+.card-flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.card.is-flipped .card-flip-inner {
+  transform: rotateY(180deg);
+}
+.card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.card-face-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+/* ---------- hit-type badges on front face ---------- */
+.card-hit-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 1px 5px;
+  background: rgba(8, 10, 14, 0.5);
 }
 
 /* The frame is the card border — its look is driven by the SET (special parallels
@@ -26,7 +60,7 @@
   box-shadow: var(--shadow-card);
   transition: transform 0.12s ease, box-shadow 0.2s ease;
 }
-.card.clickable:hover .card-frame {
+.card:not(.is-flipped):hover .card-face-front .card-frame {
   transform: translateY(-3px);
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
 }
