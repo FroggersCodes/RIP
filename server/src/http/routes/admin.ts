@@ -7,7 +7,7 @@ import { advanceWeek } from '../../league/advanceWeek';
 import { maybeAdvance, updateClock } from '../../league/clock';
 import { importNflData } from '../../data/importNfl';
 import { seed } from '../../../prisma/seed';
-import { PARALLELS } from '@rip/shared';
+import { PARALLELS, PARALLEL_NAMES } from '@rip/shared';
 
 const router = Router();
 
@@ -35,7 +35,7 @@ const clockSchema = z.object({
   autoAdvance: z.boolean().optional(),
   luckBoost: z.number().min(1).max(50).optional(),
   forceParallel: z
-    .enum(['BASE', 'BLUE', 'PURPLE', 'GOLD', 'PATCH', 'BLACK', 'AUTOGRAPH', 'PATCH_AUTO', 'EMERALD', 'SUPERFRACTOR'])
+    .enum(PARALLEL_NAMES as [string, ...string[]])
     .nullable()
     .optional(),
 });

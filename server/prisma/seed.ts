@@ -73,8 +73,19 @@ export async function seed() {
   const SPARK = { BASE: 7200, BLUE: 1460, GOLD: 270, PATCH: 260, AUTOGRAPH: 210 };
   // Tier 2: Momentum — athletic mid box; guaranteed 1 hit per box.
   const MOMENTUM = { BASE: 6200, BLUE: 800, PURPLE: 800, GOLD: 500, PATCH: 400, BLACK: 200, AUTOGRAPH: 300 };
-  // Tier 3: Artistry — gallery prestige; guaranteed 2 hits, at least 1 auto naturally.
-  const ARTISTRY = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, PATCH_AUTO: 30, EMERALD: 100 };
+  // Tier 3: Artistry — gallery prestige with its own numbered rainbow, base autographs,
+  // and a Rookie Patch Auto chase. Guaranteed 2 hits, strong auto odds.
+  const ARTISTRY = {
+    BASE: 5000,
+    // numbered rainbow
+    ART_RED: 1400, ART_BLUE: 1000, ART_GREEN: 700,
+    ART_BLUE_ICE: 220, ART_RAINBOW: 150, ART_PURPLE_ICE: 110, ART_GOLD: 60, ART_WHITE: 18, ART_BLACK: 2,
+    // base autographs (same rainbow, signed)
+    ART_RED_AUTO: 120, ART_BLUE_AUTO: 90, ART_GREEN_AUTO: 70, ART_BLUE_ICE_AUTO: 40,
+    ART_RAINBOW_AUTO: 28, ART_PURPLE_ICE_AUTO: 20, ART_GOLD_AUTO: 12, ART_WHITE_AUTO: 5, ART_BLACK_AUTO: 1,
+    // rookie patch autos
+    ART_RPA_50: 30, ART_RPA_35: 20, ART_RPA_25: 14, ART_RPA_10: 8, ART_RPA_3: 3, ART_RPA_1: 1,
+  };
   // Tier 4: Gold Standard — high-end; guaranteed 2 hits, all-numbered box.
   const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
   // Tier 5: Reliquary — ultra; every card numbered, guaranteed 4 hits (dense patch/auto).
@@ -94,7 +105,7 @@ export async function seed() {
       {
         name: 'Artistry', year: 2026, entryCost: 500, caseCost: 0, tier: 'artistry',
         setKey: 'artistry', cardsPerPack: 5, packsPerBox: 2, minHits: 2, topPlayerBias: 0.55, pullRates: ARTISTRY,
-        description: '2-pack box (10 cards). Canvas-texture gallery aesthetic. Guaranteed ≥2 hits, strong auto odds.',
+        description: '2-pack box (10 cards). Canvas-texture gallery aesthetic with its own numbered rainbow (Red /299 → Black 1/1), on-card base autographs, and a Rookie Patch Auto chase. Guaranteed ≥2 hits.',
       },
       {
         name: 'Gold Standard', year: 2026, entryCost: 1000, caseCost: 1, tier: 'gold-standard',

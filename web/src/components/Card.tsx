@@ -52,26 +52,36 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
   const [flipped, setFlipped] = useState(false);
 
   const def = PARALLEL_MAP[card.parallel];
-  const isRpa = card.parallel === 'PATCH_AUTO';
-  const tier = card.refractor
-    ? 'refractor'
-    : isRpa
-      ? 'tier-rpa'
-      : card.parallel === 'AUTOGRAPH'
-        ? 'tier-auto'
-        : card.parallel === 'PATCH'
-          ? 'tier-patch'
-          : card.parallel === 'GOLD'
-            ? 'tier-gold'
-            : 'tier-plain';
+  const isRpa = !!def.rpa;
+  // Each parallel's `finish` maps to a frame treatment; RPA owns its own layout,
+  // and a refractor frame trumps the plain finish.
+  const FINISH_TIER: Record<string, string> = {
+    plain: 'tier-plain',
+    gold: 'tier-gold',
+    autogold: 'tier-auto',
+    patch: 'tier-patch',
+    ice: 'finish-ice',
+    white: 'finish-white',
+    black: 'finish-black',
+  };
+  const tier = isRpa
+    ? 'tier-rpa'
+    : card.refractor
+      ? 'refractor'
+      : FINISH_TIER[def.finish ?? 'plain'] ?? 'tier-plain';
 
   const set = setOf(card.setKey);
-  const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
-  const hasSig = card.parallel === 'AUTOGRAPH' || isRpa;
+  const shortName = def.displayName
+    .replace(/\s*1\/1.*$/, '')
+    .replace(/\s*\/\d.*$/, '')
+    .replace(/\s*Finite$/, '')
+    .trim();
+  const isDarkPill = def.finish === 'black';
+  const hasSig = !!def.signed;
   const sig = hasSig ? signaturePath(card.player.id) : null;
   const teamPrimary = card.player.teamPrimaryColor ?? '#1a2a4a';
   const teamSecondary = card.player.teamSecondaryColor ?? '#0c1422';
-  const hasPatch = card.parallel === 'PATCH' || isRpa;
+  const hasPatch = !!def.patched;
 
   const handleClick = () => {
     if (onClick) {
@@ -186,7 +196,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   {card.player.isRookie && <span className="card-rc-badge">RC</span>}
-                  <span className="card-parallel-pill" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
+                  <span className="card-parallel-pill" style={{ color: isDarkPill ? '#cfd6e2' : def.color }}>
                     {shortName}
                   </span>
                 </div>
