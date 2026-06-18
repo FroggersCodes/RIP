@@ -165,22 +165,37 @@
   opacity: 0.4;
   mix-blend-mode: screen;
 }
+/* Chrome — silver sunburst rays from behind the player. */
 .set-chrome .card-set-fx {
-  background: repeating-linear-gradient(90deg, rgba(180, 215, 255, 0) 0 8px, rgba(190, 220, 255, 0.12) 8px 9px);
+  opacity: 0.5;
+  background: repeating-conic-gradient(from 0deg at 50% 40%, rgba(190, 220, 255, 0.13) 0deg 3.2deg, transparent 3.2deg 8deg);
 }
+/* Prizm — animated rainbow refractor shards. */
 .set-prizm .card-set-fx {
-  background: repeating-linear-gradient(
-    115deg,
-    rgba(255, 60, 180, 0.14) 0 5px,
-    rgba(60, 210, 255, 0.14) 5px 10px,
-    rgba(150, 90, 255, 0.12) 10px 15px,
-    transparent 15px 26px
+  opacity: 0.62;
+  background-size: 200% 200%;
+  background-image: repeating-linear-gradient(
+    125deg,
+    rgba(255, 60, 180, 0.18) 0 4px,
+    rgba(60, 210, 255, 0.18) 4px 8px,
+    rgba(150, 90, 255, 0.16) 8px 12px,
+    rgba(120, 255, 170, 0.14) 12px 16px,
+    transparent 16px 24px
   );
+  animation: prizm-shift 7s linear infinite;
 }
+/* Vault — dark carbon weave with a gold floor glow. */
 .set-vault .card-set-fx {
   mix-blend-mode: normal;
-  opacity: 0.7;
-  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.22) 0 2px, transparent 2px 7px);
+  opacity: 0.85;
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.3) 0 3px, transparent 3px 8px),
+    radial-gradient(120% 90% at 50% 112%, rgba(245, 181, 61, 0.2), transparent 55%);
+}
+@keyframes prizm-shift {
+  to {
+    background-position: 80px 0;
+  }
 }
 
 /* ---------- specular sheen ---------- */
@@ -229,18 +244,12 @@
   pointer-events: none;
 }
 .card-sig-svg {
-  width: 80%;
+  width: 82%;
   height: auto;
-  transform: rotate(-4deg);
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.75));
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
 .card-sig-svg path {
-  fill: none;
-  stroke: #ffffff;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.94;
+  opacity: 0.95;
 }
 .auto-badge {
   font-family: var(--font-display);

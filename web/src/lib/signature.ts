@@ -1,6 +1,7 @@
-// Generate a deterministic, signature-looking SVG path from a player's name.
-// Each player gets a consistent, unique scrawl (a capital loop, a wavy run, a
-// trailing flourish, and an underline) — looks hand-signed, not like typed cursive.
+// Generate a unique, hand-signed-looking signature for each player. Everything
+// (capital style, stroke count, amplitude, loops, flourish, underline, slant, ink
+// color, stroke width) is seeded from the player's name, so each player has their
+// own distinct, stable autograph.
 
 function mulberry32(seed: number) {
   return function () {
@@ -20,34 +21,67 @@ function hash(s: string): number {
   return h >>> 0;
 }
 
-export function signaturePath(name: string): { d: string; width: number } {
+const INKS = ['#ffffff', '#e6edf8', '#5b8cff', '#ffd479', '#8be0ff', '#c9b3ff'];
+
+export interface Signature {
+  d: string;
+  width: number;
+  slant: number;
+  ink: string;
+  strokeWidth: number;
+}
+
+export function signaturePath(name: string): Signature {
   const rng = mulberry32(hash(name));
   const r = (a: number, b: number) => a + rng() * (b - a);
-  const y = 64;
-  let x = 14;
   const n = (v: number) => v.toFixed(1);
-
-  // Capital initial loop.
-  const capH = r(34, 52);
+  const y = 62;
+  let x = 14;
   let d = `M ${n(x)} ${n(y)}`;
-  d += ` C ${n(x - 8)} ${n(y - capH)}, ${n(x + 28)} ${n(y - capH - 8)}, ${n(x + 22)} ${n(y - 4)}`;
-  d += ` S ${n(x + 8)} ${n(y + 10)}, ${n(x + 26)} ${n(y)}`;
-  x += 28;
 
-  // Wavy scrawl.
-  const strokes = 5 + Math.floor(rng() * 5);
+  // Capital initial — one of a few shapes.
+  const cap = Math.floor(rng() * 3);
+  const capH = r(34, 54);
+  if (cap === 0) {
+    d += ` C ${n(x - 10)} ${n(y - capH)}, ${n(x + 30)} ${n(y - capH - 8)}, ${n(x + 22)} ${n(y - 4)}`;
+    d += ` S ${n(x + 8)} ${n(y + 10)}, ${n(x + 28)} ${n(y)}`;
+    x += 30;
+  } else if (cap === 1) {
+    d += ` Q ${n(x + 6)} ${n(y - capH - 6)}, ${n(x + 26)} ${n(y - 10)} T ${n(x + 42)} ${n(y)}`;
+    x += 44;
+  } else {
+    d += ` L ${n(x + 10)} ${n(y - capH)} L ${n(x + 20)} ${n(y)} L ${n(x + 30)} ${n(y - capH * 0.6)}`;
+    x += 32;
+  }
+
+  // Wavy run, with occasional mid-stroke loops.
+  const strokes = 4 + Math.floor(rng() * 6);
+  const amp = r(16, 38);
   for (let i = 0; i < strokes; i++) {
-    const x2 = x + r(15, 30);
-    const up = y - r(14, 42);
-    const dn = y + r(0, 14);
+    const x2 = x + r(13, 28);
+    const up = y - r(amp * 0.4, amp);
+    const dn = y + r(0, 16);
+    if (rng() < 0.22) d += ` c ${n(r(2, 8))} ${n(-r(18, 30))}, ${n(-r(4, 10))} ${n(-r(18, 30))}, 2 2`;
     d += ` C ${n(x + r(2, 9))} ${n(up)}, ${n(x2 - r(2, 9))} ${n(dn)}, ${n(x2)} ${n(y - r(0, 10))}`;
     x = x2;
   }
 
-  // Trailing flourish + underline swoosh.
-  const fx = x + r(22, 48);
-  d += ` C ${n(x + 12)} ${n(y - 28)}, ${n(fx)} ${n(y - 32)}, ${n(fx)} ${n(y + 2)}`;
-  d += ` M 10 ${n(y + 20)} q ${n(x / 2)} ${n(r(10, 20))} ${n(x + 28)} ${n(r(-8, 2))}`;
+  // Trailing flourish.
+  const fx = x + r(18, 50);
+  if (rng() < 0.7) d += ` C ${n(x + 12)} ${n(y - r(20, 34))}, ${n(fx)} ${n(y - r(20, 36))}, ${n(fx)} ${n(y + 2)}`;
+  else d += ` L ${n(fx)} ${n(y - r(6, 18))}`;
 
-  return { d, width: Math.max(150, fx + 20) };
+  // Underline swoosh (sometimes).
+  if (rng() < 0.6) {
+    const uy = y + r(16, 24);
+    d += ` M 8 ${n(uy)} q ${n(fx / 2)} ${n(r(8, 20))} ${n(fx - 2)} ${n(r(-10, 2))}`;
+  }
+
+  return {
+    d,
+    width: Math.max(150, fx + 18),
+    slant: r(-9, 2),
+    ink: INKS[Math.floor(rng() * INKS.length)]!,
+    strokeWidth: r(2.4, 3.6),
+  };
 }

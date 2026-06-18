@@ -49,8 +49,20 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
           <div className="sheen" />
           {sig && (
             <div className="card-sig">
-              <svg className="card-sig-svg" viewBox={`0 0 ${sig.width} 100`} preserveAspectRatio="xMidYMid meet">
-                <path d={sig.d} />
+              <svg
+                className="card-sig-svg"
+                viewBox={`0 0 ${sig.width} 100`}
+                preserveAspectRatio="xMidYMid meet"
+                style={{ transform: `rotate(${sig.slant}deg)` }}
+              >
+                <path
+                  d={sig.d}
+                  fill="none"
+                  stroke={sig.ink}
+                  strokeWidth={sig.strokeWidth}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <span className="auto-badge">✒ AUTO</span>
             </div>
