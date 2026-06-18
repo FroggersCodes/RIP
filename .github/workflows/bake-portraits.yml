@@ -41,7 +41,9 @@ jobs:
         env:
           IMAGE_PROVIDER: ${{ inputs.provider }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          BAKE_CONCURRENCY: '6'
+          # Pollinations free tier rate-limits hard above 1 concurrent request
+          BAKE_CONCURRENCY: '1'
+          BAKE_DELAY_MS: '4000'
         run: npm run bake:portraits
       - name: Commit portraits
         run: |

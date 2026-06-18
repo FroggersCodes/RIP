@@ -12,7 +12,9 @@ import { buildAllPlayers, nameSlug, type PlayerSeed } from '../src/data/roster';
 
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/public/players');
 const PROVIDER = process.env.IMAGE_PROVIDER ?? (process.env.OPENAI_API_KEY ? 'dalle' : 'pollinations');
-const CONCURRENCY = Number(process.env.BAKE_CONCURRENCY ?? 4);
+const CONCURRENCY = Number(process.env.BAKE_CONCURRENCY ?? 1);
+// Minimum gap between requests per worker — keeps Pollinations happy on the free tier
+const DELAY_MS = Number(process.env.BAKE_DELAY_MS ?? 4000);
 
 const POSITION_TITLE: Record<string, string> = {
   QB: 'quarterback',
@@ -75,24 +77,35 @@ async function genOpenAI(prompt: string): Promise<Buffer> {
 async function genPollinations(prompt: string, seed: number): Promise<Buffer> {
   // flux-realism produces photorealistic results vs plain flux which looks illustrated
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=960&seed=${seed}&nologo=true&model=flux-realism&enhance=true`;
-  const r = await fetch(url, { signal: AbortSignal.timeout(60_000) });
-  if (!r.ok) throw new Error(`pollinations ${r.status}`);
+  const r = await fetch(url, { signal: AbortSignal.timeout(90_000) });
+  if (!r.ok) {
+    // Surface the rate-limit delay hint if present
+    const retryAfter = r.headers.get('retry-after');
+    throw Object.assign(new Error(`pollinations ${r.status}`), { status: r.status, retryAfter: retryAfter ? Number(retryAfter) : null });
+  }
   const ct = r.headers.get('content-type') ?? '';
   if (!ct.startsWith('image')) throw new Error(`pollinations returned ${ct}`);
   return Buffer.from(await r.arrayBuffer());
 }
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function generate(p: PlayerSeed): Promise<Buffer> {
   const prompt = promptFor(p);
   const seed = hash(p.name) % 1_000_000;
-  for (let attempt = 0; attempt < 4; attempt++) {
+  for (let attempt = 0; attempt < 6; attempt++) {
     try {
       if (PROVIDER === 'openai') return await genOpenAI(prompt);
       if (PROVIDER === 'dalle') return await genDallE3(prompt);
       return await genPollinations(prompt, seed);
-    } catch (e) {
-      if (attempt === 3) throw e;
-      await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+    } catch (e: any) {
+      if (attempt === 5) throw e;
+      // 429: respect retry-after or back off aggressively
+      const wait = e.status === 429
+        ? (e.retryAfter ? e.retryAfter * 1000 : 15_000 * (attempt + 1))
+        : 3_000 * (attempt + 1);
+      console.log(`    retry ${attempt + 1} for ${p.name} in ${wait / 1000}s (${e.message})`);
+      await delay(wait);
     }
   }
   throw new Error('unreachable');
@@ -126,6 +139,8 @@ async function main() {
         failed++;
         console.error(`  FAILED ${p.name}: ${(e as Error).message ?? e}`);
       }
+      // Throttle between requests so Pollinations free tier doesn't 429
+      if (PROVIDER === 'pollinations') await delay(DELAY_MS);
     }
   }
 
