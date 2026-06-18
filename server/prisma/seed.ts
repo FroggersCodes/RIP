@@ -67,16 +67,44 @@ export async function seed() {
   await prisma.cardTemplate.createMany({ data: templateData });
 
   console.log('Creating products...');
-  const CHROME = { BASE: 8800, BLUE: 950, PURPLE: 200, GOLD: 42, PATCH: 8, BLACK: 6, AUTOGRAPH: 1, EMERALD: 1.4, SUPERFRACTOR: 0.15 };
-  const PRIZM = { BASE: 8400, BLUE: 1150, PURPLE: 300, GOLD: 95, PATCH: 20, BLACK: 16, AUTOGRAPH: 2.5, EMERALD: 4, SUPERFRACTOR: 0.5 };
-  const VAULT = { BASE: 7100, BLUE: 1900, PURPLE: 700, GOLD: 280, PATCH: 55, BLACK: 40, AUTOGRAPH: 7, EMERALD: 12, SUPERFRACTOR: 1.6 };
+  // Pull rate weights — normalized per card during the roll. Higher = more likely.
+  // Tier 1: Spark — cheap, snappy, cardboard-and-foil entry box.
+  const SPARK = { BASE: 7200, BLUE: 1460, GOLD: 270, PATCH: 260, AUTOGRAPH: 210 };
+  // Tier 2: Momentum — athletic mid box; guaranteed 1 hit per box.
+  const MOMENTUM = { BASE: 6200, BLUE: 800, PURPLE: 800, GOLD: 500, PATCH: 400, BLACK: 200, AUTOGRAPH: 300 };
+  // Tier 3: Artistry — gallery prestige; guaranteed 2 hits, at least 1 auto naturally.
+  const ARTISTRY = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, EMERALD: 100 };
+  // Tier 4: Gold Standard — high-end; guaranteed 2 hits, all-numbered box.
+  const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, EMERALD: 250, SUPERFRACTOR: 30 };
+  // Tier 5: Reliquary — ultra; every card numbered, guaranteed 4 hits (dense patch/auto).
+  const RELIQUARY = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, EMERALD: 700, SUPERFRACTOR: 150 };
   await prisma.product.createMany({
     data: [
-      { name: 'Topps Chrome 2026', year: 2026, entryCost: 100, caseCost: 0, tier: 'fresh', setKey: 'chrome', cardsPerPack: 5, description: 'Fresh-season flagship. Reliable base with a real shot at a refractor or auto hit.', topPlayerBias: 0.4, pullRates: CHROME },
-      { name: 'Prizm Legacy 2025', year: 2025, entryCost: 150, caseCost: 0, tier: 'legacy', setKey: 'prizm', cardsPerPack: 5, description: 'Last season legacy product. Better mid-tier parallels for the patient collector.', topPlayerBias: 0.5, pullRates: PRIZM },
-      { name: 'Premier Vault', year: 2026, entryCost: 500, caseCost: 1, tier: 'chase', setKey: 'vault', cardsPerPack: 6, description: 'Chase-heavy premium pack. Costs a case. Every card has elevated hit odds.', topPlayerBias: 0.7, pullRates: VAULT },
-      { name: 'Topps Chrome — Hobby Box', year: 2026, entryCost: 480, caseCost: 0, tier: 'box', setKey: 'chrome', cardsPerPack: 5, packsPerBox: 6, guaranteeNumbered: true, description: '6 packs (30 cards). Every box guarantees at least one numbered card.', topPlayerBias: 0.45, pullRates: CHROME },
-      { name: 'Premier Vault — Hobby Box', year: 2026, entryCost: 2400, caseCost: 1, tier: 'box', setKey: 'vault', cardsPerPack: 5, packsPerBox: 6, guaranteeNumbered: true, description: '6 chase-heavy packs (30 cards), guaranteed numbered — your best shot at autos and 1/1s.', topPlayerBias: 0.7, pullRates: VAULT },
+      {
+        name: 'Spark', year: 2026, entryCost: 80, caseCost: 0, tier: 'spark',
+        setKey: 'spark', cardsPerPack: 6, topPlayerBias: 0.35, pullRates: SPARK,
+        description: 'Entry-level 6-card rip. Electric blue foil, crackling static aesthetic. ~70% color parallel, ~25% hit per box.',
+      },
+      {
+        name: 'Momentum', year: 2026, entryCost: 200, caseCost: 0, tier: 'momentum',
+        setKey: 'momentum', cardsPerPack: 4, packsPerBox: 2, minHits: 1, topPlayerBias: 0.45, pullRates: MOMENTUM,
+        description: '2-pack box (8 cards). Motion-blur speed-line design. Guaranteed ≥1 hit per box.',
+      },
+      {
+        name: 'Artistry', year: 2026, entryCost: 500, caseCost: 0, tier: 'artistry',
+        setKey: 'artistry', cardsPerPack: 5, packsPerBox: 2, minHits: 2, topPlayerBias: 0.55, pullRates: ARTISTRY,
+        description: '2-pack box (10 cards). Canvas-texture gallery aesthetic. Guaranteed ≥2 hits, strong auto odds.',
+      },
+      {
+        name: 'Gold Standard', year: 2026, entryCost: 1000, caseCost: 1, tier: 'gold-standard',
+        setKey: 'gold-standard', cardsPerPack: 8, minHits: 2, guaranteeNumbered: true, topPlayerBias: 0.65, pullRates: GOLD_STANDARD,
+        description: 'Matte-black, embossed gold foil. 8-card premium box. Costs a case. All cards numbered, ≥2 hits guaranteed.',
+      },
+      {
+        name: 'Reliquary', year: 2026, entryCost: 2500, caseCost: 2, tier: 'reliquary',
+        setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
+        description: 'Vault-door ultra-premium. 8-card rip. Costs 2 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.',
+      },
     ],
   });
 

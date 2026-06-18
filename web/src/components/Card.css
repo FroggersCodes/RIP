@@ -259,6 +259,160 @@
   }
 }
 
+/* ============================================================
+   5-TIER PRODUCT LINE
+   ============================================================ */
+
+/* ---------- SPARK (tier 1) — electric blue, crackling static ---------- */
+.set-spark .card-frame {
+  background: linear-gradient(140deg, #0a1828, #153055 40%, #38bdf8 52%, #153055 64%, #0a1828);
+}
+.set-spark .card-set-bg {
+  background: radial-gradient(100% 75% at 50% 20%, #1e3a6e 0%, #0b1a3a 55%, #02060f 100%);
+}
+.set-spark .card-set-bg::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background:
+    repeating-linear-gradient(70deg, transparent 0 9px, rgba(56, 189, 248, 0.18) 9px 10px, transparent 10px 22px),
+    repeating-linear-gradient(-70deg, transparent 0 14px, rgba(99, 210, 255, 0.1) 14px 15px, transparent 15px 32px);
+  animation: spark-flicker 0.5s steps(4) infinite;
+}
+@keyframes spark-flicker {
+  0%   { opacity: 1; }
+  25%  { opacity: 0.55; }
+  50%  { opacity: 0.9; }
+  75%  { opacity: 0.65; }
+  100% { opacity: 1; }
+}
+.set-spark .card-set-fx {
+  opacity: 0.5;
+  background: linear-gradient(118deg, transparent 33%, rgba(56, 189, 248, 0.55) 48%, rgba(186, 230, 255, 0.28) 54%, transparent 68%);
+}
+
+/* ---------- MOMENTUM (tier 2) — motion blur, diagonal speed lines, field green ---------- */
+.set-momentum .card-frame {
+  background: linear-gradient(140deg, #0d1a0d, #1a3a20 40%, #4ade80 52%, #1a3a20 64%, #0d1a0d);
+}
+.set-momentum .card-set-bg {
+  background:
+    radial-gradient(90% 55% at 50% 40%, rgba(74, 222, 128, 0.12) 0%, transparent 65%),
+    linear-gradient(155deg, #060e07 0%, #0c160c 100%);
+}
+.set-momentum .card-set-bg::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(
+    155deg,
+    transparent 0 18px,
+    rgba(255, 255, 255, 0.065) 18px 20px,
+    transparent 20px 40px,
+    rgba(74, 222, 128, 0.07) 40px 42px,
+    transparent 42px 66px
+  );
+  animation: momentum-streak 1.8s linear infinite;
+}
+@keyframes momentum-streak {
+  to { background-position: 0 100px; }
+}
+.set-momentum .card-set-fx {
+  opacity: 0.48;
+  background: linear-gradient(155deg, transparent 28%, rgba(134, 239, 172, 0.32) 47%, rgba(255, 255, 255, 0.12) 54%, transparent 70%);
+}
+
+/* ---------- ARTISTRY (tier 3) — canvas texture, painted, gallery prestige ---------- */
+.set-artistry .card-frame {
+  background: linear-gradient(140deg, #3a2508, #7a5810 38%, #fde68a 50%, #7a5810 62%, #3a2508);
+  box-shadow: 0 0 0 2px #1a0e02, var(--shadow-card);
+}
+.set-artistry .card-set-bg {
+  background:
+    radial-gradient(85% 65% at 25% 20%, rgba(251, 191, 36, 0.16) 0%, transparent 55%),
+    radial-gradient(70% 60% at 75% 75%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+    linear-gradient(160deg, #1a120a 0%, #0e0a05 100%);
+}
+.set-artistry .card-set-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg,   rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg,  rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 5px);
+}
+.set-artistry .card-set-fx {
+  opacity: 0.52;
+  background: linear-gradient(
+    116deg,
+    transparent 18%,
+    rgba(251, 191, 36, 0.1)  35%,
+    rgba(255, 235, 150, 0.38) 48%,
+    rgba(251, 191, 36, 0.14)  58%,
+    transparent 74%
+  );
+}
+
+/* ---------- GOLD STANDARD (tier 4) — matte black, embossed gold foil ---------- */
+.set-gold-standard .card-frame {
+  background: linear-gradient(140deg, #080806, #161200 38%, #c9a227 50%, #161200 62%, #080806);
+}
+.set-gold-standard .card-set-bg {
+  background:
+    radial-gradient(70% 45% at 50% 105%, rgba(201, 162, 39, 0.2) 0%, transparent 60%),
+    linear-gradient(160deg, #0a0905 0%, #060503 100%);
+}
+.set-gold-standard .card-set-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient( 45deg, rgba(201, 162, 39, 0.045) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(-45deg, rgba(201, 162, 39, 0.045) 0 1px, transparent 1px 9px);
+}
+.set-gold-standard .card-set-fx {
+  opacity: 0.6;
+  background: linear-gradient(118deg, transparent 28%, rgba(201, 162, 39, 0.5) 46%, rgba(255, 240, 180, 0.22) 53%, transparent 68%);
+  animation: gold-standard-gleam 5s ease-in-out infinite;
+}
+@keyframes gold-standard-gleam {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.6; }
+}
+
+/* ---------- RELIQUARY (tier 5) — vault-door, oxblood and platinum ---------- */
+.set-reliquary .card-frame {
+  background: linear-gradient(140deg, #140610, #30101e 38%, #e2e8f0 50%, #30101e 62%, #140610);
+  box-shadow: 0 0 0 1px #4a1020, var(--shadow-card);
+}
+.set-reliquary .card-set-bg {
+  background:
+    radial-gradient(100% 60% at 50% 0%, rgba(200, 30, 60, 0.22) 0%, transparent 55%),
+    linear-gradient(160deg, #120408 0%, #0a0206 100%);
+}
+.set-reliquary .card-set-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* vault plate: rivets at corners + grid lines */
+  background:
+    radial-gradient(circle at  8%  12%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
+    radial-gradient(circle at 92%  12%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
+    radial-gradient(circle at  8%  88%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
+    radial-gradient(circle at 92%  88%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
+    repeating-linear-gradient( 0deg, rgba(160, 18, 36, 0.06) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(90deg, rgba(160, 18, 36, 0.06) 0 1px, transparent 1px 14px);
+}
+.set-reliquary .card-set-fx {
+  opacity: 0.6;
+  background: linear-gradient(118deg, transparent 22%, rgba(220, 230, 240, 0.38) 45%, rgba(255, 255, 255, 0.18) 52%, rgba(220, 230, 240, 0.18) 58%, transparent 74%);
+  animation: reliquary-gleam 3.5s ease-in-out infinite;
+}
+@keyframes reliquary-gleam {
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 0.62; }
+}
+
 /* ---------- specular sheen ---------- */
 .sheen {
   position: absolute;

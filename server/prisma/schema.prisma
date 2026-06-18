@@ -149,6 +149,7 @@ model Product {
   cardsPerPack  Int     @default(5)
   packsPerBox   Int     @default(1) // >1 = a box of packs
   guaranteeNumbered Boolean @default(false) // box guarantees >=1 numbered card
+  minHits           Int     @default(0)     // box guarantees this many hit-quality cards
   description   String
   isActive      Boolean @default(true)
   pullRates     Json // { "BASE": weight, "BLUE": weight, ... } per-card weights

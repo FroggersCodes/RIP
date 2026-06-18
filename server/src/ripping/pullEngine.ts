@@ -245,6 +245,20 @@ export function rollNumberedParallel(pullRates: Record<string, number>): Paralle
   return entries[entries.length - 1]![0];
 }
 
+/** Weighted roll restricted to hit-quality parallels (GOLD and rarer). */
+export function rollHitParallel(pullRates: Record<string, number>): ParallelName {
+  const hitNames: ParallelName[] = ['GOLD', 'PATCH', 'BLACK', 'AUTOGRAPH', 'EMERALD', 'SUPERFRACTOR'];
+  const entries = hitNames.map((n) => [n, pullRates[n] ?? 0] as const).filter(([, w]) => w > 0);
+  const total = entries.reduce((a, [, w]) => a + w, 0);
+  if (total <= 0) return 'GOLD';
+  let r = Math.random() * total;
+  for (const [name, w] of entries) {
+    r -= w;
+    if (r <= 0) return name;
+  }
+  return entries[entries.length - 1]![0];
+}
+
 function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation, setKey: string): PulledCard {
   return {
     instanceId: resolved.instanceId,
@@ -278,6 +292,8 @@ export interface OpenPackArgs {
   setKey: string;
   /** Box guarantee: ensure at least one numbered card in the whole opening. */
   guaranteeNumbered?: boolean;
+  /** Box guarantee: ensure at least this many hit-quality cards (GOLD+) in the whole opening. */
+  minHits?: number;
   /** Dev luck: exponentially boosts rarer tiers (1 = normal odds). */
   luck?: number;
   /** Dev force: every card is pulled as this parallel (overrides the roll). */
@@ -317,5 +333,22 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
     cards[idx] = buildPulledCard(player, resolved, args.setKey);
   }
+
+  // Box guarantee: upgrade lowest-rarity cards until minHits hit-quality cards exist.
+  const needed = (args.minHits ?? 0) - cards.filter((c) => c.isHit).length;
+  if (needed > 0) {
+    const upgradeable = cards
+      .map((c, i) => ({ c, i }))
+      .filter(({ c }) => !c.isHit)
+      .slice(0, needed);
+    for (const { i } of upgradeable) {
+      await tx.cardInstance.delete({ where: { id: cards[i]!.instanceId } });
+      const rolled = rollHitParallel(rates);
+      const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
+      const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
+      cards[i] = buildPulledCard(player, resolved, args.setKey);
+    }
+  }
+
   return cards;
 }
