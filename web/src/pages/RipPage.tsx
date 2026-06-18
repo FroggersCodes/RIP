@@ -104,7 +104,11 @@ export function RipPage() {
                             }}
                           />
                         </span>
-                        <span className="odds-pct">{o.percent < 1 ? o.percent.toFixed(2) : o.percent.toFixed(1)}%</span>
+                        <span className="odds-pct">
+                          {o.percent < 0.5 && o.oneIn
+                            ? `1:${o.oneIn.toLocaleString()}`
+                            : `${o.percent < 1 ? o.percent.toFixed(2) : o.percent.toFixed(1)}%`}
+                        </span>
                       </div>
                     ))}
                   </div>

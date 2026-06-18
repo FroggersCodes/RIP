@@ -16,7 +16,7 @@ export function productView(p: Product) {
       printRun: par.printRun,
       refractor: par.refractor,
       color: par.color,
-      percent: Math.round(prob * 10000) / 100,
+      percent: Math.round(prob * 1_000_000) / 10_000,
       oneIn: prob > 0 ? Math.round(1 / prob) : null,
     };
   });
