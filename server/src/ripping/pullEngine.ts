@@ -50,6 +50,8 @@ export interface PlayerPoolEntry {
   isTopPlayer: boolean;
   teamName: string;
   teamAbbr: string;
+  teamPrimaryColor: string;
+  teamSecondaryColor: string;
 }
 
 export interface PulledCard {
@@ -61,6 +63,8 @@ export interface PulledCard {
     currentValue: number;
     teamName: string;
     teamAbbr: string;
+    teamPrimaryColor: string;
+    teamSecondaryColor: string;
   };
   parallel: ParallelName;
   serial: number | null;
@@ -80,7 +84,7 @@ export async function loadPlayerPool(client: DbClient): Promise<PlayerPoolEntry[
       position: true,
       currentValue: true,
       isTopPlayer: true,
-      team: { select: { name: true, abbreviation: true } },
+      team: { select: { name: true, abbreviation: true, primaryColor: true, secondaryColor: true } },
     },
   });
   return players.map((p) => ({
@@ -91,6 +95,8 @@ export async function loadPlayerPool(client: DbClient): Promise<PlayerPoolEntry[
     isTopPlayer: p.isTopPlayer,
     teamName: p.team.name,
     teamAbbr: p.team.abbreviation,
+    teamPrimaryColor: p.team.primaryColor,
+    teamSecondaryColor: p.team.secondaryColor,
   }));
 }
 
@@ -249,6 +255,8 @@ function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation, 
       currentValue: player.currentValue,
       teamName: player.teamName,
       teamAbbr: player.teamAbbr,
+      teamPrimaryColor: player.teamPrimaryColor,
+      teamSecondaryColor: player.teamSecondaryColor,
     },
     parallel: resolved.parallel,
     serial: resolved.serial,

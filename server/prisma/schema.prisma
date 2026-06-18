@@ -22,6 +22,7 @@ enum Parallel {
   BLUE
   PURPLE
   GOLD
+  PATCH
   BLACK
   AUTOGRAPH
   EMERALD
