@@ -49,6 +49,7 @@ export async function resolveBattleVsBot(challengerId: string, productId: string
           topPlayerBias: product.topPlayerBias,
           count: product.cardsPerPack,
           pool,
+          setKey: product.setKey,
         };
         const challengerCards = await openPack(tx, { ownerId: challengerId, ...packArgs });
         const opponentCards = await openPack(tx, { ownerId: bot.id, ...packArgs });

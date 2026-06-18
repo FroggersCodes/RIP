@@ -36,6 +36,7 @@ export interface PulledCard {
   marketValue: number;
   isHit: boolean;
   refractor: boolean;
+  setKey: string;
 }
 
 export async function loadPlayerPool(client: DbClient): Promise<PlayerPoolEntry[]> {
@@ -141,6 +142,7 @@ export async function allocateWithFallback(
   playerId: string,
   rolled: ParallelName,
   ownerId: string,
+  setKey: string,
 ): Promise<ResolvedAllocation> {
   const order = PARALLELS_BY_RARITY_DESC; // rarest -> Base
   let idx = order.indexOf(rolled);
@@ -154,7 +156,7 @@ export async function allocateWithFallback(
       });
       if (!base) throw new Error(`Missing Base template for player ${playerId}`);
       const inst = await tx.cardInstance.create({
-        data: { templateId: base.id, serial: null, ownerId },
+        data: { templateId: base.id, serial: null, ownerId, setKey },
         select: { id: true },
       });
       return {
@@ -169,7 +171,7 @@ export async function allocateWithFallback(
     const alloc = await allocateNumberedSerial(tx, playerId, parallel);
     if (alloc) {
       const inst = await tx.cardInstance.create({
-        data: { templateId: alloc.templateId, serial: alloc.serial, ownerId },
+        data: { templateId: alloc.templateId, serial: alloc.serial, ownerId, setKey },
         select: { id: true },
       });
       return {
@@ -201,7 +203,7 @@ export function rollNumberedParallel(pullRates: Record<string, number>): Paralle
   return entries[entries.length - 1]![0];
 }
 
-function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation): PulledCard {
+function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation, setKey: string): PulledCard {
   return {
     instanceId: resolved.instanceId,
     player: {
@@ -219,6 +221,7 @@ function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation):
     marketValue: computeMarketValue(player.currentValue, resolved.valueMultiplier, resolved.serial, resolved.printRun),
     isHit: isHit(resolved.parallel),
     refractor: PARALLEL_MAP[resolved.parallel]?.refractor ?? false,
+    setKey,
   };
 }
 
@@ -228,6 +231,7 @@ export interface OpenPackArgs {
   topPlayerBias: number;
   count: number;
   pool: PlayerPoolEntry[];
+  setKey: string;
   /** Box guarantee: ensure at least one numbered card in the whole opening. */
   guaranteeNumbered?: boolean;
 }
@@ -238,8 +242,8 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
   for (let i = 0; i < args.count; i++) {
     const rolled = rollParallel(args.pullRates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
-    const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId);
-    cards.push(buildPulledCard(player, resolved));
+    const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
+    cards.push(buildPulledCard(player, resolved, args.setKey));
   }
 
   // Box guarantee: if nothing numbered came out, upgrade one card to a numbered pull.
@@ -248,8 +252,8 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
     await tx.cardInstance.delete({ where: { id: cards[idx]!.instanceId } });
     const rolled = rollNumberedParallel(args.pullRates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
-    const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId);
-    cards[idx] = buildPulledCard(player, resolved);
+    const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
+    cards[idx] = buildPulledCard(player, resolved, args.setKey);
   }
   return cards;
 }

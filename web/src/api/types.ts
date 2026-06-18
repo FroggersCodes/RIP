@@ -30,6 +30,7 @@ export interface PulledCard {
   marketValue: number;
   isHit: boolean;
   refractor: boolean;
+  setKey: string;
 }
 
 export interface OddsRow {
@@ -49,6 +50,7 @@ export interface Product {
   entryCost: number;
   caseCost: number;
   tier: string;
+  setKey: string;
   cardsPerPack: number;
   packsPerBox: number;
   guaranteeNumbered: boolean;
@@ -66,6 +68,7 @@ export interface CollectionCard {
   marketValue: number;
   refractor: boolean;
   pulledAt: string;
+  setKey: string;
   equippedRole: LineupRoleName | null;
   listed: boolean;
   listPrice: number | null;

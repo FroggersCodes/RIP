@@ -1,5 +1,6 @@
-import { PARALLEL_MAP, type ParallelName, type Position } from '@rip/shared';
+import { PARALLEL_MAP, setOf, type ParallelName, type Position } from '@rip/shared';
 import { money } from '../lib/format';
+import { signaturePath } from '../lib/signature';
 import { PlayerPortrait } from './PlayerPortrait';
 import './Card.css';
 
@@ -10,6 +11,7 @@ export interface CardData {
   printRun: number | null;
   marketValue: number;
   refractor: boolean;
+  setKey?: string;
 }
 
 interface Props {
@@ -29,9 +31,11 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
         ? 'tier-gold'
         : 'tier-plain';
   const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
+  const set = setOf(card.setKey);
+  const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.name) : null;
   return (
     <div
-      className={`card card-${size} ${tier} ${faded ? 'faded' : ''} ${onClick ? 'clickable' : ''}`}
+      className={`card card-${size} ${tier} set-${set.key} ${faded ? 'faded' : ''} ${onClick ? 'clickable' : ''}`}
       style={{ ['--accent' as string]: def.color }}
       onClick={onClick}
     >
@@ -41,10 +45,14 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
             <PlayerPortrait player={card.player} fill />
           </div>
           <div className="card-photo-scrim" />
+          <div className="card-set-fx" />
           <div className="sheen" />
-          {card.parallel === 'AUTOGRAPH' && (
+          <span className="card-set-mark">{set.wordmark}</span>
+          {sig && (
             <div className="card-sig">
-              <span className="card-sig-name">{card.player.name.split(' ')[0]}</span>
+              <svg className="card-sig-svg" viewBox={`0 0 ${sig.width} 100`} preserveAspectRatio="xMidYMid meet">
+                <path d={sig.d} />
+              </svg>
               <span className="auto-badge">✒ AUTO</span>
             </div>
           )}

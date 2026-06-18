@@ -49,6 +49,7 @@ router.post(
             topPlayerBias: product.topPlayerBias,
             count: product.cardsPerPack * product.packsPerBox,
             pool,
+            setKey: product.setKey,
             guaranteeNumbered: product.guaranteeNumbered,
           });
           const user = await tx.user.findUniqueOrThrow({ where: { id: uid } });

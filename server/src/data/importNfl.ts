@@ -63,11 +63,11 @@ const CHROME = { BASE: 880, BLUE: 90, PURPLE: 22, GOLD: 6, BLACK: 1.5, AUTOGRAPH
 const PRIZM = { BASE: 820, BLUE: 120, PURPLE: 38, GOLD: 14, BLACK: 5, AUTOGRAPH: 1.5, EMERALD: 2, SUPERFRACTOR: 0.3 };
 const VAULT = { BASE: 600, BLUE: 200, PURPLE: 110, GOLD: 60, BLACK: 22, AUTOGRAPH: 4, EMERALD: 6, SUPERFRACTOR: 2 };
 const PRODUCTS = [
-  { name: 'Topps Chrome 2026', year: 2026, entryCost: 100, caseCost: 0, tier: 'fresh', cardsPerPack: 5, description: 'Fresh-season flagship. Reliable base with a real shot at a refractor or auto hit.', topPlayerBias: 0.4, pullRates: CHROME },
-  { name: 'Prizm Legacy 2025', year: 2025, entryCost: 150, caseCost: 0, tier: 'legacy', cardsPerPack: 5, description: 'Last season legacy product. Better mid-tier parallels for the patient collector.', topPlayerBias: 0.5, pullRates: PRIZM },
-  { name: 'Premier Vault', year: 2026, entryCost: 500, caseCost: 1, tier: 'chase', cardsPerPack: 6, description: 'Chase-heavy premium pack. Costs a case. Every card has elevated hit odds.', topPlayerBias: 0.7, pullRates: VAULT },
-  { name: 'Topps Chrome — Hobby Box', year: 2026, entryCost: 480, caseCost: 0, tier: 'box', cardsPerPack: 5, packsPerBox: 6, guaranteeNumbered: true, description: '6 packs (30 cards). Every box guarantees at least one numbered card.', topPlayerBias: 0.45, pullRates: CHROME },
-  { name: 'Premier Vault — Hobby Box', year: 2026, entryCost: 2400, caseCost: 1, tier: 'box', cardsPerPack: 5, packsPerBox: 6, guaranteeNumbered: true, description: '6 chase-heavy packs (30 cards), guaranteed numbered — your best shot at autos and 1/1s.', topPlayerBias: 0.7, pullRates: VAULT },
+  { name: 'Topps Chrome 2026', year: 2026, entryCost: 100, caseCost: 0, tier: 'fresh', setKey: 'chrome', cardsPerPack: 5, description: 'Fresh-season flagship. Reliable base with a real shot at a refractor or auto hit.', topPlayerBias: 0.4, pullRates: CHROME },
+  { name: 'Prizm Legacy 2025', year: 2025, entryCost: 150, caseCost: 0, tier: 'legacy', setKey: 'prizm', cardsPerPack: 5, description: 'Last season legacy product. Better mid-tier parallels for the patient collector.', topPlayerBias: 0.5, pullRates: PRIZM },
+  { name: 'Premier Vault', year: 2026, entryCost: 500, caseCost: 1, tier: 'chase', setKey: 'vault', cardsPerPack: 6, description: 'Chase-heavy premium pack. Costs a case. Every card has elevated hit odds.', topPlayerBias: 0.7, pullRates: VAULT },
+  { name: 'Topps Chrome — Hobby Box', year: 2026, entryCost: 480, caseCost: 0, tier: 'box', setKey: 'chrome', cardsPerPack: 5, packsPerBox: 6, guaranteeNumbered: true, description: '6 packs (30 cards). Every box guarantees at least one numbered card.', topPlayerBias: 0.45, pullRates: CHROME },
+  { name: 'Premier Vault — Hobby Box', year: 2026, entryCost: 2400, caseCost: 1, tier: 'box', setKey: 'vault', cardsPerPack: 5, packsPerBox: 6, guaranteeNumbered: true, description: '6 chase-heavy packs (30 cards), guaranteed numbered — your best shot at autos and 1/1s.', topPlayerBias: 0.7, pullRates: VAULT },
 ];
 
 function ratingFor(ppr: number, searchRank: number): number {

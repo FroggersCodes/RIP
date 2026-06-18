@@ -126,6 +126,7 @@ model CardInstance {
   serial     Int? // null for Base. Postgres treats NULLs as distinct, so Base stacks freely.
   ownerId    String
   owner      User     @relation(fields: [ownerId], references: [id])
+  setKey     String?  // which product/set this card came from (drives its look)
   pulledAt   DateTime @default(now())
 
   lineupSlot LineupSlot?
@@ -143,6 +144,7 @@ model Product {
   entryCost     Int // tokens
   caseCost      Int     @default(0) // premium currency for chase products
   tier          String
+  setKey        String  @default("chrome") // visual set theme for cards from this product
   cardsPerPack  Int     @default(5)
   packsPerBox   Int     @default(1) // >1 = a box of packs
   guaranteeNumbered Boolean @default(false) // box guarantees >=1 numbered card

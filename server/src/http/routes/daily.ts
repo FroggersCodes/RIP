@@ -81,6 +81,7 @@ router.post(
             topPlayerBias: tier.topPlayerBias,
             count: tier.cards,
             pool,
+            setKey: 'chrome',
           });
           const fresh = await tx.user.findUniqueOrThrow({ where: { id: uid } });
           return { cards, user: fresh, tier, streak };

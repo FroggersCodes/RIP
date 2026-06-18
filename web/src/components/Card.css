@@ -134,6 +134,54 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
+/* ---------- per-set treatment (over the photo) ---------- */
+.card-set-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 12px;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+}
+.set-chrome .card-set-fx {
+  background:
+    repeating-linear-gradient(90deg, rgba(170, 210, 255, 0) 0 7px, rgba(180, 215, 255, 0.12) 7px 8px),
+    linear-gradient(180deg, rgba(120, 170, 255, 0.08), transparent 60%);
+}
+.set-prizm .card-set-fx {
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255, 60, 180, 0.12) 0 6px,
+    rgba(60, 210, 255, 0.12) 6px 12px,
+    rgba(150, 90, 255, 0.1) 12px 18px,
+    transparent 18px 30px
+  );
+}
+.set-vault .card-set-fx {
+  mix-blend-mode: normal;
+  opacity: 0.85;
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.24) 0 2px, transparent 2px 6px),
+    radial-gradient(120% 80% at 50% 100%, rgba(245, 181, 61, 0.12), transparent 55%);
+}
+.card-set-mark {
+  position: absolute;
+  z-index: 4;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+.card-sm .card-set-mark {
+  font-size: 8px;
+}
+
 /* ---------- specular sheen ---------- */
 .sheen {
   position: absolute;
@@ -176,25 +224,28 @@
 .card-sig {
   position: absolute;
   z-index: 4;
-  left: 12px;
-  right: 12px;
-  top: 44%;
+  left: 10px;
+  right: 10px;
+  top: 40%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   pointer-events: none;
 }
-.card-sig-name {
-  font-family: 'Brush Script MT', 'Segoe Script', cursive;
-  font-size: 30px;
-  color: #fff;
-  transform: rotate(-6deg);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
-  opacity: 0.92;
+.card-sig-svg {
+  width: 80%;
+  height: auto;
+  transform: rotate(-4deg);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.75));
 }
-.card-sm .card-sig-name {
-  font-size: 24px;
+.card-sig-svg path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.94;
 }
 .auto-badge {
   font-family: var(--font-display);

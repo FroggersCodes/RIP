@@ -22,6 +22,7 @@ export function cardView(inst: CardWithRels) {
     marketValue,
     refractor: PARALLEL_MAP[t.parallel]?.refractor ?? false,
     pulledAt: inst.pulledAt,
+    setKey: inst.setKey ?? 'chrome',
     equippedRole: inst.lineupSlot?.role ?? null,
     listed: !!inst.listing,
     listPrice: inst.listing?.priceTokens ?? null,

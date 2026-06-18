@@ -27,6 +27,7 @@ export function productView(p: Product) {
     entryCost: p.entryCost,
     caseCost: p.caseCost,
     tier: p.tier,
+    setKey: p.setKey,
     cardsPerPack: p.cardsPerPack,
     packsPerBox: p.packsPerBox,
     guaranteeNumbered: p.guaranteeNumbered,

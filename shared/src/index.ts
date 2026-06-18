@@ -63,6 +63,22 @@ export function isHit(parallel: ParallelName): boolean {
   );
 }
 
+// Card sets — each product belongs to a set with its own on-card visual treatment.
+export type SetKey = 'chrome' | 'prizm' | 'vault';
+export interface SetDef {
+  key: SetKey;
+  label: string;
+  wordmark: string;
+}
+export const SETS: Record<string, SetDef> = {
+  chrome: { key: 'chrome', label: 'Topps Chrome', wordmark: 'CHROME' },
+  prizm: { key: 'prizm', label: 'Prizm Legacy', wordmark: 'PRIZM' },
+  vault: { key: 'vault', label: 'Premier Vault', wordmark: 'VAULT' },
+};
+export function setOf(key: string | null | undefined): SetDef {
+  return SETS[key ?? 'chrome'] ?? SETS.chrome!;
+}
+
 export const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];
 
 export const LINEUP_ROLES: LineupRoleName[] = ['QB', 'WR1', 'WR2', 'RB', 'TE', 'FLEX'];

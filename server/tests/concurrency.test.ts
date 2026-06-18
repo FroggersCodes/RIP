@@ -113,7 +113,7 @@ describe('race-safe serial allocation', () => {
   it('falls back to Base when the numbered parallel is sold out and nothing in between exists', async () => {
     // playerB's Emerald /10 is now exhausted; only Base remains for it.
     for (let i = 0; i < 5; i++) {
-      const r = await db.$transaction((tx) => allocateWithFallback(tx, playerB, 'EMERALD', ownerId));
+      const r = await db.$transaction((tx) => allocateWithFallback(tx, playerB, 'EMERALD', ownerId, 'chrome'));
       expect(r.parallel).toBe('BASE');
       expect(r.serial).toBeNull();
     }
@@ -121,11 +121,11 @@ describe('race-safe serial allocation', () => {
 
   it('falls back to the next available numbered parallel when one exists', async () => {
     // playerA has Superfractor /1 then Emerald /10 with capacity.
-    const first = await db.$transaction((tx) => allocateWithFallback(tx, playerA, 'SUPERFRACTOR', ownerId));
+    const first = await db.$transaction((tx) => allocateWithFallback(tx, playerA, 'SUPERFRACTOR', ownerId, 'chrome'));
     expect(first.parallel).toBe('SUPERFRACTOR');
     expect(first.serial).toBe(1);
 
-    const second = await db.$transaction((tx) => allocateWithFallback(tx, playerA, 'SUPERFRACTOR', ownerId));
+    const second = await db.$transaction((tx) => allocateWithFallback(tx, playerA, 'SUPERFRACTOR', ownerId, 'chrome'));
     expect(second.parallel).toBe('EMERALD'); // Superfractor sold out -> next more-common with capacity
     expect(second.serial).toBeGreaterThanOrEqual(1);
   });
