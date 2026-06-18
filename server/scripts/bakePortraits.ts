@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildAllPlayers, nameSlug, type PlayerSeed } from '../src/data/roster';
+import { buildAllPlayers, nameSlug, TEAMS, type PlayerSeed } from '../src/data/roster';
 
 // Generate one portrait per player into web/public/players/<slug>.jpg.
 // Providers:
@@ -25,6 +25,8 @@ const POSITION_TITLE: Record<string, string> = {
 
 const ETHNICITIES = ['Black', 'white', 'Latino', 'Samoan', 'mixed race', 'Pacific Islander'];
 
+const TEAM_BY_ABBR = new Map(TEAMS.map((t) => [t.abbreviation, t]));
+
 function hash(s: string): number {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
@@ -34,16 +36,58 @@ function hash(s: string): number {
   return h >>> 0;
 }
 
+// Image models follow named colors far better than hex, so translate the team's
+// hex into a human color name via HSL buckets.
+function hexToColorName(hex: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return 'team-colored';
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) / 255;
+  const g = ((n >> 8) & 0xff) / 255;
+  const b = (n & 0xff) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+  if (d < 0.08) {
+    if (l < 0.2) return 'black';
+    if (l < 0.45) return 'charcoal gray';
+    if (l < 0.7) return 'gray';
+    return 'white';
+  }
+  const s = d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (max === r) h = ((g - b) / d) % 6;
+  else if (max === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  h = (h * 60 + 360) % 360;
+  const dark = l < 0.4;
+  const muted = s < 0.4;
+  if (h < 15 || h >= 345) return dark ? 'dark red' : 'red';
+  if (h < 40) return dark ? 'burnt orange' : 'orange';
+  if (h < 55) return muted ? 'tan' : dark ? 'amber' : 'gold';
+  if (h < 70) return 'yellow';
+  if (h < 160) return dark ? 'dark green' : 'green';
+  if (h < 200) return 'teal';
+  if (h < 250) return dark ? 'navy blue' : 'blue';
+  if (h < 290) return dark ? 'deep purple' : 'purple';
+  return dark ? 'maroon' : 'pink';
+}
+
 function promptFor(p: PlayerSeed): string {
   const eth = ETHNICITIES[hash(p.name + 'E') % ETHNICITIES.length];
   const age = 22 + (hash(p.name + 'A') % 12);
   const title = POSITION_TITLE[p.position] ?? 'player';
-  // Prompt tuned for photorealistic sports card headshots
+  const team = TEAM_BY_ABBR.get(p.teamAbbr);
+  const primary = team ? hexToColorName(team.primaryColor) : 'team-colored';
+  const secondary = team ? hexToColorName(team.secondaryColor) : 'dark';
+  // Prompt tuned for a full-body clean studio cutout in team colors
   return (
-    `photorealistic portrait photograph of a ${age}-year-old ${eth} male NFL ${title}, ` +
-    `close-up headshot, wearing football jersey, athletic build, serious confident expression, ` +
-    `dark seamless studio background with subtle vignette, dramatic side rim lighting, ` +
-    `sharp focus on face, 8k ultra-detailed, shot on Canon EOS R5, 85mm f/1.4 lens, ` +
+    `full-body studio photograph of a ${age}-year-old ${eth} male NFL ${title}, ` +
+    `standing three-quarter hero pose, full football uniform with ${primary} and ${secondary} team jersey, ` +
+    `matching ${primary} helmet held under one arm, shoulder pads, athletic build, serious confident expression, ` +
+    `entire body visible head to cleats, isolated on a seamless dark studio background, clean studio cutout, ` +
+    `dramatic rim lighting, sharp focus, 8k ultra-detailed, shot on Canon EOS R5, 85mm f/1.4 lens, ` +
     `professional sports photography, no illustration, no cartoon, no painting, real human face`
   );
 }
@@ -52,7 +96,7 @@ async function genDallE3(prompt: string): Promise<Buffer> {
   const r = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-    body: JSON.stringify({ model: 'dall-e-3', prompt, size: '1024x1024', quality: 'standard', response_format: 'b64_json', n: 1 }),
+    body: JSON.stringify({ model: 'dall-e-3', prompt, size: '1024x1792', quality: 'standard', response_format: 'b64_json', n: 1 }),
   });
   if (!r.ok) throw new Error(`dalle3 ${r.status} ${(await r.text().catch(() => '')).slice(0, 160)}`);
   const j: any = await r.json();
@@ -65,7 +109,7 @@ async function genOpenAI(prompt: string): Promise<Buffer> {
   const r = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-    body: JSON.stringify({ model: 'gpt-image-1', prompt, size: '1024x1024', n: 1 }),
+    body: JSON.stringify({ model: 'gpt-image-1', prompt, size: '1024x1536', n: 1 }),
   });
   if (!r.ok) throw new Error(`openai ${r.status} ${(await r.text().catch(() => '')).slice(0, 160)}`);
   const j: any = await r.json();
@@ -76,7 +120,7 @@ async function genOpenAI(prompt: string): Promise<Buffer> {
 
 async function genPollinations(prompt: string, seed: number): Promise<Buffer> {
   // flux-realism produces photorealistic results vs plain flux which looks illustrated
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=960&seed=${seed}&nologo=true&model=flux-realism&enhance=true`;
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=1152&seed=${seed}&nologo=true&model=flux-realism&enhance=true`;
   const r = await fetch(url, { signal: AbortSignal.timeout(90_000) });
   if (!r.ok) {
     // Surface the rate-limit delay hint if present
