@@ -123,13 +123,40 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               <div className="card-photo-scrim" />
               <div className="card-set-fx" />
               <div className="sheen" />
+              {hasPatch && !isRpa && (
+                <div className="card-patch">
+                  <div className="card-patch-window">
+                    <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+                  </div>
+                  <span className="patch-badge">PATCH</span>
+                </div>
+              )}
+
+              {sig && !isRpa && (
+                <div className="card-sig">
+                  {sigSvg}
+                  <span className="auto-badge">✒ AUTO</span>
+                </div>
+              )}
+
+              {isRpa && sig && (
+                <>
+                  <div className="card-rpa-patch">
+                    <div className="card-patch-window">
+                      <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+                    </div>
+                    <span className="patch-badge">PATCH</span>
+                  </div>
+                  <div className="card-rpa-sig">
+                    {sigSvg}
+                    <span className="auto-badge">✒ RPA</span>
+                  </div>
+                </>
+              )}
+
               <div className="card-head">
                 <div style={{ display: 'flex', gap: 4 }}>
                   {card.player.isRookie && <span className="card-rc-badge">RC</span>}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  {hasPatch && <span className="card-hit-badge">PATCH</span>}
-                  {hasSig && <span className="card-hit-badge">AUTO</span>}
                 </div>
               </div>
               <div className="card-plate">
@@ -164,37 +191,6 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                   </span>
                 </div>
               </div>
-
-              {hasPatch && !isRpa && (
-                <div className="card-patch">
-                  <div className="card-patch-window">
-                    <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
-                  </div>
-                  <span className="patch-badge">PATCH</span>
-                </div>
-              )}
-
-              {sig && !isRpa && (
-                <div className="card-sig">
-                  {sigSvg}
-                  <span className="auto-badge">✒ AUTO</span>
-                </div>
-              )}
-
-              {isRpa && sig && (
-                <>
-                  <div className="card-rpa-patch">
-                    <div className="card-patch-window">
-                      <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
-                    </div>
-                    <span className="patch-badge">PATCH</span>
-                  </div>
-                  <div className="card-rpa-sig">
-                    {sigSvg}
-                    <span className="auto-badge">✒ RPA</span>
-                  </div>
-                </>
-              )}
 
               <div className="card-plate">
                 <div className="card-name">{card.player.name}</div>
