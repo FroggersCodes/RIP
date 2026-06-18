@@ -32,7 +32,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
         : 'tier-plain';
   const set = setOf(card.setKey);
   const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
-  const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.name) : null;
+  const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.id) : null;
   return (
     <div
       className={`card card-${size} ${tier} set-${set.key} ${faded ? 'faded' : ''} ${onClick ? 'clickable' : ''}`}

@@ -303,6 +303,9 @@
   align-items: center;
   gap: 6px;
   pointer-events: none;
+  background: rgba(0, 0, 0, 0.30);
+  border-radius: 6px;
+  padding: 6px 4px 4px;
 }
 .card-sig-svg {
   width: 82%;
