@@ -14,7 +14,7 @@ interface LeagueCurrent {
 }
 
 export function HomePage() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, refresh } = useAuth();
   const daily = useApi(() => api<DailyStatus>('/daily/status'), []);
   const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
   const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
@@ -50,6 +50,7 @@ export function HomePage() {
   const [advanceMsg, setAdvanceMsg] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [granting, setGranting] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
@@ -138,6 +139,26 @@ export function HomePage() {
       setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
       setResetting(false);
+    }
+  };
+
+  const grantMe = async () => {
+    setGranting(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/grant`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: '{}',
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      await refresh();
+      setImportMsg('Topped up +1,000,000 tokens, +10,000 cases, +100,000 dust.');
+    } catch (e) {
+      setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
+    } finally {
+      setGranting(false);
     }
   };
 
@@ -324,6 +345,9 @@ export function HomePage() {
             </button>
             <button className="btn" onClick={resetFictional} disabled={resetting}>
               {resetting ? 'Resetting…' : 'Reset to generated players'}
+            </button>
+            <button className="btn btn-gold" onClick={grantMe} disabled={granting}>
+              {granting ? 'Granting…' : 'Give me tokens + cases'}
             </button>
           </div>
           {advanceMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{advanceMsg}</div>}

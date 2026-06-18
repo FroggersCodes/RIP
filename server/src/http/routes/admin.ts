@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { prisma } from '../../prisma';
 import { requireAdmin } from '../middleware';
 import { asyncHandler } from '../asyncHandler';
 import { advanceWeek } from '../../league/advanceWeek';
@@ -49,6 +50,19 @@ router.post(
   asyncHandler(async (req, res) => {
     const season = typeof req.body?.season === 'string' ? req.body.season : undefined;
     res.json(await importNflData(season));
+  }),
+);
+
+// Dev cheat: top up every (non-bot) account with a huge pile of currency.
+router.post(
+  '/grant',
+  requireAdmin,
+  asyncHandler(async (_req, res) => {
+    const r = await prisma.user.updateMany({
+      where: { isBot: false },
+      data: { tokens: { increment: 1_000_000 }, cases: { increment: 10_000 }, dust: { increment: 100_000 } },
+    });
+    res.json({ granted: r.count, tokens: 1_000_000, cases: 10_000, dust: 100_000 });
   }),
 );
 
