@@ -24,7 +24,7 @@ export function portraitFile(name: string): string {
 }
 
 export function portraitFallbackUrl(name: string): string {
-  return `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(nameSlug(name))}&backgroundColor=0f172a&scale=120`;
+  return `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(nameSlug(name))}&backgroundColor=transparent&scale=115`;
 }
 
 export function initials(name: string): string {

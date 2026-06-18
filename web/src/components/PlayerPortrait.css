@@ -38,9 +38,17 @@
   opacity: 0.9;
 }
 
-/* As card art: drop the opaque box so the bold per-set background shows through,
-   and render the initials as a faint watermark instead of a solid block. */
-.portrait-fill .portrait-bg,
+/* As card art: show a team-colored glow behind the face illustration so every
+   card has a distinct, vibrant background tied to the player's team. The
+   initials become a faint watermark (shown only when no portrait loads). */
+.portrait-fill .portrait-bg {
+  background: radial-gradient(
+    140% 100% at 50% -5%,
+    color-mix(in srgb, var(--team-primary, var(--pa)) 75%, #050709) 0%,
+    color-mix(in srgb, var(--team-primary, var(--pa)) 28%, #050709) 48%,
+    #060810 100%
+  );
+}
 .portrait-fill .portrait-fallback {
   background: transparent;
 }
