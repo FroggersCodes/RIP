@@ -359,6 +359,8 @@
 /* ---------- ARTISTRY (tier 3) — clean gallery canvas; the PARALLEL color is the
    identity, expressed as a sweeping wave (.card-art-wave) + accent frame. ---------- */
 .set-artistry .card-frame {
+  border-radius: 0;
+  padding: 6px;
   background: linear-gradient(
     150deg,
     color-mix(in srgb, var(--accent) 48%, #2a2e36),
@@ -366,6 +368,9 @@
     color-mix(in srgb, var(--accent) 42%, #23272f)
   );
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), var(--shadow-card);
+}
+.set-artistry .card-inner {
+  border-radius: 0;
 }
 .set-artistry .card-set-bg {
   background:
@@ -391,25 +396,25 @@
   );
 }
 
-/* The signature Artistry wave — sweeps across the lower card in the parallel's
-   color (grey for Base). Sits under the bottom scrim so the name stays legible. */
+/* The signature Artistry wave — a bold band sitting behind the name plate in the
+   parallel's color (grey for Base). Above the scrim so it reads strongly. */
 .card-art-wave {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 44%;
-  z-index: 1;
+  height: 30%;
+  z-index: 3;
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--accent) 55%, transparent) 0%,
-    color-mix(in srgb, var(--accent) 85%, transparent) 50%,
-    color-mix(in srgb, var(--accent) 100%, #000 6%) 100%
+    color-mix(in srgb, var(--accent) 78%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 100%, #000 4%) 38%,
+    color-mix(in srgb, var(--accent) 100%, #000 14%) 100%
   );
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,34 C22,8 38,8 52,26 C66,44 82,44 100,20 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
   -webkit-mask-size: 100% 100%;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,34 C22,8 38,8 52,26 C66,44 82,44 100,20 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
   mask-size: 100% 100%;
 }
 /* Crisp highlight along the wave crest. */
@@ -419,14 +424,14 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--accent) 30%, #ffffff) 0%,
-    transparent 12%
+    color-mix(in srgb, var(--accent) 25%, #ffffff) 0%,
+    transparent 10%
   );
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,34 C22,8 38,8 52,26 C66,44 82,44 100,20 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
   -webkit-mask-size: 100% 100%;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,34 C22,8 38,8 52,26 C66,44 82,44 100,20 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
   mask-size: 100% 100%;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 /* ---------- GOLD STANDARD (tier 4) — matte black, embossed gold foil ---------- */
