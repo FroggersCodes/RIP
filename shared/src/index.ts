@@ -8,6 +8,7 @@ export type ParallelName =
   | 'BLUE'
   | 'PURPLE'
   | 'GOLD'
+  | 'PATCH'
   | 'BLACK'
   | 'AUTOGRAPH'
   | 'EMERALD'
@@ -24,6 +25,8 @@ export interface ParallelDef {
   refractor: boolean;
   /** Autograph treatment (signature flourish). */
   signed?: boolean;
+  /** Game-worn patch swatch embedded in the card. */
+  patched?: boolean;
   color: string;
 }
 
@@ -33,6 +36,7 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'BLUE', displayName: 'Blue /5000', printRun: 5000, valueMultiplier: 2.5, refractor: false, color: '#3b82f6' },
   { name: 'PURPLE', displayName: 'Purple /999', printRun: 999, valueMultiplier: 6, refractor: false, color: '#a855f7' },
   { name: 'GOLD', displayName: 'Gold /250', printRun: 250, valueMultiplier: 15, refractor: false, color: '#f5b53d' },
+  { name: 'PATCH', displayName: 'Patch /99', printRun: 99, valueMultiplier: 30, refractor: false, patched: true, color: '#94a3b8' },
   { name: 'BLACK', displayName: 'Black /50', printRun: 50, valueMultiplier: 50, refractor: true, color: '#0c0e12' },
   { name: 'AUTOGRAPH', displayName: 'Autograph /25', printRun: 25, valueMultiplier: 120, refractor: false, signed: true, color: '#e8c87a' },
   { name: 'EMERALD', displayName: 'Emerald /10', printRun: 10, valueMultiplier: 150, refractor: true, color: '#10b981' },
@@ -56,6 +60,7 @@ export function isRefractor(parallel: ParallelName): boolean {
 export function isHit(parallel: ParallelName): boolean {
   return (
     parallel === 'GOLD' ||
+    parallel === 'PATCH' ||
     parallel === 'BLACK' ||
     parallel === 'AUTOGRAPH' ||
     parallel === 'EMERALD' ||

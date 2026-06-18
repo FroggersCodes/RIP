@@ -5,7 +5,15 @@ import { PlayerPortrait } from './PlayerPortrait';
 import './Card.css';
 
 export interface CardData {
-  player: { id: string; name: string; position: Position; teamAbbr: string; overallRating?: number };
+  player: {
+    id: string;
+    name: string;
+    position: Position;
+    teamAbbr: string;
+    overallRating?: number;
+    teamPrimaryColor?: string;
+    teamSecondaryColor?: string;
+  };
   parallel: ParallelName;
   serial: number | null;
   printRun: number | null;
@@ -27,16 +35,29 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
     ? 'refractor'
     : card.parallel === 'AUTOGRAPH'
       ? 'tier-auto'
-      : card.parallel === 'GOLD'
-        ? 'tier-gold'
-        : 'tier-plain';
+      : card.parallel === 'PATCH'
+        ? 'tier-patch'
+        : card.parallel === 'GOLD'
+          ? 'tier-gold'
+          : 'tier-plain';
   const set = setOf(card.setKey);
   const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
   const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.id) : null;
+  const patch =
+    card.parallel === 'PATCH'
+      ? { primary: card.player.teamPrimaryColor ?? '#4a5568', secondary: card.player.teamSecondaryColor ?? '#1a202c' }
+      : null;
+
   return (
     <div
       className={`card card-${size} ${tier} set-${set.key} ${faded ? 'faded' : ''} ${onClick ? 'clickable' : ''}`}
-      style={{ ['--accent' as string]: def.color }}
+      style={{
+        ['--accent' as string]: def.color,
+        ...(patch && {
+          ['--patch-primary' as string]: patch.primary,
+          ['--patch-secondary' as string]: patch.secondary,
+        }),
+      }}
       onClick={onClick}
     >
       <div className="card-frame">
@@ -66,6 +87,29 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                 />
               </svg>
               <span className="auto-badge">✒ AUTO</span>
+            </div>
+          )}
+          {patch && (
+            <div className="card-patch">
+              <svg className="card-patch-swatch" viewBox="0 0 88 56" xmlns="http://www.w3.org/2000/svg">
+                {/* Base fabric */}
+                <rect width="88" height="56" rx="4" fill={patch.primary} />
+                {/* Jersey number stripe bands */}
+                <rect y="14" width="88" height="11" fill={patch.secondary} opacity="0.85" />
+                <rect y="31" width="88" height="11" fill={patch.secondary} opacity="0.85" />
+                {/* Horizontal knit-stitch lines */}
+                {[6, 13, 20, 27, 34, 41, 48].map((y) => (
+                  <line key={y} x1="2" y1={y} x2="86" y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" strokeDasharray="3,3" />
+                ))}
+                {/* Seam stitching on stripe edges */}
+                <line x1="0" y1="14" x2="88" y2="14" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
+                <line x1="0" y1="25" x2="88" y2="25" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
+                <line x1="0" y1="31" x2="88" y2="31" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
+                <line x1="0" y1="42" x2="88" y2="42" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeDasharray="4,2" />
+                {/* Border frame */}
+                <rect width="88" height="56" rx="4" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+              </svg>
+              <span className="patch-badge">⬛ PATCH</span>
             </div>
           )}
           <div className="card-head">

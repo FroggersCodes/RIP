@@ -282,6 +282,53 @@
   animation: sheen-move 3.8s ease-in-out infinite;
 }
 
+/* ---------- patch (game-worn swatch) ---------- */
+.card.tier-patch .card-frame {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--patch-primary, #4a5568) 60%, #000) 0%,
+    var(--patch-secondary, #1a202c) 40%,
+    var(--patch-primary, #4a5568) 70%,
+    color-mix(in srgb, var(--patch-secondary, #1a202c) 70%, #fff) 100%
+  );
+}
+.card.tier-patch .card-inner {
+  background: linear-gradient(180deg, #0d1117 0%, #1a1f28 100%);
+}
+.card.tier-patch .sheen {
+  opacity: 0.6;
+  animation: sheen-move 5s ease-in-out infinite;
+}
+.card-patch {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 38%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+.card-patch-swatch {
+  width: 72px;
+  height: auto;
+  border-radius: 4px;
+}
+.patch-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
 /* ---------- autograph (signed) ---------- */
 .card.tier-auto .card-frame {
   background: linear-gradient(135deg, #6b4f1a, #e8c87a, #fff4d6, #e8c87a, #6b4f1a);

@@ -67,9 +67,9 @@ export async function seed() {
   await prisma.cardTemplate.createMany({ data: templateData });
 
   console.log('Creating products...');
-  const CHROME = { BASE: 8800, BLUE: 950, PURPLE: 200, GOLD: 42, BLACK: 6, AUTOGRAPH: 1, EMERALD: 1.4, SUPERFRACTOR: 0.15 };
-  const PRIZM = { BASE: 8400, BLUE: 1150, PURPLE: 300, GOLD: 95, BLACK: 16, AUTOGRAPH: 2.5, EMERALD: 4, SUPERFRACTOR: 0.5 };
-  const VAULT = { BASE: 7100, BLUE: 1900, PURPLE: 700, GOLD: 280, BLACK: 40, AUTOGRAPH: 7, EMERALD: 12, SUPERFRACTOR: 1.6 };
+  const CHROME = { BASE: 8800, BLUE: 950, PURPLE: 200, GOLD: 42, PATCH: 8, BLACK: 6, AUTOGRAPH: 1, EMERALD: 1.4, SUPERFRACTOR: 0.15 };
+  const PRIZM = { BASE: 8400, BLUE: 1150, PURPLE: 300, GOLD: 95, PATCH: 20, BLACK: 16, AUTOGRAPH: 2.5, EMERALD: 4, SUPERFRACTOR: 0.5 };
+  const VAULT = { BASE: 7100, BLUE: 1900, PURPLE: 700, GOLD: 280, PATCH: 55, BLACK: 40, AUTOGRAPH: 7, EMERALD: 12, SUPERFRACTOR: 1.6 };
   await prisma.product.createMany({
     data: [
       { name: 'Topps Chrome 2026', year: 2026, entryCost: 100, caseCost: 0, tier: 'fresh', setKey: 'chrome', cardsPerPack: 5, description: 'Fresh-season flagship. Reliable base with a real shot at a refractor or auto hit.', topPlayerBias: 0.4, pullRates: CHROME },

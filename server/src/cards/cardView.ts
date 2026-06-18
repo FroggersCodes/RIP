@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import { computeMarketValue, PARALLEL_MAP } from '@rip/shared';
 
 export const cardInclude = Prisma.validator<Prisma.CardInstanceInclude>()({
-  template: { include: { player: { include: { team: { select: { name: true, abbreviation: true } } } } } },
+  template: { include: { player: { include: { team: { select: { name: true, abbreviation: true, primaryColor: true, secondaryColor: true } } } } } },
   lineupSlot: { select: { role: true } },
   listing: { select: { id: true, priceTokens: true } },
 });
@@ -34,6 +34,8 @@ export function cardView(inst: CardWithRels) {
       currentValue: p.currentValue,
       teamName: p.team.name,
       teamAbbr: p.team.abbreviation,
+      teamPrimaryColor: p.team.primaryColor,
+      teamSecondaryColor: p.team.secondaryColor,
     },
   };
 }
