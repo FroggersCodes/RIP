@@ -20,6 +20,7 @@ export interface PlayerSeed {
   overallRating: number;
   currentValue: number;
   isTopPlayer: boolean;
+  isRookie: boolean;
 }
 
 export const TEAMS: TeamSeed[] = [
@@ -96,12 +97,19 @@ export function buildAllPlayers(): PlayerSeed[] {
     throw new Error('Ran out of unique names');
   };
 
+  // Last slot of QB, RB, WR per team is the rookie — low rating, big upside.
+  const ROOKIE_SLOT: Partial<Record<Position, number>> = { QB: 2, RB: 3, WR: 5 };
+
   const all: PlayerSeed[] = [];
   for (const team of TEAMS) {
     const roster: PlayerSeed[] = [];
     (Object.keys(ROSTER_COMP) as Position[]).forEach((pos) => {
       for (let i = 0; i < ROSTER_COMP[pos]; i++) {
-        const rating = clamp(Math.round(i === 0 ? gaussian(86, 6) : gaussian(72, 8)), 58, 99);
+        const isRookie = ROOKIE_SLOT[pos] === i;
+        const rating = clamp(
+          Math.round(isRookie ? gaussian(62, 5) : i === 0 ? gaussian(86, 6) : gaussian(72, 8)),
+          56, 99,
+        );
         roster.push({
           teamAbbr: team.abbreviation,
           name: uniqueName(),
@@ -109,6 +117,7 @@ export function buildAllPlayers(): PlayerSeed[] {
           overallRating: rating,
           currentValue: valueFromRating(rating),
           isTopPlayer: false,
+          isRookie,
         });
       }
     });

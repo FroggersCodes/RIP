@@ -61,9 +61,9 @@ const TEAM_ABBRS = new Set(NFL_TEAMS.map((t) => t.abbr));
 
 const SPARK         = { BASE: 7200, BLUE: 1460, GOLD: 270, PATCH: 260, AUTOGRAPH: 210 };
 const MOMENTUM      = { BASE: 6200, BLUE: 800, PURPLE: 800, GOLD: 500, PATCH: 400, BLACK: 200, AUTOGRAPH: 300 };
-const ARTISTRY      = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, EMERALD: 100 };
-const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, EMERALD: 250, SUPERFRACTOR: 30 };
-const RELIQUARY     = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, EMERALD: 700, SUPERFRACTOR: 150 };
+const ARTISTRY      = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, PATCH_AUTO: 30, EMERALD: 100 };
+const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
+const RELIQUARY     = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, PATCH_AUTO: 400, EMERALD: 700, SUPERFRACTOR: 150 };
 const PRODUCTS = [
   { name: 'Spark', year: 2026, entryCost: 80, caseCost: 0, tier: 'spark', setKey: 'spark', cardsPerPack: 6, topPlayerBias: 0.35, pullRates: SPARK, description: 'Entry-level 6-card rip. Electric blue foil, crackling static aesthetic. ~70% color parallel, ~25% hit per box.' },
   { name: 'Momentum', year: 2026, entryCost: 200, caseCost: 0, tier: 'momentum', setKey: 'momentum', cardsPerPack: 4, packsPerBox: 2, minHits: 1, topPlayerBias: 0.45, pullRates: MOMENTUM, description: '2-pack box (8 cards). Motion-blur speed-line design. Guaranteed ≥1 hit per box.' },

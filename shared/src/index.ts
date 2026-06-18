@@ -11,6 +11,7 @@ export type ParallelName =
   | 'PATCH'
   | 'BLACK'
   | 'AUTOGRAPH'
+  | 'PATCH_AUTO'
   | 'EMERALD'
   | 'SUPERFRACTOR';
 export type LineupRoleName = 'QB' | 'WR1' | 'WR2' | 'RB' | 'TE' | 'FLEX';
@@ -39,6 +40,7 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'PATCH', displayName: 'Patch /99', printRun: 99, valueMultiplier: 30, refractor: false, patched: true, color: '#94a3b8' },
   { name: 'BLACK', displayName: 'Black /50', printRun: 50, valueMultiplier: 50, refractor: true, color: '#0c0e12' },
   { name: 'AUTOGRAPH', displayName: 'Autograph /25', printRun: 25, valueMultiplier: 120, refractor: false, signed: true, color: '#e8c87a' },
+  { name: 'PATCH_AUTO', displayName: 'RPA /5', printRun: 5, valueMultiplier: 400, refractor: false, signed: true, patched: true, color: '#f0c060' },
   { name: 'EMERALD', displayName: 'Emerald /10', printRun: 10, valueMultiplier: 150, refractor: true, color: '#10b981' },
   { name: 'SUPERFRACTOR', displayName: 'Superfractor 1/1', printRun: 1, valueMultiplier: 600, refractor: true, color: '#f5b53d' },
 ];
@@ -63,6 +65,7 @@ export function isHit(parallel: ParallelName): boolean {
     parallel === 'PATCH' ||
     parallel === 'BLACK' ||
     parallel === 'AUTOGRAPH' ||
+    parallel === 'PATCH_AUTO' ||
     parallel === 'EMERALD' ||
     parallel === 'SUPERFRACTOR'
   );
