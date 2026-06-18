@@ -25,6 +25,7 @@ enum Parallel {
   PATCH
   BLACK
   AUTOGRAPH
+  PATCH_AUTO
   EMERALD
   SUPERFRACTOR
 }
@@ -94,6 +95,7 @@ model Player {
   overallRating Int
   currentValue  Float
   isTopPlayer   Boolean  @default(false)
+  isRookie      Boolean  @default(false)
   createdAt     DateTime @default(now())
 
   templates    CardTemplate[]

@@ -50,6 +50,7 @@ export async function seed() {
       overallRating: p.overallRating,
       currentValue: p.currentValue,
       isTopPlayer: p.isTopPlayer,
+      isRookie: p.isRookie,
     })),
   });
   const players = await prisma.player.findMany({ select: { id: true } });
@@ -73,11 +74,11 @@ export async function seed() {
   // Tier 2: Momentum — athletic mid box; guaranteed 1 hit per box.
   const MOMENTUM = { BASE: 6200, BLUE: 800, PURPLE: 800, GOLD: 500, PATCH: 400, BLACK: 200, AUTOGRAPH: 300 };
   // Tier 3: Artistry — gallery prestige; guaranteed 2 hits, at least 1 auto naturally.
-  const ARTISTRY = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, EMERALD: 100 };
+  const ARTISTRY = { BASE: 5000, BLUE: 600, PURPLE: 800, GOLD: 700, PATCH: 600, BLACK: 400, AUTOGRAPH: 700, PATCH_AUTO: 30, EMERALD: 100 };
   // Tier 4: Gold Standard — high-end; guaranteed 2 hits, all-numbered box.
-  const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, EMERALD: 250, SUPERFRACTOR: 30 };
+  const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
   // Tier 5: Reliquary — ultra; every card numbered, guaranteed 4 hits (dense patch/auto).
-  const RELIQUARY = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, EMERALD: 700, SUPERFRACTOR: 150 };
+  const RELIQUARY = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, PATCH_AUTO: 400, EMERALD: 700, SUPERFRACTOR: 150 };
   await prisma.product.createMany({
     data: [
       {

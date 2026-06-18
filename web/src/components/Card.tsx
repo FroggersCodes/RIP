@@ -13,6 +13,7 @@ export interface CardData {
     overallRating?: number;
     teamPrimaryColor?: string;
     teamSecondaryColor?: string;
+    isRookie?: boolean;
   };
   parallel: ParallelName;
   serial: number | null;
@@ -29,23 +30,45 @@ interface Props {
   onClick?: () => void;
 }
 
+function PatchSwatch({ primary, secondary }: { primary: string; secondary: string }) {
+  return (
+    <svg className="card-patch-swatch" viewBox="0 0 88 56" xmlns="http://www.w3.org/2000/svg">
+      <rect width="88" height="56" fill={primary} />
+      <rect y="14" width="88" height="11" fill={secondary} opacity="0.85" />
+      <rect y="31" width="88" height="11" fill={secondary} opacity="0.85" />
+      {[5, 12, 19, 26, 33, 40, 47, 54].map((y) => (
+        <line key={y} x1="0" y1={y} x2="88" y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth="0.7" strokeDasharray="3,3" />
+      ))}
+      <line x1="0" y1="14" x2="88" y2="14" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+      <line x1="0" y1="25" x2="88" y2="25" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+      <line x1="0" y1="31" x2="88" y2="31" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+      <line x1="0" y1="42" x2="88" y2="42" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
+    </svg>
+  );
+}
+
 export function Card({ card, size = 'md', faded, onClick }: Props) {
   const def = PARALLEL_MAP[card.parallel];
+  const isRpa = card.parallel === 'PATCH_AUTO';
   const tier = card.refractor
     ? 'refractor'
-    : card.parallel === 'AUTOGRAPH'
-      ? 'tier-auto'
-      : card.parallel === 'PATCH'
-        ? 'tier-patch'
-        : card.parallel === 'GOLD'
-          ? 'tier-gold'
-          : 'tier-plain';
+    : isRpa
+      ? 'tier-rpa'
+      : card.parallel === 'AUTOGRAPH'
+        ? 'tier-auto'
+        : card.parallel === 'PATCH'
+          ? 'tier-patch'
+          : card.parallel === 'GOLD'
+            ? 'tier-gold'
+            : 'tier-plain';
+
   const set = setOf(card.setKey);
   const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
-  const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.id) : null;
+  const hasSig = card.parallel === 'AUTOGRAPH' || isRpa;
+  const sig = hasSig ? signaturePath(card.player.id) : null;
   const teamPrimary = card.player.teamPrimaryColor ?? '#1a2a4a';
   const teamSecondary = card.player.teamSecondaryColor ?? '#0c1422';
-  const patch = card.parallel === 'PATCH' ? { primary: teamPrimary, secondary: teamSecondary } : null;
+  const hasPatch = card.parallel === 'PATCH' || isRpa;
 
   return (
     <div
@@ -66,8 +89,20 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
           <div className="card-photo-scrim" />
           <div className="card-set-fx" />
           <div className="sheen" />
+
+          {/* Patch swatch — standalone PATCH cards or top half of RPA */}
+          {hasPatch && (
+            <div className={`card-patch${isRpa ? ' card-patch-rpa' : ''}`}>
+              <div className="card-patch-window">
+                <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+              </div>
+              <span className="patch-badge">{isRpa ? 'PATCH' : 'PATCH'}</span>
+            </div>
+          )}
+
+          {/* Autograph — standalone AUTO cards or bottom half of RPA */}
           {sig && (
-            <div className="card-sig">
+            <div className={`card-sig${isRpa ? ' card-sig-rpa' : ''}`}>
               <svg
                 className="card-sig-svg"
                 viewBox={`0 0 ${sig.width} 100`}
@@ -83,35 +118,20 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span className="auto-badge">✒ AUTO</span>
+              <span className="auto-badge">{isRpa ? '✒ RPA' : '✒ AUTO'}</span>
             </div>
           )}
-          {patch && (
-            <div className="card-patch">
-              <div className="card-patch-window">
-                <svg className="card-patch-swatch" viewBox="0 0 88 56" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="88" height="56" fill={patch.primary} />
-                  <rect y="14" width="88" height="11" fill={patch.secondary} opacity="0.85" />
-                  <rect y="31" width="88" height="11" fill={patch.secondary} opacity="0.85" />
-                  {[5, 12, 19, 26, 33, 40, 47, 54].map((y) => (
-                    <line key={y} x1="0" y1={y} x2="88" y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth="0.7" strokeDasharray="3,3" />
-                  ))}
-                  <line x1="0" y1="14" x2="88" y2="14" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
-                  <line x1="0" y1="25" x2="88" y2="25" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
-                  <line x1="0" y1="31" x2="88" y2="31" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
-                  <line x1="0" y1="42" x2="88" y2="42" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeDasharray="4,2" />
-                </svg>
-              </div>
-              <span className="patch-badge">PATCH</span>
-            </div>
-          )}
+
           <div className="card-head">
             <span className="card-setmark">
               {set.wordmark} <span className="card-setyear">· '26</span>
             </span>
-            <span className="card-parallel-pill" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
-              {shortName}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {card.player.isRookie && <span className="card-rc-badge">RC</span>}
+              <span className="card-parallel-pill" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
+                {shortName}
+              </span>
+            </div>
           </div>
           <div className="card-plate">
             <div className="card-name">{card.player.name}</div>

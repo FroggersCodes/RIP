@@ -48,6 +48,7 @@ export interface PlayerPoolEntry {
   position: Position;
   currentValue: number;
   isTopPlayer: boolean;
+  isRookie: boolean;
   teamName: string;
   teamAbbr: string;
   teamPrimaryColor: string;
@@ -61,6 +62,7 @@ export interface PulledCard {
     name: string;
     position: Position;
     currentValue: number;
+    isRookie: boolean;
     teamName: string;
     teamAbbr: string;
     teamPrimaryColor: string;
@@ -84,6 +86,7 @@ export async function loadPlayerPool(client: DbClient): Promise<PlayerPoolEntry[
       position: true,
       currentValue: true,
       isTopPlayer: true,
+      isRookie: true,
       team: { select: { name: true, abbreviation: true, primaryColor: true, secondaryColor: true } },
     },
   });
@@ -93,6 +96,7 @@ export async function loadPlayerPool(client: DbClient): Promise<PlayerPoolEntry[
     position: p.position,
     currentValue: p.currentValue,
     isTopPlayer: p.isTopPlayer,
+    isRookie: p.isRookie,
     teamName: p.team.name,
     teamAbbr: p.team.abbreviation,
     teamPrimaryColor: p.team.primaryColor,
@@ -113,12 +117,17 @@ export function rollParallel(pullRates: Record<string, number>): ParallelName {
   return entries[entries.length - 1]![0];
 }
 
-/** Base cards pick any player uniformly; hits bias toward top players. */
+/** Base cards pick any player uniformly; hits bias toward top players; PATCH_AUTO always picks a rookie. */
 export function pickPlayer(
   parallel: ParallelName,
   topPlayerBias: number,
   pool: PlayerPoolEntry[],
 ): PlayerPoolEntry {
+  // Rookie Patch Autos always feature a rookie player.
+  if (parallel === 'PATCH_AUTO') {
+    const rookies = pool.filter((p) => p.isRookie);
+    if (rookies.length > 0) return rookies[Math.floor(Math.random() * rookies.length)]!;
+  }
   if (parallel !== 'BASE' && topPlayerBias > 0) {
     const tops = pool.filter((p) => p.isTopPlayer);
     if (tops.length > 0 && Math.random() < topPlayerBias) {
@@ -267,6 +276,7 @@ function buildPulledCard(player: PlayerPoolEntry, resolved: ResolvedAllocation, 
       name: player.name,
       position: player.position,
       currentValue: player.currentValue,
+      isRookie: player.isRookie,
       teamName: player.teamName,
       teamAbbr: player.teamAbbr,
       teamPrimaryColor: player.teamPrimaryColor,

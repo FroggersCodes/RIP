@@ -32,6 +32,7 @@ export function cardView(inst: CardWithRels) {
       position: p.position,
       overallRating: p.overallRating,
       currentValue: p.currentValue,
+      isRookie: p.isRookie,
       teamName: p.team.name,
       teamAbbr: p.team.abbreviation,
       teamPrimaryColor: p.team.primaryColor,

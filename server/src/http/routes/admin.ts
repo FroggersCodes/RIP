@@ -35,7 +35,7 @@ const clockSchema = z.object({
   autoAdvance: z.boolean().optional(),
   luckBoost: z.number().min(1).max(50).optional(),
   forceParallel: z
-    .enum(['BASE', 'BLUE', 'PURPLE', 'GOLD', 'PATCH', 'BLACK', 'AUTOGRAPH', 'EMERALD', 'SUPERFRACTOR'])
+    .enum(['BASE', 'BLUE', 'PURPLE', 'GOLD', 'PATCH', 'BLACK', 'AUTOGRAPH', 'PATCH_AUTO', 'EMERALD', 'SUPERFRACTOR'])
     .nullable()
     .optional(),
 });

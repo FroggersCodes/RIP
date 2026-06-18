@@ -534,6 +534,48 @@
   border-radius: 999px;
 }
 
+/* ---------- RC rookie badge ---------- */
+.card-rc-badge {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: #1a0800;
+  background: linear-gradient(135deg, #fde68a, #f59e0b);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ---------- patch auto (RPA) — patch + signature stacked on one card ---------- */
+.card.tier-rpa .card-frame {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--team-primary, #4a5568) 35%, #3d2a0e) 0%,
+    var(--team-secondary, #1a202c) 28%,
+    #f0c060 50%,
+    var(--team-primary, #4a5568) 68%,
+    color-mix(in srgb, var(--team-secondary, #1a202c) 50%, #5a3f12) 100%
+  );
+  background-size: 200% 200%;
+  animation: holo-shift 7s linear infinite;
+}
+.card.tier-rpa .card-inner {
+  background: linear-gradient(180deg, #0d1117 0%, #1a1f28 100%);
+}
+.card.tier-rpa .sheen {
+  opacity: 1;
+  animation: sheen-move 4s ease-in-out infinite;
+}
+
+/* RPA: push patch up to make room for the sig below */
+.card-patch-rpa {
+  top: 22% !important;
+}
+/* RPA: sig sits below the patch */
+.card-sig-rpa {
+  top: 50% !important;
+}
+
 /* ---------- holographic refractor — rarest pulls only ---------- */
 .card.refractor .card-frame {
   background: linear-gradient(125deg, #ff4d4d, #ffb84d, #ffe24d, #4dff88, #4de1ff, #4d7bff, #b84dff, #ff4dd2);
