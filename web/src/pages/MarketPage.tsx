@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PARALLEL_MAP, PARALLEL_NAMES } from '@rip/shared';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
@@ -71,7 +72,26 @@ export function MarketPage() {
       coll.reload();
     });
 
+  const sellAll = (parallel: string, count: number, total: number, needConfirm: boolean) =>
+    run(`bulk-${parallel}`, async () => {
+      if (
+        needConfirm &&
+        !window.confirm(
+          `Sell all ${count} ${parallel} card${count > 1 ? 's' : ''} to the house for ~${num(total)} tokens? Numbered serials transfer to the house.`,
+        )
+      ) {
+        return;
+      }
+      const r = await api<{ sold: number; tokens: number; user: User }>('/market/sell-bulk', {
+        method: 'POST',
+        body: { parallel },
+      });
+      setUser(r.user);
+      coll.reload();
+    });
+
   const sellable = (coll.data?.cards ?? []).filter((c) => !c.equippedRole && !c.listed);
+  const houseValue = (c: CollectionCard) => Math.max(1, Math.round(c.marketValue * 0.8));
 
   return (
     <>
@@ -119,7 +139,35 @@ export function MarketPage() {
         (coll.loading ? (
           <Spin />
         ) : sellable.length ? (
-          <div className="cards-grid">
+          <>
+            <div className="panel panel-p" style={{ marginBottom: 14 }}>
+              <div className="section-title">Quick sell to house · 80% of value</div>
+              <div className="quicksell">
+                {PARALLEL_NAMES.map((p) => {
+                  const g = sellable.filter((c) => c.parallel === p);
+                  if (!g.length) return null;
+                  const total = g.reduce((a, c) => a + houseValue(c), 0);
+                  const def = PARALLEL_MAP[p];
+                  return (
+                    <div className="quicksell-row" key={p}>
+                      <span className="qs-name" style={{ color: p === 'BLACK' ? '#cfd6e2' : def.color }}>
+                        {def.displayName.replace(/\s*\/.*/, '')}
+                      </span>
+                      <span className="muted mono">{g.length}</span>
+                      <span className="gold mono">{num(total)} tok</span>
+                      <button
+                        className="btn btn-sm"
+                        disabled={busy === `bulk-${p}`}
+                        onClick={() => sellAll(p, g.length, total, p !== 'BASE')}
+                      >
+                        Sell all
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="cards-grid">
             {sellable.map((c) => (
               <div className="card-wrap" key={c.id}>
                 <Card card={c} size="sm" />
@@ -142,7 +190,8 @@ export function MarketPage() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         ) : (
           <div className="empty">No sellable cards. Pull some, or unequip first.</div>
         ))}

@@ -89,6 +89,37 @@ router.post(
   }),
 );
 
+// ---- sell every unequipped, unlisted card of a parallel to the house at once ----
+const bulkSchema = z.object({ parallel: z.string().min(1) });
+router.post(
+  '/sell-bulk',
+  requireAuth,
+  asyncHandler(async (req: AuthedRequest, res) => {
+    const uid = userId(req);
+    const { parallel } = bulkSchema.parse(req.body);
+    const result = await prisma.$transaction(async (tx) => {
+      const bot = await tx.user.findFirst({ where: { isBot: true } });
+      if (!bot) throw new AppError(500, 'No house account');
+      const instances = await tx.cardInstance.findMany({
+        where: {
+          ownerId: uid,
+          lineupSlot: { is: null },
+          listing: { is: null },
+          template: { is: { parallel: parallel as Prisma.CardTemplateWhereInput['parallel'] } },
+        },
+        include: cardInclude,
+      });
+      if (instances.length === 0) return { sold: 0, tokens: 0 };
+      const payout = instances.reduce((a, inst) => a + Math.max(1, Math.round(cardView(inst).marketValue * HOUSE_SELL_RATE)), 0);
+      await tx.cardInstance.updateMany({ where: { id: { in: instances.map((i) => i.id) } }, data: { ownerId: bot.id } });
+      await grant(tx, uid, { tokens: payout });
+      return { sold: instances.length, tokens: payout };
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });
+    res.json({ ...result, user: publicUser(user) });
+  }),
+);
+
 // ---- list a card for sale ----
 const listSchema = z.object({ instanceId: z.string().min(1), priceTokens: z.number().int().min(1).max(100_000_000) });
 router.post(

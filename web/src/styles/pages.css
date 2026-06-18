@@ -646,6 +646,28 @@
 }
 
 /* ---------- marketplace ---------- */
+.quicksell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+.quicksell-row {
+  display: grid;
+  grid-template-columns: 1fr auto 86px auto;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 2px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.quicksell-row:last-child {
+  border-bottom: 0;
+}
+.qs-name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+}
 .market-foot {
   display: flex;
   align-items: center;
