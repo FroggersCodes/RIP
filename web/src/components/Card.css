@@ -17,11 +17,12 @@
   filter: saturate(0.75);
 }
 
-/* gradient-border technique: frame is the (animated) border, inner is opaque */
+/* The frame is the card border — its look is driven by the SET (special parallels
+   override it below). */
 .card-frame {
-  border-radius: 14px;
-  padding: 2px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 70%, #2a3340), #2a3340);
+  border-radius: 13px;
+  padding: 3px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 60%, #2a3340), #2a3340);
   box-shadow: var(--shadow-card);
   transition: transform 0.12s ease, box-shadow 0.2s ease;
 }
@@ -30,15 +31,26 @@
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
 }
 
+/* ---------- set frames ---------- */
+.set-chrome .card-frame {
+  background: linear-gradient(140deg, #cfd6e0, #7e8794 38%, #f4f8fc 52%, #9aa3b0 66%, #cfd6e0);
+}
+.set-prizm .card-frame {
+  background: linear-gradient(180deg, #ffffff, #dce4ee);
+}
+.set-vault .card-frame {
+  background: linear-gradient(140deg, #0e0a02, #3a2c10 42%, #e0bd63 52%, #3a2c10 62%, #0e0a02);
+}
+
 .card-inner {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #0c0e12;
   aspect-ratio: 5 / 7;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 
-/* player photo fills the card; text plates sit on top */
 .card-photo {
   position: absolute;
   inset: 0;
@@ -48,10 +60,10 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  background:
-    linear-gradient(180deg, rgba(8, 10, 14, 0.55) 0%, transparent 22%, transparent 45%, rgba(8, 10, 14, 0.85) 88%);
+  background: linear-gradient(180deg, rgba(8, 10, 14, 0.5) 0%, transparent 20%, transparent 42%, rgba(7, 9, 13, 0.9) 86%);
 }
 
+/* ---------- header: set wordmark + parallel pill ---------- */
 .card-head {
   position: absolute;
   z-index: 4;
@@ -63,123 +75,112 @@
   justify-content: space-between;
   gap: 6px;
 }
-.card-parallel {
-  font-family: var(--font-mono);
+.card-setmark {
+  font-family: var(--font-display);
+  font-weight: 800;
   font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+.card-setyear {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.card-parallel-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 1px 7px;
+  background: rgba(8, 10, 14, 0.4);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+/* ---------- name plate ---------- */
+.card-plate {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px 11px;
+}
+.card-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 1.05;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+}
+.card-sm .card-name {
+  font-size: 14px;
+}
+.card-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: #c7cfda;
+  margin-top: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+.card-plate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
 }
 .card-serial {
   font-size: 11px;
   font-weight: 600;
   color: #e7ebf1;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
 }
-
-.card-plate {
-  position: absolute;
-  z-index: 4;
-  left: 12px;
-  right: 12px;
-  bottom: 11px;
-}
-.card-pos {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.pos-badge {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 12px;
-  color: #0c0e12;
-  background: var(--accent);
-  padding: 1px 7px;
-  border-radius: 6px;
-}
-.card-team {
-  font-size: 12px;
-  color: #d6dce5;
-  font-weight: 700;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-.card-name {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 16px;
-  line-height: 1.05;
-  margin-top: 5px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-}
-.card-sm .card-name {
-  font-size: 14px;
-}
-.card-foot {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-top: 6px;
-}
-.card-value {
-  font-size: 15px;
+.card-value-pill {
+  font-size: 13px;
   font-weight: 700;
   color: var(--gold);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(245, 181, 61, 0.5);
+  background: rgba(10, 12, 16, 0.62);
+  padding: 2px 9px;
+  border-radius: 999px;
 }
-.card-ovr {
-  font-size: 10px;
-  color: #c3cbd6;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+.card-sm .card-value-pill {
+  font-size: 12px;
+  padding: 1px 7px;
 }
 
-/* ---------- per-set treatment (over the photo) ---------- */
+/* ---------- per-set surface finish (subtle, over the photo) ---------- */
 .card-set-fx {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  border-radius: 12px;
-  opacity: 0.6;
+  border-radius: 10px;
+  opacity: 0.4;
   mix-blend-mode: screen;
 }
 .set-chrome .card-set-fx {
-  background:
-    repeating-linear-gradient(90deg, rgba(170, 210, 255, 0) 0 7px, rgba(180, 215, 255, 0.12) 7px 8px),
-    linear-gradient(180deg, rgba(120, 170, 255, 0.08), transparent 60%);
+  background: repeating-linear-gradient(90deg, rgba(180, 215, 255, 0) 0 8px, rgba(190, 220, 255, 0.12) 8px 9px);
 }
 .set-prizm .card-set-fx {
   background: repeating-linear-gradient(
     115deg,
-    rgba(255, 60, 180, 0.12) 0 6px,
-    rgba(60, 210, 255, 0.12) 6px 12px,
-    rgba(150, 90, 255, 0.1) 12px 18px,
-    transparent 18px 30px
+    rgba(255, 60, 180, 0.14) 0 5px,
+    rgba(60, 210, 255, 0.14) 5px 10px,
+    rgba(150, 90, 255, 0.12) 10px 15px,
+    transparent 15px 26px
   );
 }
 .set-vault .card-set-fx {
   mix-blend-mode: normal;
-  opacity: 0.85;
-  background:
-    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.24) 0 2px, transparent 2px 6px),
-    radial-gradient(120% 80% at 50% 100%, rgba(245, 181, 61, 0.12), transparent 55%);
-}
-.card-set-mark {
-  position: absolute;
-  z-index: 4;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(180deg);
-  writing-mode: vertical-rl;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.5);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
-}
-.card-sm .card-set-mark {
-  font-size: 8px;
+  opacity: 0.7;
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.22) 0 2px, transparent 2px 7px);
 }
 
 /* ---------- specular sheen ---------- */
@@ -188,19 +189,13 @@
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  border-radius: 12px;
-  background: linear-gradient(
-    115deg,
-    transparent 28%,
-    rgba(255, 255, 255, 0.22) 46%,
-    rgba(255, 255, 255, 0.05) 54%,
-    transparent 70%
-  );
+  border-radius: 10px;
+  background: linear-gradient(115deg, transparent 28%, rgba(255, 255, 255, 0.22) 46%, rgba(255, 255, 255, 0.05) 54%, transparent 70%);
   background-size: 250% 250%;
   opacity: 0;
 }
 
-/* ---------- gold treatment (premium, not full refractor) ---------- */
+/* ---------- gold parallel ---------- */
 .card.tier-gold .card-frame {
   background: linear-gradient(135deg, #5a3f12, #f5b53d, #fff0c0, #f5b53d, #5a3f12);
   background-size: 200% 200%;
@@ -264,6 +259,9 @@
   background-size: 320% 320%;
   animation: holo-shift 6s linear infinite;
   box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadow-card);
+}
+.card.refractor .card-inner {
+  background: radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.07), transparent 60%), linear-gradient(180deg, #11161f, #0a0d13);
 }
 .card.refractor .sheen {
   opacity: 1;

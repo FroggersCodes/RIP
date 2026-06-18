@@ -30,8 +30,8 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
       : card.parallel === 'GOLD'
         ? 'tier-gold'
         : 'tier-plain';
-  const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
   const set = setOf(card.setKey);
+  const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
   const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.name) : null;
   return (
     <div
@@ -47,7 +47,6 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
           <div className="card-photo-scrim" />
           <div className="card-set-fx" />
           <div className="sheen" />
-          <span className="card-set-mark">{set.wordmark}</span>
           {sig && (
             <div className="card-sig">
               <svg className="card-sig-svg" viewBox={`0 0 ${sig.width} 100`} preserveAspectRatio="xMidYMid meet">
@@ -57,22 +56,24 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
             </div>
           )}
           <div className="card-head">
-            <span className="card-parallel" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
-              {shortName}
+            <span className="card-setmark">
+              {set.wordmark} <span className="card-setyear">· '26</span>
             </span>
-            <span className="card-serial mono">
-              {card.serial != null ? `#${card.serial}${card.printRun ? '/' + card.printRun : ''}` : 'BASE'}
+            <span className="card-parallel-pill" style={{ color: card.parallel === 'BLACK' ? '#cfd6e2' : def.color }}>
+              {shortName}
             </span>
           </div>
           <div className="card-plate">
-            <div className="card-pos">
-              <span className="pos-badge">{card.player.position}</span>
-              <span className="card-team mono">{card.player.teamAbbr}</span>
-            </div>
             <div className="card-name">{card.player.name}</div>
-            <div className="card-foot">
-              <span className="card-value mono">{money(card.marketValue)}</span>
-              {card.player.overallRating != null && <span className="card-ovr mono">OVR {card.player.overallRating}</span>}
+            <div className="card-sub">
+              {card.player.position} · {card.player.teamAbbr}
+              {card.player.overallRating != null ? ` · OVR ${card.player.overallRating}` : ''}
+            </div>
+            <div className="card-plate-row">
+              <span className="card-serial mono">
+                {card.serial != null ? `#${card.serial}${card.printRun ? '/' + card.printRun : ''}` : 'BASE'}
+              </span>
+              <span className="card-value-pill mono">{money(card.marketValue)}</span>
             </div>
           </div>
         </div>
