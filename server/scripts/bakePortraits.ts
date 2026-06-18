@@ -5,13 +5,21 @@ import { buildAllPlayers, nameSlug, TEAMS, type PlayerSeed } from '../src/data/r
 
 // Generate one portrait per player into web/public/players/<slug>.jpg.
 // Providers:
-//   pollinations (default, free)  – uses flux-realism, no key needed
+//   pollinations (free)           – uses flux-realism, no key needed
+//   cloudflare                    – Cloudflare Workers AI (Flux), generous free
+//                                   tier; set CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN
 //   dalle                         – DALL-E 3 via OPENAI_API_KEY, best quality
 //   openai                        – gpt-image-1 via OPENAI_API_KEY
 // Resumable: existing files are skipped, so a re-run only fills gaps.
 
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/public/players');
-const PROVIDER = process.env.IMAGE_PROVIDER ?? (process.env.OPENAI_API_KEY ? 'dalle' : 'pollinations');
+const PROVIDER =
+  process.env.IMAGE_PROVIDER ??
+  (process.env.OPENAI_API_KEY
+    ? 'dalle'
+    : process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN
+      ? 'cloudflare'
+      : 'pollinations');
 const CONCURRENCY = Number(process.env.BAKE_CONCURRENCY ?? 1);
 // Minimum gap between requests per worker — keeps Pollinations happy on the free tier
 const DELAY_MS = Number(process.env.BAKE_DELAY_MS ?? 4000);
@@ -118,6 +126,51 @@ async function genOpenAI(prompt: string): Promise<Buffer> {
   return Buffer.from(b64, 'base64');
 }
 
+// Cloudflare Workers AI. Default model is flux-1-schnell (photoreal, fast, but
+// square-only and ignores seed). Set CF_IMAGE_MODEL to an SDXL model — e.g.
+// @cf/stabilityai/stable-diffusion-xl-base-1.0 — to control width/height/seed.
+const CF_MODEL = process.env.CF_IMAGE_MODEL ?? '@cf/black-forest-labs/flux-1-schnell';
+
+async function genCloudflare(prompt: string, seed: number): Promise<Buffer> {
+  const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const token = process.env.CLOUDFLARE_API_TOKEN;
+  if (!account || !token) throw new Error('cloudflare: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN');
+  const isFlux = CF_MODEL.includes('flux');
+  const body = isFlux
+    ? { prompt, steps: 8 }
+    : {
+        prompt,
+        width: 768,
+        height: 1152,
+        num_steps: 20,
+        seed,
+        negative_prompt: 'illustration, cartoon, painting, deformed, extra limbs, blurry',
+      };
+  const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/ai/run/${CF_MODEL}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(90_000),
+  });
+  if (!r.ok) {
+    const retryAfter = r.headers.get('retry-after');
+    throw Object.assign(new Error(`cloudflare ${r.status} ${(await r.text().catch(() => '')).slice(0, 160)}`), {
+      status: r.status,
+      retryAfter: retryAfter ? Number(retryAfter) : null,
+    });
+  }
+  const ct = r.headers.get('content-type') ?? '';
+  // flux-1-schnell returns JSON { result: { image: <base64 jpeg> } }; SDXL
+  // returns the raw PNG binary.
+  if (ct.includes('application/json')) {
+    const j: any = await r.json();
+    const b64 = j?.result?.image;
+    if (!b64) throw new Error(`cloudflare: no image (${JSON.stringify(j?.errors ?? j).slice(0, 160)})`);
+    return Buffer.from(b64, 'base64');
+  }
+  return Buffer.from(await r.arrayBuffer());
+}
+
 async function genPollinations(prompt: string, seed: number): Promise<Buffer> {
   // flux-realism produces photorealistic results vs plain flux which looks illustrated
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=1152&seed=${seed}&nologo=true&model=flux-realism&enhance=true`;
@@ -141,6 +194,7 @@ async function generate(p: PlayerSeed): Promise<Buffer> {
     try {
       if (PROVIDER === 'openai') return await genOpenAI(prompt);
       if (PROVIDER === 'dalle') return await genDallE3(prompt);
+      if (PROVIDER === 'cloudflare') return await genCloudflare(prompt, seed);
       return await genPollinations(prompt, seed);
     } catch (e: any) {
       if (attempt === 5) throw e;

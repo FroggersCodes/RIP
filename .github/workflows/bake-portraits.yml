@@ -7,6 +7,8 @@ name: Bake player portraits
 #
 # Providers:
 #   pollinations  free, no key, uses flux-realism model (~1 min for all players)
+#   cloudflare    Cloudflare Workers AI (Flux), free tier; requires
+#                 CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN secrets
 #   dalle         DALL-E 3, best quality, requires OPENAI_API_KEY secret (~$0.04/player)
 #   openai        gpt-image-1, requires OPENAI_API_KEY secret
 
@@ -16,7 +18,7 @@ on:
       provider:
         description: 'Image provider'
         type: choice
-        options: [pollinations, dalle, openai]
+        options: [pollinations, cloudflare, dalle, openai]
         default: pollinations
       branch:
         description: 'Branch to commit portraits to'
@@ -41,6 +43,8 @@ jobs:
         env:
           IMAGE_PROVIDER: ${{ inputs.provider }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Pollinations free tier rate-limits hard above 1 concurrent request
           BAKE_CONCURRENCY: '1'
           BAKE_DELAY_MS: '4000'
