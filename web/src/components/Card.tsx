@@ -90,19 +90,19 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
           <div className="card-set-fx" />
           <div className="sheen" />
 
-          {/* Patch swatch — standalone PATCH cards or top half of RPA */}
-          {hasPatch && (
-            <div className={`card-patch${isRpa ? ' card-patch-rpa' : ''}`}>
+          {/* Patch swatch — standalone PATCH cards only */}
+          {hasPatch && !isRpa && (
+            <div className="card-patch">
               <div className="card-patch-window">
                 <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
               </div>
-              <span className="patch-badge">{isRpa ? 'PATCH' : 'PATCH'}</span>
+              <span className="patch-badge">PATCH</span>
             </div>
           )}
 
-          {/* Autograph — standalone AUTO cards or bottom half of RPA */}
-          {sig && (
-            <div className={`card-sig${isRpa ? ' card-sig-rpa' : ''}`}>
+          {/* Autograph — standalone AUTO cards only */}
+          {sig && !isRpa && (
+            <div className="card-sig">
               <svg
                 className="card-sig-svg"
                 viewBox={`0 0 ${sig.width} 100`}
@@ -118,7 +118,37 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span className="auto-badge">{isRpa ? '✒ RPA' : '✒ AUTO'}</span>
+              <span className="auto-badge">✒ AUTO</span>
+            </div>
+          )}
+
+          {/* RPA — right column: patch window (top) + signature (bottom) */}
+          {isRpa && sig && (
+            <div className="card-rpa-side">
+              <div className="card-rpa-patch">
+                <div className="card-patch-window">
+                  <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
+                </div>
+                <span className="patch-badge">PATCH</span>
+              </div>
+              <div className="card-rpa-sig">
+                <svg
+                  className="card-sig-svg"
+                  viewBox={`0 0 ${sig.width} 100`}
+                  preserveAspectRatio="xMidYMid meet"
+                  style={{ transform: `rotate(${sig.slant}deg)` }}
+                >
+                  <path
+                    d={sig.d}
+                    fill="none"
+                    stroke={sig.ink}
+                    strokeWidth={sig.strokeWidth}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="auto-badge">✒ RPA</span>
+              </div>
             </div>
           )}
 
