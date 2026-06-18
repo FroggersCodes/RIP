@@ -396,17 +396,17 @@
 }
 
 .pack.tearing {
-  animation: pack-shake 0.32s ease-in-out;
+  animation: pack-shake var(--shake-dur, 0.32s) ease-in-out;
   cursor: default;
 }
 .pack.tearing .pack-top {
-  animation: tear-top 0.7s 0.3s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+  animation: tear-top var(--tear-dur, 0.7s) var(--tear-delay, 0.3s) cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
 }
 .pack.tearing .pack-bottom {
-  animation: tear-bottom 0.7s 0.3s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+  animation: tear-bottom var(--tear-dur, 0.7s) var(--tear-delay, 0.3s) cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
 }
 .pack.tearing .pack-burst {
-  animation: pack-burst 0.55s 0.4s ease-out forwards;
+  animation: pack-burst var(--burst-dur, 0.55s) var(--burst-delay, 0.4s) ease-out forwards;
 }
 @keyframes pack-shake {
   0%, 100% { transform: translate(0, 0) rotate(0); }

@@ -69,19 +69,28 @@ export function isHit(parallel: ParallelName): boolean {
 }
 
 // Card sets — each product belongs to a set with its own on-card visual treatment.
-export type SetKey = 'chrome' | 'prizm' | 'vault';
+export type SetKey = 'chrome' | 'prizm' | 'vault' | 'spark' | 'momentum' | 'artistry' | 'gold-standard' | 'reliquary';
 export interface SetDef {
   key: SetKey;
   label: string;
   wordmark: string;
+  /** 1 (entry/Spark) → 5 (ultra/Reliquary). Drives rip animation speed: lower = snappier. */
+  tierLevel: number;
 }
 export const SETS: Record<string, SetDef> = {
-  chrome: { key: 'chrome', label: 'Topps Chrome', wordmark: 'CHROME' },
-  prizm: { key: 'prizm', label: 'Prizm Legacy', wordmark: 'PRIZM' },
-  vault: { key: 'vault', label: 'Premier Vault', wordmark: 'VAULT' },
+  // Legacy sets (kept for existing cards)
+  chrome:        { key: 'chrome',        label: 'Topps Chrome',  wordmark: 'CHROME',   tierLevel: 1 },
+  prizm:         { key: 'prizm',         label: 'Prizm Legacy',  wordmark: 'PRIZM',    tierLevel: 2 },
+  vault:         { key: 'vault',         label: 'Premier Vault', wordmark: 'VAULT',    tierLevel: 4 },
+  // 5-tier product lineup
+  spark:         { key: 'spark',         label: 'Spark',         wordmark: 'SPARK',    tierLevel: 1 },
+  momentum:      { key: 'momentum',      label: 'Momentum',      wordmark: 'MNTM',     tierLevel: 2 },
+  artistry:      { key: 'artistry',      label: 'Artistry',      wordmark: 'ARTISTRY', tierLevel: 3 },
+  'gold-standard': { key: 'gold-standard', label: 'Gold Standard', wordmark: 'GLD STD', tierLevel: 4 },
+  reliquary:     { key: 'reliquary',     label: 'Reliquary',     wordmark: 'RLQ',      tierLevel: 5 },
 };
 export function setOf(key: string | null | undefined): SetDef {
-  return SETS[key ?? 'chrome'] ?? SETS.chrome!;
+  return SETS[key ?? 'spark'] ?? SETS.spark!;
 }
 
 export const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];

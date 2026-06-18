@@ -53,6 +53,7 @@ router.post(
             pool,
             setKey: product.setKey,
             guaranteeNumbered: product.guaranteeNumbered,
+            minHits: product.minHits,
             luck,
             force,
           });

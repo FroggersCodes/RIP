@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
-import { PARALLEL_MAP, PARALLELS_BY_RARITY_DESC } from '@rip/shared';
+import { PARALLEL_MAP, PARALLELS_BY_RARITY_DESC, SETS } from '@rip/shared';
 import { Card, type CardData } from './Card';
 import { money } from '../lib/format';
 import './RipReveal.css';
@@ -47,10 +47,22 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
   }
   const glowColor = PARALLEL_MAP[order[bestIdx] ?? 'BASE']?.color ?? '#8b94a3';
 
+  // Tier-based animation speed: Spark (1) = snappy, Reliquary (5) = dramatic and slow.
+  const TIER_MULT: Record<number, number> = { 1: 0.45, 2: 0.75, 3: 1.0, 4: 1.5, 5: 2.2 };
+  const tierLevel = SETS[cards[0]?.setKey ?? '']?.tierLevel ?? 1;
+  const tearMult = TIER_MULT[tierLevel] ?? 1.0;
+  const tearCss = {
+    '--shake-dur':  `${(0.32 * tearMult).toFixed(2)}s`,
+    '--tear-dur':   `${(0.7  * tearMult).toFixed(2)}s`,
+    '--tear-delay': `${(0.3  * tearMult).toFixed(2)}s`,
+    '--burst-dur':  `${(0.55 * tearMult).toFixed(2)}s`,
+    '--burst-delay':`${(0.4  * tearMult).toFixed(2)}s`,
+  } as React.CSSProperties;
+
   const rip = () => {
     if (tearing || opened) return;
     setTearing(true);
-    timers.current.push(window.setTimeout(() => setOpened(true), 950));
+    timers.current.push(window.setTimeout(() => setOpened(true), Math.round(950 * tearMult)));
   };
 
   // Flash the screen when the card now on top is a rare hit.
@@ -162,7 +174,7 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
 
       {!opened ? (
         <div className="pack-stage" style={{ ['--glow' as string]: glowColor }}>
-          <div className={`pack ${anyRefractor ? 'holo' : ''} ${tearing ? 'tearing' : ''}`} onClick={rip}>
+          <div className={`pack ${anyRefractor ? 'holo' : ''} ${tearing ? 'tearing' : ''}`} style={tearCss} onClick={rip}>
             <div className="pack-half pack-top">
               <div className="pack-art">
                 <span className="pack-logo">RIP<span className="gold">.</span></span>
