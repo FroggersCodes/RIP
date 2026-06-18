@@ -567,31 +567,18 @@
   animation: sheen-move 4s ease-in-out infinite;
 }
 
-/* ---------- RPA right-column layout ---------- */
-/* Right ~40% of the card is a dark panel split into patch (top) and sig (bottom). */
-.card-rpa-side {
+/* ---------- RPA layout ---------- */
+/* Patch floats in the upper-right; sig is a full-width strip just above the name plate. */
+.card-rpa-patch {
   position: absolute;
   z-index: 4;
-  right: 0;
-  top: 0;
-  bottom: 60px;
-  width: 40%;
-  display: flex;
-  flex-direction: column;
-  background: rgba(4, 6, 10, 0.74);
-  border-left: 1px solid rgba(240, 192, 96, 0.38);
-  pointer-events: none;
-}
-
-.card-rpa-patch {
-  flex: 1 1 50%;
+  right: 10px;
+  top: 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 4px;
-  padding: 8px 6px 4px;
-  border-bottom: 1px solid rgba(240, 192, 96, 0.22);
+  pointer-events: none;
 }
 
 .card-rpa-patch .card-patch-swatch {
@@ -599,17 +586,24 @@
 }
 
 .card-rpa-sig {
-  flex: 1 1 50%;
+  position: absolute;
+  z-index: 4;
+  left: 8px;
+  right: 8px;
+  bottom: 68px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 4px 4px 8px;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(240, 192, 96, 0.2);
+  border-radius: 6px;
+  padding: 6px 6px 5px;
+  pointer-events: none;
 }
 
 .card-rpa-sig .card-sig-svg {
-  width: 90%;
+  width: 88%;
   height: auto;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
