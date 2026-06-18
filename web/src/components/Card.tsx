@@ -43,20 +43,17 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
   const set = setOf(card.setKey);
   const shortName = def.displayName.replace(/\s*\/.*/, '').replace(/\s*1\/1/, '');
   const sig = card.parallel === 'AUTOGRAPH' ? signaturePath(card.player.id) : null;
-  const patch =
-    card.parallel === 'PATCH'
-      ? { primary: card.player.teamPrimaryColor ?? '#4a5568', secondary: card.player.teamSecondaryColor ?? '#1a202c' }
-      : null;
+  const teamPrimary = card.player.teamPrimaryColor ?? '#1a2a4a';
+  const teamSecondary = card.player.teamSecondaryColor ?? '#0c1422';
+  const patch = card.parallel === 'PATCH' ? { primary: teamPrimary, secondary: teamSecondary } : null;
 
   return (
     <div
       className={`card card-${size} ${tier} set-${set.key} ${faded ? 'faded' : ''} ${onClick ? 'clickable' : ''}`}
       style={{
         ['--accent' as string]: def.color,
-        ...(patch && {
-          ['--patch-primary' as string]: patch.primary,
-          ['--patch-secondary' as string]: patch.secondary,
-        }),
+        ['--team-primary' as string]: teamPrimary,
+        ['--team-secondary' as string]: teamSecondary,
       }}
       onClick={onClick}
     >

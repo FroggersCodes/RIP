@@ -286,10 +286,10 @@
 .card.tier-patch .card-frame {
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--patch-primary, #4a5568) 60%, #000) 0%,
-    var(--patch-secondary, #1a202c) 40%,
-    var(--patch-primary, #4a5568) 70%,
-    color-mix(in srgb, var(--patch-secondary, #1a202c) 70%, #fff) 100%
+    color-mix(in srgb, var(--team-primary, #4a5568) 60%, #000) 0%,
+    var(--team-secondary, #1a202c) 40%,
+    var(--team-primary, #4a5568) 70%,
+    color-mix(in srgb, var(--team-secondary, #1a202c) 70%, #fff) 100%
   );
 }
 .card.tier-patch .card-inner {
