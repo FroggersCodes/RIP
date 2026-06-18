@@ -9,6 +9,39 @@ import {
 } from '@rip/shared';
 import type { DbClient, Tx } from '../prisma';
 
+function fnv1a(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+function mulberry32(seed: number) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Maps a sequential allocation index (0-based) to a pseudo-random serial within
+ * 1..printRun using a Fisher-Yates shuffle seeded from the template ID. The
+ * mapping is a bijection, so uniqueness is preserved; nextSerial stays the
+ * race-safe atomic counter it already is.
+ */
+function shuffledSerial(templateId: string, index: number, printRun: number): number {
+  if (printRun === 1) return 1;
+  const rng = mulberry32(fnv1a(templateId));
+  const arr = Array.from({ length: printRun }, (_, i) => i + 1);
+  for (let i = printRun - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = arr[i]!;
+    arr[i] = arr[j]!;
+    arr[j] = tmp;
+  }
+  return arr[index]!;
+}
+
 export interface PlayerPoolEntry {
   id: string;
   name: string;
@@ -120,7 +153,10 @@ export async function allocateNumberedSerial(
   `;
   if (rows.length === 0) return null;
   const r = rows[0]!;
-  return { templateId: r.id, serial: r.nextSerial, valueMultiplier: r.valueMultiplier, printRun: r.printRun };
+  // nextSerial is 1-based after the increment; map to a pseudo-random serial via
+  // a bijective shuffle so collectors see e.g. #147/250 instead of #1/250.
+  const serial = shuffledSerial(r.id, r.nextSerial - 1, r.printRun);
+  return { templateId: r.id, serial, valueMultiplier: r.valueMultiplier, printRun: r.printRun };
 }
 
 export interface ResolvedAllocation {
