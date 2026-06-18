@@ -396,21 +396,23 @@
   );
 }
 
-/* The signature Artistry wave — a bold band sitting behind the name plate in the
-   parallel's color (grey for Base). Above the scrim so it reads strongly. */
+/* The signature Artistry wave — a bold band hugging the name plate in the
+   parallel's color (grey for Base). Crest sits just above the name top and the
+   band fades off just below the name. Above the scrim so it reads strongly. */
 .card-art-wave {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 30%;
+  bottom: 9%;
+  height: 36%;
   z-index: 3;
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--accent) 78%, transparent) 0%,
-    color-mix(in srgb, var(--accent) 100%, #000 4%) 38%,
-    color-mix(in srgb, var(--accent) 100%, #000 14%) 100%
+    color-mix(in srgb, var(--accent) 70%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 100%, #000 4%) 28%,
+    color-mix(in srgb, var(--accent) 100%, #000 8%) 70%,
+    transparent 100%
   );
   -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,34 C22,8 38,8 52,26 C66,44 82,44 100,20 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
   -webkit-mask-size: 100% 100%;
@@ -425,7 +427,7 @@
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--accent) 25%, #ffffff) 0%,
-    transparent 10%
+    transparent 9%
   );
   -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,34 C22,8 38,8 52,26 C66,44 82,44 100,20 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
   -webkit-mask-size: 100% 100%;
