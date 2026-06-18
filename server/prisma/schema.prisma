@@ -291,6 +291,7 @@ model LeagueState {
   lastAdvanceAt DateTime?
   autoAdvance   Boolean   @default(true)
   luckBoost     Float     @default(1) // dev: exponentially boosts rarer pull tiers (1 = normal)
+  forceParallel String? // dev: force every pulled card to this parallel (null = normal)
   updatedAt     DateTime  @updatedAt
 }
 

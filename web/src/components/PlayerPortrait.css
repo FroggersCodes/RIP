@@ -37,3 +37,15 @@
   letter-spacing: 0.02em;
   opacity: 0.9;
 }
+
+/* As card art: drop the opaque box so the bold per-set background shows through,
+   and render the initials as a faint watermark instead of a solid block. */
+.portrait-fill .portrait-bg,
+.portrait-fill .portrait-fallback {
+  background: transparent;
+}
+.portrait-fill .portrait-initials {
+  color: rgba(255, 255, 255, 0.14);
+  opacity: 1;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}

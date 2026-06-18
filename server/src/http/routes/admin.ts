@@ -33,6 +33,10 @@ const clockSchema = z.object({
   lockMinutes: z.number().int().min(0).max(720).optional(),
   autoAdvance: z.boolean().optional(),
   luckBoost: z.number().min(1).max(50).optional(),
+  forceParallel: z
+    .enum(['BASE', 'BLUE', 'PURPLE', 'GOLD', 'BLACK', 'AUTOGRAPH', 'EMERALD', 'SUPERFRACTOR'])
+    .nullable()
+    .optional(),
 });
 
 // Tune the clock (cadence, lineup-lock window, on/off) without DB access.

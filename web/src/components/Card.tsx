@@ -41,6 +41,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
     >
       <div className="card-frame">
         <div className="card-inner">
+          <div className="card-set-bg" />
           <div className="card-photo">
             <PlayerPortrait player={card.player} fill />
           </div>

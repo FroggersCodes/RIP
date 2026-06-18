@@ -9,6 +9,7 @@ interface State {
   lockMinutes: number;
   lastAdvanceAt: Date;
   luckBoost: number;
+  forceParallel: string | null;
 }
 
 async function getState(): Promise<State> {
@@ -36,6 +37,7 @@ export interface ClockInfo {
   msToKickoff: number;
   msToLock: number;
   luckBoost: number;
+  forceParallel: string | null;
 }
 
 export async function getClock(): Promise<ClockInfo> {
@@ -51,6 +53,7 @@ export async function getClock(): Promise<ClockInfo> {
     msToKickoff: Math.max(0, next - now),
     msToLock: Math.max(0, lockAt - now),
     luckBoost: s.luckBoost ?? 1,
+    forceParallel: s.forceParallel ?? null,
   };
 }
 
@@ -60,6 +63,12 @@ export async function isLineupLocked(): Promise<boolean> {
 
 export async function getLuck(): Promise<number> {
   return (await getState()).luckBoost ?? 1;
+}
+
+/** Dev pull modifiers applied to every opening: luck multiplier + forced parallel. */
+export async function getPullMods(): Promise<{ luck: number; force: string | null }> {
+  const s = await getState();
+  return { luck: s.luckBoost ?? 1, force: s.forceParallel ?? null };
 }
 
 /** Advance the league if the cadence has elapsed. Idempotent and concurrency-safe. */
@@ -81,6 +90,7 @@ export async function updateClock(patch: {
   lockMinutes?: number;
   autoAdvance?: boolean;
   luckBoost?: number;
+  forceParallel?: string | null;
 }) {
   await getState();
   return prisma.leagueState.update({ where: { id: SINGLETON }, data: patch });

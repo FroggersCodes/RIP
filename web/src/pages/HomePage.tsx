@@ -53,6 +53,7 @@ export function HomePage() {
   const [granting, setGranting] = useState(false);
   const [luckInput, setLuckInput] = useState('5');
   const [settingLuck, setSettingLuck] = useState(false);
+  const [settingForce, setSettingForce] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
@@ -186,6 +187,30 @@ export function HomePage() {
       setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
       setSettingLuck(false);
+    }
+  };
+
+  const setForce = async (forceParallel: string | null) => {
+    setSettingForce(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/clock`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({ forceParallel }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      clock.reload();
+      setImportMsg(
+        forceParallel
+          ? `Forcing every pulled card to ${forceParallel}. Rip a pack to see it — turn off when done.`
+          : 'Forced parallel off — pulls are back to normal odds.',
+      );
+    } catch (e) {
+      setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
+    } finally {
+      setSettingForce(false);
     }
   };
 
@@ -384,6 +409,21 @@ export function HomePage() {
               {settingLuck ? '…' : 'Set'}
             </button>
             {clock.data && <span className="muted mono" style={{ fontSize: 11 }}>now {clock.data.luckBoost}×</span>}
+          </div>
+          <div className="row wrap" style={{ marginTop: 8, gap: 8 }}>
+            <span className="muted" style={{ fontSize: 13 }}>Force every pull to one parallel:</span>
+            <button className="btn btn-sm" onClick={() => setForce('AUTOGRAPH')} disabled={settingForce}>
+              {settingForce ? '…' : 'Force all autos'}
+            </button>
+            <button className="btn btn-sm" onClick={() => setForce('SUPERFRACTOR')} disabled={settingForce}>
+              Force all 1/1s
+            </button>
+            <button className="btn btn-sm" onClick={() => setForce(null)} disabled={settingForce}>
+              Off
+            </button>
+            {clock.data?.forceParallel && (
+              <span className="muted mono" style={{ fontSize: 11 }}>forcing {clock.data.forceParallel}</span>
+            )}
           </div>
           {advanceMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{advanceMsg}</div>}
           {importMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{importMsg}</div>}

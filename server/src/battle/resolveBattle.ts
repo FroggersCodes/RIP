@@ -2,7 +2,7 @@ import { prisma } from '../prisma';
 import { withTxRetry } from '../db/withTxRetry';
 import { AppError } from '../errors';
 import { loadPlayerPool, openPack, type PulledCard } from '../ripping/pullEngine';
-import { getLuck } from '../league/clock';
+import { getPullMods } from '../league/clock';
 import { grant, spendTokensAndCases } from '../economy/wallet';
 
 const WIN_TOKEN_MULTIPLIER = 1.8;
@@ -45,13 +45,15 @@ export async function resolveBattleVsBot(challengerId: string, productId: string
         await spendTokensAndCases(tx, challengerId, wager, product.caseCost);
 
         const pool = await loadPlayerPool(tx);
+        const { luck, force } = await getPullMods();
         const packArgs = {
           pullRates: product.pullRates as Record<string, number>,
           topPlayerBias: product.topPlayerBias,
           count: product.cardsPerPack,
           pool,
           setKey: product.setKey,
-          luck: await getLuck(),
+          luck,
+          force,
         };
         const challengerCards = await openPack(tx, { ownerId: challengerId, ...packArgs });
         const opponentCards = await openPack(tx, { ownerId: bot.id, ...packArgs });

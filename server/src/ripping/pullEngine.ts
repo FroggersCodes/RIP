@@ -236,6 +236,8 @@ export interface OpenPackArgs {
   guaranteeNumbered?: boolean;
   /** Dev luck: exponentially boosts rarer tiers (1 = normal odds). */
   luck?: number;
+  /** Dev force: every card is pulled as this parallel (overrides the roll). */
+  force?: string | null;
 }
 
 /** Multiply each tier's weight by luck^rarity, so the rarest get boosted most. */
@@ -251,9 +253,12 @@ export function applyLuck(pullRates: Record<string, number>, luck: number): Reco
 /** Roll and allocate `count` cards to ownerId. Must be called inside a transaction. */
 export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]> {
   const rates = applyLuck(args.pullRates, args.luck ?? 1);
+  // Dev force: if set to a valid parallel, every card is rolled as that tier.
+  const forced =
+    args.force && PARALLEL_NAMES.includes(args.force as ParallelName) ? (args.force as ParallelName) : null;
   const cards: PulledCard[] = [];
   for (let i = 0; i < args.count; i++) {
-    const rolled = rollParallel(rates);
+    const rolled = forced ?? rollParallel(rates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
     cards.push(buildPulledCard(player, resolved, args.setKey));

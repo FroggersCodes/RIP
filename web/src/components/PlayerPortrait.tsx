@@ -19,7 +19,7 @@ export function PlayerPortrait({ player, fill, size = 48, round = true }: Props)
     : { width: size, height: size, borderRadius: round ? '50%' : 12 };
 
   return (
-    <div className="portrait" style={{ ...style, ['--pa' as string]: accent }}>
+    <div className={`portrait${fill ? ' portrait-fill' : ''}`} style={{ ...style, ['--pa' as string]: accent }}>
       <div className="portrait-bg" />
       {!failed && (
         <img

@@ -6,7 +6,7 @@ import { asyncHandler } from '../asyncHandler';
 import { AppError } from '../../errors';
 import { withTxRetry } from '../../db/withTxRetry';
 import { loadPlayerPool, openPack } from '../../ripping/pullEngine';
-import { getLuck } from '../../league/clock';
+import { getPullMods } from '../../league/clock';
 import { grant } from '../../economy/wallet';
 import { publicUser } from '../serialize';
 import { bumpMission } from '../../missions/missions';
@@ -50,7 +50,7 @@ router.post(
   asyncHandler(async (req: AuthedRequest, res) => {
     const uid = userId(req);
     const pool = await loadPlayerPool(prisma);
-    const luck = await getLuck();
+    const { luck, force } = await getPullMods();
 
     const result = await withTxRetry(() =>
       prisma.$transaction(
@@ -85,6 +85,7 @@ router.post(
             pool,
             setKey: 'chrome',
             luck,
+            force,
           });
           const fresh = await tx.user.findUniqueOrThrow({ where: { id: uid } });
           return { cards, user: fresh, tier, streak };
