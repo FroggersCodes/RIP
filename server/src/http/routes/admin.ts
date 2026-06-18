@@ -7,6 +7,7 @@ import { advanceWeek } from '../../league/advanceWeek';
 import { maybeAdvance, updateClock } from '../../league/clock';
 import { importNflData } from '../../data/importNfl';
 import { seed } from '../../../prisma/seed';
+import { PARALLELS } from '@rip/shared';
 
 const router = Router();
 
@@ -34,7 +35,7 @@ const clockSchema = z.object({
   autoAdvance: z.boolean().optional(),
   luckBoost: z.number().min(1).max(50).optional(),
   forceParallel: z
-    .enum(['BASE', 'BLUE', 'PURPLE', 'GOLD', 'BLACK', 'AUTOGRAPH', 'EMERALD', 'SUPERFRACTOR'])
+    .enum(['BASE', 'BLUE', 'PURPLE', 'GOLD', 'PATCH', 'BLACK', 'AUTOGRAPH', 'EMERALD', 'SUPERFRACTOR'])
     .nullable()
     .optional(),
 });
@@ -78,6 +79,29 @@ router.post(
   asyncHandler(async (_req, res) => {
     await seed();
     res.json({ reset: true });
+  }),
+);
+
+// Non-destructive: create missing CardTemplates for any parallel not yet seeded.
+// Safe to run on a live DB — skips players that already have the template.
+router.post(
+  '/backfill-templates',
+  requireAdmin,
+  asyncHandler(async (_req, res) => {
+    const players = await prisma.player.findMany({ select: { id: true } });
+    let created = 0;
+    for (const par of PARALLELS) {
+      const data = players.map((p) => ({
+        playerId: p.id,
+        parallel: par.name,
+        printRun: par.printRun,
+        valueMultiplier: par.valueMultiplier,
+        nextSerial: 0,
+      }));
+      const r = await prisma.cardTemplate.createMany({ data, skipDuplicates: true });
+      created += r.count;
+    }
+    res.json({ created });
   }),
 );
 
