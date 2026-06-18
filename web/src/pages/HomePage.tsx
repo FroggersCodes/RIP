@@ -51,6 +51,8 @@ export function HomePage() {
   const [importing, setImporting] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [granting, setGranting] = useState(false);
+  const [luckInput, setLuckInput] = useState('5');
+  const [settingLuck, setSettingLuck] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
@@ -159,6 +161,31 @@ export function HomePage() {
       setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
       setGranting(false);
+    }
+  };
+
+  const setLuck = async () => {
+    const v = parseFloat(luckInput);
+    if (!v || v < 1) {
+      setImportMsg('Luck must be ≥ 1 (1 = normal odds).');
+      return;
+    }
+    setSettingLuck(true);
+    setImportMsg(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/clock`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+        body: JSON.stringify({ luckBoost: v }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      clock.reload();
+      setImportMsg(v === 1 ? 'Luck reset to normal odds.' : `Luck boost set to ${v}× — rares are much more common now.`);
+    } catch (e) {
+      setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
+    } finally {
+      setSettingLuck(false);
     }
   };
 
@@ -349,6 +376,14 @@ export function HomePage() {
             <button className="btn btn-gold" onClick={grantMe} disabled={granting}>
               {granting ? 'Granting…' : 'Give me tokens + cases'}
             </button>
+          </div>
+          <div className="row wrap" style={{ marginTop: 8, gap: 8 }}>
+            <span className="muted" style={{ fontSize: 13 }}>Luck boost (1 = normal, higher = luckier):</span>
+            <input className="input mono" style={{ maxWidth: 70 }} value={luckInput} onChange={(e) => setLuckInput(e.target.value)} />
+            <button className="btn btn-sm" onClick={setLuck} disabled={settingLuck}>
+              {settingLuck ? '…' : 'Set'}
+            </button>
+            {clock.data && <span className="muted mono" style={{ fontSize: 11 }}>now {clock.data.luckBoost}×</span>}
           </div>
           {advanceMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{advanceMsg}</div>}
           {importMsg && <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>{importMsg}</div>}

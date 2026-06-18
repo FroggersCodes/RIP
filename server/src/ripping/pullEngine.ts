@@ -234,13 +234,26 @@ export interface OpenPackArgs {
   setKey: string;
   /** Box guarantee: ensure at least one numbered card in the whole opening. */
   guaranteeNumbered?: boolean;
+  /** Dev luck: exponentially boosts rarer tiers (1 = normal odds). */
+  luck?: number;
+}
+
+/** Multiply each tier's weight by luck^rarity, so the rarest get boosted most. */
+export function applyLuck(pullRates: Record<string, number>, luck: number): Record<string, number> {
+  if (!luck || luck === 1) return pullRates;
+  const out: Record<string, number> = {};
+  PARALLEL_NAMES.forEach((name, i) => {
+    out[name] = (pullRates[name] ?? 0) * Math.pow(luck, i);
+  });
+  return out;
 }
 
 /** Roll and allocate `count` cards to ownerId. Must be called inside a transaction. */
 export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]> {
+  const rates = applyLuck(args.pullRates, args.luck ?? 1);
   const cards: PulledCard[] = [];
   for (let i = 0; i < args.count; i++) {
-    const rolled = rollParallel(args.pullRates);
+    const rolled = rollParallel(rates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
     cards.push(buildPulledCard(player, resolved, args.setKey));
@@ -250,7 +263,7 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
   if (args.guaranteeNumbered && cards.length > 0 && !cards.some((c) => c.serial !== null)) {
     const idx = cards.length - 1;
     await tx.cardInstance.delete({ where: { id: cards[idx]!.instanceId } });
-    const rolled = rollNumberedParallel(args.pullRates);
+    const rolled = rollNumberedParallel(rates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
     cards[idx] = buildPulledCard(player, resolved, args.setKey);

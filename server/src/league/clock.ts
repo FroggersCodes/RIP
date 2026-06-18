@@ -8,6 +8,7 @@ interface State {
   cadenceHours: number;
   lockMinutes: number;
   lastAdvanceAt: Date;
+  luckBoost: number;
 }
 
 async function getState(): Promise<State> {
@@ -34,6 +35,7 @@ export interface ClockInfo {
   locked: boolean;
   msToKickoff: number;
   msToLock: number;
+  luckBoost: number;
 }
 
 export async function getClock(): Promise<ClockInfo> {
@@ -48,11 +50,16 @@ export async function getClock(): Promise<ClockInfo> {
     locked,
     msToKickoff: Math.max(0, next - now),
     msToLock: Math.max(0, lockAt - now),
+    luckBoost: s.luckBoost ?? 1,
   };
 }
 
 export async function isLineupLocked(): Promise<boolean> {
   return compute(await getState()).locked;
+}
+
+export async function getLuck(): Promise<number> {
+  return (await getState()).luckBoost ?? 1;
 }
 
 /** Advance the league if the cadence has elapsed. Idempotent and concurrency-safe. */
@@ -69,7 +76,12 @@ export async function maybeAdvance(): Promise<{ advanced: boolean; result?: Adva
   return { advanced: true, result: await advanceWeek() };
 }
 
-export async function updateClock(patch: { cadenceHours?: number; lockMinutes?: number; autoAdvance?: boolean }) {
+export async function updateClock(patch: {
+  cadenceHours?: number;
+  lockMinutes?: number;
+  autoAdvance?: boolean;
+  luckBoost?: number;
+}) {
   await getState();
   return prisma.leagueState.update({ where: { id: SINGLETON }, data: patch });
 }

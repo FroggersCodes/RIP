@@ -290,6 +290,7 @@ model LeagueState {
   lockMinutes   Int       @default(20) // lineups lock this long before kickoff
   lastAdvanceAt DateTime?
   autoAdvance   Boolean   @default(true)
+  luckBoost     Float     @default(1) // dev: exponentially boosts rarer pull tiers (1 = normal)
   updatedAt     DateTime  @updatedAt
 }
 

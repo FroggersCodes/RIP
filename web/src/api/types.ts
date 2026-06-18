@@ -285,6 +285,7 @@ export interface ClockInfo {
   locked: boolean;
   msToKickoff: number;
   msToLock: number;
+  luckBoost: number;
 }
 
 export interface PlayerTotals {

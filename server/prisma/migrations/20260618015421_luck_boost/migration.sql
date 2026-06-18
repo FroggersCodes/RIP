@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "LeagueState" ADD COLUMN     "luckBoost" DOUBLE PRECISION NOT NULL DEFAULT 1;

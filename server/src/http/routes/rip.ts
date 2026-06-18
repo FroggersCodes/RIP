@@ -6,6 +6,7 @@ import { asyncHandler } from '../asyncHandler';
 import { AppError } from '../../errors';
 import { withTxRetry } from '../../db/withTxRetry';
 import { loadPlayerPool, openPack } from '../../ripping/pullEngine';
+import { getLuck } from '../../league/clock';
 import { spendDust, spendTokensAndCases } from '../../economy/wallet';
 import { publicUser } from '../serialize';
 import { recordPullHits } from '../../feed/feed';
@@ -34,6 +35,7 @@ router.post(
     // Pool loaded outside the transaction (read-only) to keep the locking window small.
     const pool = await loadPlayerPool(prisma);
     if (pool.length === 0) throw new AppError(500, 'No players seeded');
+    const luck = await getLuck();
 
     const result = await withTxRetry(() =>
       prisma.$transaction(
@@ -51,6 +53,7 @@ router.post(
             pool,
             setKey: product.setKey,
             guaranteeNumbered: product.guaranteeNumbered,
+            luck,
           });
           const user = await tx.user.findUniqueOrThrow({ where: { id: uid } });
           return { cards, user };
