@@ -356,35 +356,77 @@
   background: linear-gradient(155deg, transparent 28%, rgba(134, 239, 172, 0.32) 47%, rgba(255, 255, 255, 0.12) 54%, transparent 70%);
 }
 
-/* ---------- ARTISTRY (tier 3) — canvas texture, painted, gallery prestige ---------- */
+/* ---------- ARTISTRY (tier 3) — clean gallery canvas; the PARALLEL color is the
+   identity, expressed as a sweeping wave (.card-art-wave) + accent frame. ---------- */
 .set-artistry .card-frame {
-  background: linear-gradient(140deg, #3a2508, #7a5810 38%, #fde68a 50%, #7a5810 62%, #3a2508);
-  box-shadow: 0 0 0 2px #1a0e02, var(--shadow-card);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--accent) 48%, #2a2e36),
+    color-mix(in srgb, var(--accent) 20%, #181b21) 50%,
+    color-mix(in srgb, var(--accent) 42%, #23272f)
+  );
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), var(--shadow-card);
 }
 .set-artistry .card-set-bg {
   background:
-    radial-gradient(85% 65% at 25% 20%, rgba(251, 191, 36, 0.16) 0%, transparent 55%),
-    radial-gradient(70% 60% at 75% 75%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
-    linear-gradient(160deg, #1a120a 0%, #0e0a05 100%);
+    radial-gradient(80% 55% at 50% 10%, rgba(255, 255, 255, 0.06) 0%, transparent 60%),
+    linear-gradient(160deg, #21252c 0%, #14171c 100%);
 }
 .set-artistry .card-set-bg::before {
   content: '';
   position: absolute;
   inset: 0;
+  /* fine canvas weave */
   background:
-    repeating-linear-gradient(0deg,   rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 5px),
-    repeating-linear-gradient(90deg,  rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 5px);
+    repeating-linear-gradient(0deg,  rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 5px);
 }
 .set-artistry .card-set-fx {
-  opacity: 0.52;
+  opacity: 0.4;
   background: linear-gradient(
     116deg,
-    transparent 18%,
-    rgba(251, 191, 36, 0.1)  35%,
-    rgba(255, 235, 150, 0.38) 48%,
-    rgba(251, 191, 36, 0.14)  58%,
-    transparent 74%
+    transparent 30%,
+    color-mix(in srgb, var(--accent) 35%, #ffffff) 48%,
+    transparent 66%
   );
+}
+
+/* The signature Artistry wave — sweeps across the lower card in the parallel's
+   color (grey for Base). Sits under the bottom scrim so the name stays legible. */
+.card-art-wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 55%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 85%, transparent) 50%,
+    color-mix(in srgb, var(--accent) 100%, #000 6%) 100%
+  );
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  mask-size: 100% 100%;
+}
+/* Crisp highlight along the wave crest. */
+.card-art-wave::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 30%, #ffffff) 0%,
+    transparent 12%
+  );
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0,40 C20,18 36,18 50,33 C64,48 80,48 100,26 L100,100 L0,100 Z' fill='white'/></svg>") no-repeat;
+  mask-size: 100% 100%;
+  opacity: 0.7;
 }
 
 /* ---------- GOLD STANDARD (tier 4) — matte black, embossed gold foil ---------- */

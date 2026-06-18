@@ -71,6 +71,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
       : FINISH_TIER[def.finish ?? 'plain'] ?? 'tier-plain';
 
   const set = setOf(card.setKey);
+  const isArtistry = set.key === 'artistry';
   const shortName = def.displayName
     .replace(/\s*1\/1.*$/, '')
     .replace(/\s*\/\d.*$/, '')
@@ -130,6 +131,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               <div className="card-photo">
                 <PlayerPortrait player={card.player} fill />
               </div>
+              {isArtistry && <div className="card-art-wave" />}
               <div className="card-photo-scrim" />
               <div className="card-set-fx" />
               <div className="sheen" />
