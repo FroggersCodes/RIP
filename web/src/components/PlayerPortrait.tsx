@@ -24,7 +24,11 @@ export function PlayerPortrait({ player, fill, size = 48, round = true }: Props)
       {!failed && (
         <img
           className="portrait-img"
-          src={player.position === 'QB' ? '/players/qb-default.jpg' : portraitFile(player.name)}
+          src={
+            player.position === 'QB' ? '/players/qb-default.jpg' :
+            player.position === 'WR' ? '/players/wr-default.jpg' :
+            portraitFile(player.name)
+          }
           alt={player.name}
           loading="lazy"
           onError={() => setFailed(true)}
