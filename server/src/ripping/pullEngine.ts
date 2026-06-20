@@ -361,5 +361,8 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
     }
   }
 
+  // Hits go to the back so they're revealed last.
+  cards.sort((a, b) => (a.isHit ? 1 : 0) - (b.isHit ? 1 : 0));
+
   return cards;
 }
