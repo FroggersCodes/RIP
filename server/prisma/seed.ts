@@ -115,7 +115,7 @@ export async function seed() {
       {
         name: 'Reliquary', year: 2026, entryCost: 2500, caseCost: 2, tier: 'reliquary',
         setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
-        description: 'Vault-door ultra-premium. 8-card rip. Costs 2 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.',
+        description: 'Engraved-gold reliquary ultra-premium. 8-card rip. Costs 2 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.',
       },
     ],
   });

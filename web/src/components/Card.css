@@ -463,37 +463,154 @@
   50%       { opacity: 0.6; }
 }
 
-/* ---------- RELIQUARY (tier 5) — vault-door, oxblood and platinum ---------- */
+/* ---------- RELIQUARY (tier 5) — engraved-gold cathedral reliquary ----------
+   The pinnacle set: an ornate animated gold frame around an arched photo niche,
+   over an oxblood damask interior, finished with a serif nameplate, a gold
+   RELIQUARY wordmark and a foil serial. */
 .set-reliquary .card-frame {
-  background: linear-gradient(140deg, #140610, #30101e 38%, #e2e8f0 50%, #30101e 62%, #140610);
-  box-shadow: 0 0 0 1px #4a1020, var(--shadow-card);
+  background: linear-gradient(135deg, #6e4a14 0%, #e7c878 16%, #fff4cf 30%, #d8af52 46%, #8a6320 62%, #f0d488 80%, #b88a34 100%);
+  background-size: 220% 220%;
+  animation: holo-shift 14s linear infinite;
+  box-shadow: 0 0 0 1px rgba(255, 245, 205, 0.5), var(--shadow-card);
 }
+/* engraved gold inner border ring */
+.set-reliquary .card-inner {
+  background: radial-gradient(125% 100% at 50% 0%, #3a161a 0%, #1a0c0e 72%, #140a0b 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(20, 8, 9, 0.9),
+    inset 0 0 0 4px rgba(199, 154, 62, 0.5),
+    inset 0 0 0 5px rgba(20, 8, 9, 0.85),
+    inset 0 0 40px rgba(0, 0, 0, 0.7);
+}
+/* oxblood ground */
 .set-reliquary .card-set-bg {
   background:
-    radial-gradient(100% 60% at 50% 0%, rgba(200, 30, 60, 0.22) 0%, transparent 55%),
-    linear-gradient(160deg, #120408 0%, #0a0206 100%);
+    radial-gradient(120% 70% at 50% 0%, rgba(120, 30, 40, 0.4) 0%, transparent 58%),
+    linear-gradient(160deg, #1a0c0e 0%, #120809 100%);
 }
+/* woven damask texture */
 .set-reliquary .card-set-bg::before {
   content: '';
   position: absolute;
   inset: 0;
-  /* vault plate: rivets at corners + grid lines */
+  opacity: 0.16;
   background:
-    radial-gradient(circle at  8%  12%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
-    radial-gradient(circle at 92%  12%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
-    radial-gradient(circle at  8%  88%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
-    radial-gradient(circle at 92%  88%, rgba(226,232,240,0.1) 0%, rgba(226,232,240,0.1) 3px, transparent 3px),
-    repeating-linear-gradient( 0deg, rgba(160, 18, 36, 0.06) 0 1px, transparent 1px 14px),
-    repeating-linear-gradient(90deg, rgba(160, 18, 36, 0.06) 0 1px, transparent 1px 14px);
+    repeating-conic-gradient(from 0deg at 28px 28px, rgba(231, 200, 120, 0.4) 0deg 6deg, transparent 6deg 24deg),
+    repeating-conic-gradient(from 0deg at 84px 84px, rgba(231, 200, 120, 0.3) 0deg 5deg, transparent 5deg 22deg);
+  background-size: 56px 56px, 112px 112px;
 }
+/* thin gold frame line just inside the metal border */
+.set-reliquary .card-set-bg::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(199, 154, 62, 0.5);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 2px rgba(20, 8, 9, 0.35);
+  pointer-events: none;
+}
+/* gold reliquary sheen sweeping across the card */
 .set-reliquary .card-set-fx {
-  opacity: 0.6;
-  background: linear-gradient(118deg, transparent 22%, rgba(220, 230, 240, 0.38) 45%, rgba(255, 255, 255, 0.18) 52%, rgba(220, 230, 240, 0.18) 58%, transparent 74%);
-  animation: reliquary-gleam 3.5s ease-in-out infinite;
+  opacity: 0.55;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 248, 222, 0.4) 49%, transparent 58%);
+  background-size: 250% 100%;
+  mix-blend-mode: overlay;
+  animation: sheen-move 6.5s linear infinite;
 }
-@keyframes reliquary-gleam {
-  0%, 100% { opacity: 0.2; }
-  50%       { opacity: 0.62; }
+
+/* ---- front: photo set into an arched gold niche ---- */
+.set-reliquary .card-face-front .card-photo {
+  inset: auto;
+  top: 9%;
+  left: 9%;
+  right: 9%;
+  height: 51%;
+  border-radius: 50% 50% 8px 8px / 44% 44% 6px 6px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px #0b0708,
+    0 0 0 5px rgba(199, 154, 62, 0.85),
+    0 10px 22px rgba(0, 0, 0, 0.6);
+}
+/* RELIQUARY wordmark crowning the niche (front only) */
+.set-reliquary .card-face-front .card-inner::before {
+  content: 'RELIQUARY';
+  position: absolute;
+  z-index: 5;
+  top: 3.4%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.34em;
+  color: #e7c878;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* ---- serif nameplate ---- */
+.set-reliquary .card-plate {
+  text-align: center;
+  padding: 10px 12px 12px;
+}
+.set-reliquary .card-name {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 0.96;
+  letter-spacing: 0.01em;
+  color: #f6edd8;
+}
+.card-sm.set-reliquary .card-name {
+  font-size: 18px;
+}
+.card-lg.set-reliquary .card-name {
+  font-size: 28px;
+}
+.set-reliquary .card-sub {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: #cbb389;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+.set-reliquary .card-sub::before,
+.set-reliquary .card-sub::after {
+  content: '';
+  height: 1px;
+  width: 22px;
+  background: linear-gradient(90deg, transparent, #c79a3e);
+}
+.set-reliquary .card-sub::after {
+  background: linear-gradient(90deg, #c79a3e, transparent);
+}
+.set-reliquary .card-plate-row {
+  justify-content: center;
+  gap: 10px;
+}
+.set-reliquary .card-serial {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #1a0c0e;
+  background: linear-gradient(135deg, #fff4cf, #d8af52, #fff4cf);
+  padding: 2px 9px;
+  border-radius: 3px;
+  text-shadow: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+/* back: gold wordmark + parallel pill */
+.set-reliquary .card-setmark {
+  color: #e7c878;
+}
+.set-reliquary .card-setyear {
+  color: rgba(231, 200, 120, 0.7);
 }
 
 /* ---------- specular sheen ---------- */
