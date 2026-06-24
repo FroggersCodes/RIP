@@ -87,7 +87,7 @@ const PRODUCTS = [
   { name: 'Momentum', year: 2026, entryCost: 200, caseCost: 0, tier: 'momentum', setKey: 'momentum', cardsPerPack: 4, packsPerBox: 2, minHits: 1, topPlayerBias: 0.45, pullRates: MOMENTUM, description: '2-pack box (8 cards). Motion-blur speed-line design. Guaranteed ≥1 hit per box.' },
   { name: 'Artistry', year: 2026, entryCost: 500, caseCost: 0, tier: 'artistry', setKey: 'artistry', cardsPerPack: 5, packsPerBox: 2, minHits: 2, topPlayerBias: 0.55, pullRates: ARTISTRY, description: '2-pack box (10 cards). Canvas-texture gallery aesthetic with its own numbered rainbow (Red /299 → Black 1/1), on-card base autographs, and a Rookie Patch Auto chase. Guaranteed ≥2 hits.' },
   { name: 'Gold Standard', year: 2026, entryCost: 1000, caseCost: 1, tier: 'gold-standard', setKey: 'gold-standard', cardsPerPack: 8, minHits: 2, guaranteeNumbered: true, topPlayerBias: 0.65, pullRates: GOLD_STANDARD, description: 'Matte-black, embossed gold foil. 8-card premium box. Costs a case. All cards numbered, ≥2 hits guaranteed.' },
-  { name: 'Reliquary', year: 2026, entryCost: 100000, caseCost: 100, tier: 'reliquary', setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY, description: 'Vault-door ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.' },
+  { name: 'Reliquary', year: 2026, entryCost: 100000, caseCost: 100, tier: 'reliquary', setKey: 'reliquary', cardsPerPack: 10, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY, description: 'Vault-door ultra-premium. Fixed 10-card pack: base, base rookie, 3 numbered, 2 autos, 2 patches, an RPA. Costs 100 cases.' },
 ];
 
 function ratingFor(ppr: number, searchRank: number): number {
@@ -192,14 +192,14 @@ export async function importNflData(season = process.env.NFL_SEASON ?? '2024'): 
   await prisma.cardTemplate.createMany({
     data: dbPlayers.flatMap((pl) => PARALLELS.map((par) => ({ playerId: pl.id, parallel: par.name, printRun: par.printRun, valueMultiplier: par.valueMultiplier }))),
   });
-  const reliquaryBoxes = reliquaryBoxCap(dbPlayers.length, 8);
+  const reliquaryBoxes = reliquaryBoxCap(dbPlayers.length);
   await prisma.product.createMany({
     data: PRODUCTS.map((p) =>
       p.setKey === 'reliquary'
         ? {
             ...p,
             totalBoxes: reliquaryBoxes,
-            description: `Vault-door ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
+            description: `Vault-door ultra-premium. Fixed 10-card pack: base, base rookie, 3 numbered, 2 autos, 2 patches, an RPA. Costs 100 cases. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
           }
         : p,
     ),

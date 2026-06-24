@@ -105,9 +105,9 @@ export async function seed() {
     RLQ_RPA: 60, RLQ_RPA_OFL: 36, RLQ_RPA_WHITE: 24, RLQ_RPA_RED: 14,
     RLQ_RPA_GOLD: 9, RLQ_RPA_GOLD_SHIMMER: 6, RLQ_RPA_GREEN_SHIMMER: 3, RLQ_RPA_BLACK: 1,
   };
-  // The whole Reliquary print run is finite: cap boxes at the dedicated numbered
-  // supply so the chase can never be exhausted into base-card fallback.
-  const reliquaryBoxes = reliquaryBoxCap(players.length, 8);
+  // The whole Reliquary print run is finite: cap boxes at the supply the fixed
+  // pack structure can draw, so the chase can't be exhausted into base fallback.
+  const reliquaryBoxes = reliquaryBoxCap(players.length);
   await prisma.product.createMany({
     data: [
       {
@@ -132,9 +132,9 @@ export async function seed() {
       },
       {
         name: 'Reliquary', year: 2026, entryCost: 100000, caseCost: 100, tier: 'reliquary',
-        setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
+        setKey: 'reliquary', cardsPerPack: 10, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
         totalBoxes: reliquaryBoxes,
-        description: `Engraved-gold reliquary ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
+        description: `Engraved-gold reliquary ultra-premium. Fixed 10-card pack: base, base rookie, 3 numbered, 2 autos, 2 patches, an RPA. Costs 100 cases. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
       },
     ],
   });

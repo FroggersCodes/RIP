@@ -4,6 +4,8 @@ import {
   PARALLEL_MAP,
   computeMarketValue,
   isHit,
+  RELIQUARY_PACK,
+  RELIQUARY_SLOT_POOLS,
   type ParallelName,
   type Position,
 } from '@rip/shared';
@@ -117,14 +119,30 @@ export function rollParallel(pullRates: Record<string, number>): ParallelName {
   return entries[entries.length - 1]![0];
 }
 
-/** Base cards pick any player uniformly; hits bias toward top players; RPA always picks a rookie. */
+/** Weighted roll restricted to a fixed pool (used by slotted packs). Falls back
+ *  to a uniform pick over the pool when the table has no weight for any member. */
+export function rollFromPool(pullRates: Record<string, number>, pool: ParallelName[]): ParallelName {
+  if (pool.length === 0) return 'BASE';
+  const entries = pool.map((n) => [n, pullRates[n] ?? 0] as const);
+  const total = entries.reduce((a, [, w]) => a + w, 0);
+  if (total <= 0) return pool[Math.floor(Math.random() * pool.length)]!;
+  let r = Math.random() * total;
+  for (const [name, w] of entries) {
+    r -= w;
+    if (r <= 0) return name;
+  }
+  return entries[entries.length - 1]![0];
+}
+
+/** Base cards pick any player uniformly; hits bias toward top players; RPA/RC always pick a rookie. */
 export function pickPlayer(
   parallel: ParallelName,
   topPlayerBias: number,
   pool: PlayerPoolEntry[],
 ): PlayerPoolEntry {
-  // Rookie Patch Autos always feature a rookie player.
-  if (PARALLEL_MAP[parallel]?.rpa) {
+  // Rookie Patch Autos and rookie-only parallels (RC base/patch) feature a rookie.
+  const def = PARALLEL_MAP[parallel];
+  if (def?.rpa || def?.rookie) {
     const rookies = pool.filter((p) => p.isRookie);
     if (rookies.length > 0) return rookies[Math.floor(Math.random() * rookies.length)]!;
   }
@@ -332,9 +350,19 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
   // Dev force: if set to a valid parallel, every card is rolled as that tier.
   const forced =
     args.force && PARALLEL_NAMES.includes(args.force as ParallelName) ? (args.force as ParallelName) : null;
+  // Reliquary uses a fixed slot structure per pack (base / base-rookie / numbered
+  // x3 / auto x2 / patch x2 / RPA) instead of a flat weighted roll. Each slot
+  // draws from its own category sub-pool, weighted by the product's pull table.
+  const useSlots =
+    !forced && args.setKey === 'reliquary' && args.count % RELIQUARY_PACK.length === 0;
+
   const cards: PulledCard[] = [];
   for (let i = 0; i < args.count; i++) {
-    const rolled = forced ?? rollParallel(rates);
+    const rolled = forced
+      ? forced
+      : useSlots
+        ? rollFromPool(rates, RELIQUARY_SLOT_POOLS[RELIQUARY_PACK[i % RELIQUARY_PACK.length]!])
+        : rollParallel(rates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);
     cards.push(buildPulledCard(player, resolved, args.setKey));
