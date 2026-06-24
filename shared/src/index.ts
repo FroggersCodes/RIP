@@ -101,6 +101,8 @@ export interface ParallelDef {
   patched?: boolean;
   /** Combined patch + auto card with the dedicated RPA layout. */
   rpa?: boolean;
+  /** Rookie-only parallel (forces a rookie player, e.g. the RC base/patch). */
+  rookie?: boolean;
   /** Counts as a "HIT" — drives the reveal flash and box hit guarantees. */
   hit?: boolean;
   /** Visual finish class suffix (`finish-<x>`) the web card renders. */
@@ -156,7 +158,7 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'ART_RPA_1', displayName: 'RPA Team Patch 1/1', printRun: 1, valueMultiplier: 1000, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#e0b85a' },
 
   // ---- Reliquary: base rainbow ----
-  { name: 'RLQ_RC', displayName: 'Base RC /99', printRun: 99, valueMultiplier: 2, refractor: false, finish: 'plain', group: 'reliquary', color: '#9aa3b2' },
+  { name: 'RLQ_RC', displayName: 'Base RC /99', printRun: 99, valueMultiplier: 2, refractor: false, rookie: true, finish: 'plain', group: 'reliquary', color: '#9aa3b2' },
   { name: 'RLQ_GREEN', displayName: 'Green /99', printRun: 99, valueMultiplier: 2.5, refractor: false, finish: 'plain', group: 'reliquary', color: '#3fae5e' },
   { name: 'RLQ_ORANGE', displayName: 'Orange /60', printRun: 60, valueMultiplier: 4, refractor: false, finish: 'plain', group: 'reliquary', color: '#f08a3c' },
   { name: 'RLQ_RED', displayName: 'Red /50', printRun: 50, valueMultiplier: 6, refractor: false, finish: 'plain', group: 'reliquary', color: '#e0564f' },
@@ -170,7 +172,7 @@ export const PARALLELS: ParallelDef[] = [
 
   // ---- Reliquary: patch rainbow ----
   { name: 'RLQ_PATCH', displayName: 'Patch', printRun: null, valueMultiplier: 14, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#94a3b8' },
-  { name: 'RLQ_PATCH_RC', displayName: 'Patch RC /99', printRun: 99, valueMultiplier: 18, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#9aa3b2' },
+  { name: 'RLQ_PATCH_RC', displayName: 'Patch RC /99', printRun: 99, valueMultiplier: 18, refractor: false, patched: true, rookie: true, hit: true, finish: 'patch', group: 'reliquary', color: '#9aa3b2' },
   { name: 'RLQ_PATCH_GREEN', displayName: 'Patch Green /99', printRun: 99, valueMultiplier: 20, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#3fae5e' },
   { name: 'RLQ_PATCH_ORANGE', displayName: 'Patch Orange /60', printRun: 60, valueMultiplier: 28, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#f08a3c' },
   { name: 'RLQ_PATCH_RED', displayName: 'Patch Red /50', printRun: 50, valueMultiplier: 36, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#e0564f' },
@@ -217,19 +219,51 @@ export const SET_PARALLEL_ORDER: Record<string, ParallelName[]> = {
   reliquary: RELIQUARY_ORDER,
 };
 
-/**
- * Total numbered-card supply one full Reliquary player check-list represents
- * (sum of every reliquary parallel's print run). Multiplied by the player count
- * it gives the dedicated numbered supply, which we use to cap how many boxes can
- * ever be opened — so the chase can't be exhausted into base-card fallback.
- */
-export const RELIQUARY_NUMBERED_PER_PLAYER: number = PARALLELS
-  .filter((p) => p.group === 'reliquary' && p.printRun != null)
-  .reduce((sum, p) => sum + (p.printRun ?? 0), 0);
+// Reliquary packs aren't a flat weighted roll — each pack is a fixed run of
+// slots, every slot drawing from its own category sub-pool.
+export type ReliquarySlot = 'base' | 'base_rookie' | 'numbered' | 'auto' | 'patch' | 'rpa';
+export const RELIQUARY_PACK: ReliquarySlot[] = [
+  'base', 'base_rookie', 'numbered', 'numbered', 'numbered', 'auto', 'auto', 'patch', 'patch', 'rpa',
+];
+const rlqPool = (pred: (p: ParallelDef) => boolean): ParallelName[] =>
+  PARALLELS.filter((p) => p.group === 'reliquary' && pred(p)).map((p) => p.name);
+/** The parallels each Reliquary pack slot can yield. */
+export const RELIQUARY_SLOT_POOLS: Record<ReliquarySlot, ParallelName[]> = {
+  base: ['BASE'],
+  base_rookie: ['RLQ_RC'],
+  numbered: rlqPool((p) => !p.signed && !p.patched && !p.rpa), // base colour rainbow (incl. RC)
+  auto: rlqPool((p) => !!p.signed && !p.patched),              // autograph rainbow
+  patch: rlqPool((p) => !!p.patched && !p.signed),             // patch rainbow
+  rpa: rlqPool((p) => !!p.rpa),                                // rookie patch auto rainbow
+};
 
-/** Box cap = how many boxes the dedicated numbered supply can fill. */
-export function reliquaryBoxCap(playerCount: number, cardsPerBox: number): number {
-  return Math.floor((playerCount * RELIQUARY_NUMBERED_PER_PLAYER) / Math.max(1, cardsPerBox));
+/**
+ * Box cap for the limited Reliquary print run. Each pack draws a fixed number of
+ * cards from each category, so the supply that runs out first sets the cap: for
+ * every constraining (fully-numbered) category we take floor(players * supply /
+ * draws-per-pack) and keep the smallest. Categories with an unnumbered member
+ * (the base Patch) never constrain. This keeps the chase from being drained into
+ * base-card fallback before the boxes sell out.
+ */
+export function reliquaryBoxCap(playerCount: number): number {
+  const drawsPerSlot: Record<string, number> = {};
+  for (const slot of RELIQUARY_PACK) drawsPerSlot[slot] = (drawsPerSlot[slot] ?? 0) + 1;
+  // base_rookie draws from the same base-rainbow supply as the numbered slots.
+  const groups: { pool: ParallelName[]; draws: number }[] = [
+    { pool: RELIQUARY_SLOT_POOLS.numbered, draws: (drawsPerSlot.numbered ?? 0) + (drawsPerSlot.base_rookie ?? 0) },
+    { pool: RELIQUARY_SLOT_POOLS.auto, draws: drawsPerSlot.auto ?? 0 },
+    { pool: RELIQUARY_SLOT_POOLS.patch, draws: drawsPerSlot.patch ?? 0 },
+    { pool: RELIQUARY_SLOT_POOLS.rpa, draws: drawsPerSlot.rpa ?? 0 },
+  ];
+  let cap = Infinity;
+  for (const { pool, draws } of groups) {
+    if (draws <= 0) continue;
+    const defs = pool.map((n) => PARALLELS.find((p) => p.name === n)!);
+    if (defs.some((d) => d.printRun == null)) continue; // unlimited member -> no constraint
+    const supply = defs.reduce((s, d) => s + (d.printRun ?? 0), 0);
+    cap = Math.min(cap, Math.floor((playerCount * supply) / draws));
+  }
+  return Number.isFinite(cap) ? cap : 0;
 }
 
 /** The parallels a set can yield, ordered most common -> rarest. */
