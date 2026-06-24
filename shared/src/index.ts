@@ -41,7 +41,50 @@ export type ParallelName =
   | 'ART_RPA_25'
   | 'ART_RPA_10'
   | 'ART_RPA_3'
-  | 'ART_RPA_1';
+  | 'ART_RPA_1'
+  // Reliquary — its own four-tier checklist (base / patch / auto / RPA rainbows)
+  // Base rainbow
+  | 'RLQ_RC'
+  | 'RLQ_GREEN'
+  | 'RLQ_ORANGE'
+  | 'RLQ_RED'
+  | 'RLQ_OFL'
+  | 'RLQ_WHITE'
+  | 'RLQ_PINK'
+  | 'RLQ_GOLD'
+  | 'RLQ_GOLD_SHIMMER'
+  | 'RLQ_GREEN_SHIMMER'
+  | 'RLQ_BLACK'
+  // Patch rainbow
+  | 'RLQ_PATCH'
+  | 'RLQ_PATCH_RC'
+  | 'RLQ_PATCH_GREEN'
+  | 'RLQ_PATCH_ORANGE'
+  | 'RLQ_PATCH_RED'
+  | 'RLQ_PATCH_OFL'
+  | 'RLQ_PATCH_WHITE'
+  | 'RLQ_PATCH_PINK'
+  | 'RLQ_PATCH_GOLD'
+  | 'RLQ_PATCH_GOLD_SHIMMER'
+  | 'RLQ_PATCH_GREEN_SHIMMER'
+  | 'RLQ_PATCH_BLACK'
+  // Autograph rainbow
+  | 'RLQ_AUTO'
+  | 'RLQ_AUTO_ORANGE'
+  | 'RLQ_AUTO_RED'
+  | 'RLQ_AUTO_OFL'
+  | 'RLQ_AUTO_GOLD'
+  | 'RLQ_AUTO_GREEN_SHIMMER'
+  | 'RLQ_AUTO_BLACK'
+  // RPA rainbow
+  | 'RLQ_RPA'
+  | 'RLQ_RPA_OFL'
+  | 'RLQ_RPA_WHITE'
+  | 'RLQ_RPA_RED'
+  | 'RLQ_RPA_GOLD'
+  | 'RLQ_RPA_GOLD_SHIMMER'
+  | 'RLQ_RPA_GREEN_SHIMMER'
+  | 'RLQ_RPA_BLACK';
 export type LineupRoleName = 'QB' | 'WR1' | 'WR2' | 'RB' | 'TE' | 'FLEX';
 
 export interface ParallelDef {
@@ -63,7 +106,7 @@ export interface ParallelDef {
   /** Visual finish class suffix (`finish-<x>`) the web card renders. */
   finish?: string;
   /** Which lineup a parallel belongs to (gates the per-set fallback walk). */
-  group?: 'generic' | 'artistry';
+  group?: 'generic' | 'artistry' | 'reliquary';
   color: string;
 }
 
@@ -111,6 +154,52 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'ART_RPA_10', displayName: 'RPA /10', printRun: 10, valueMultiplier: 180, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#f5b53d' },
   { name: 'ART_RPA_3', displayName: 'RPA /3', printRun: 3, valueMultiplier: 400, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#eef2f8' },
   { name: 'ART_RPA_1', displayName: 'RPA Team Patch 1/1', printRun: 1, valueMultiplier: 1000, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#e0b85a' },
+
+  // ---- Reliquary: base rainbow ----
+  { name: 'RLQ_RC', displayName: 'Base RC /99', printRun: 99, valueMultiplier: 2, refractor: false, finish: 'plain', group: 'reliquary', color: '#9aa3b2' },
+  { name: 'RLQ_GREEN', displayName: 'Green /99', printRun: 99, valueMultiplier: 2.5, refractor: false, finish: 'plain', group: 'reliquary', color: '#3fae5e' },
+  { name: 'RLQ_ORANGE', displayName: 'Orange /60', printRun: 60, valueMultiplier: 4, refractor: false, finish: 'plain', group: 'reliquary', color: '#f08a3c' },
+  { name: 'RLQ_RED', displayName: 'Red /50', printRun: 50, valueMultiplier: 6, refractor: false, finish: 'plain', group: 'reliquary', color: '#e0564f' },
+  { name: 'RLQ_OFL', displayName: 'OFL Logo /35', printRun: 35, valueMultiplier: 12, refractor: false, hit: true, finish: 'ofl', group: 'reliquary', color: '#c9a227' },
+  { name: 'RLQ_WHITE', displayName: 'White /25', printRun: 25, valueMultiplier: 18, refractor: false, hit: true, finish: 'white', group: 'reliquary', color: '#eef2f8' },
+  { name: 'RLQ_PINK', displayName: 'Pink /18', printRun: 18, valueMultiplier: 26, refractor: false, hit: true, finish: 'plain', group: 'reliquary', color: '#ec7fb0' },
+  { name: 'RLQ_GOLD', displayName: 'Gold /10', printRun: 10, valueMultiplier: 45, refractor: false, hit: true, finish: 'gold', group: 'reliquary', color: '#f5b53d' },
+  { name: 'RLQ_GOLD_SHIMMER', displayName: 'Gold Shimmer /8', printRun: 8, valueMultiplier: 70, refractor: true, hit: true, finish: 'gold', group: 'reliquary', color: '#ffcf6b' },
+  { name: 'RLQ_GREEN_SHIMMER', displayName: 'Green Shimmer /3', printRun: 3, valueMultiplier: 150, refractor: true, hit: true, finish: 'plain', group: 'reliquary', color: '#6ee7a8' },
+  { name: 'RLQ_BLACK', displayName: 'Black Finite 1/1', printRun: 1, valueMultiplier: 450, refractor: true, hit: true, finish: 'black', group: 'reliquary', color: '#0c0e12' },
+
+  // ---- Reliquary: patch rainbow ----
+  { name: 'RLQ_PATCH', displayName: 'Patch', printRun: null, valueMultiplier: 14, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#94a3b8' },
+  { name: 'RLQ_PATCH_RC', displayName: 'Patch RC /99', printRun: 99, valueMultiplier: 18, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#9aa3b2' },
+  { name: 'RLQ_PATCH_GREEN', displayName: 'Patch Green /99', printRun: 99, valueMultiplier: 20, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#3fae5e' },
+  { name: 'RLQ_PATCH_ORANGE', displayName: 'Patch Orange /60', printRun: 60, valueMultiplier: 28, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#f08a3c' },
+  { name: 'RLQ_PATCH_RED', displayName: 'Patch Red /50', printRun: 50, valueMultiplier: 36, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#e0564f' },
+  { name: 'RLQ_PATCH_OFL', displayName: 'Patch OFL Logo /35', printRun: 35, valueMultiplier: 55, refractor: false, patched: true, hit: true, finish: 'ofl', group: 'reliquary', color: '#c9a227' },
+  { name: 'RLQ_PATCH_WHITE', displayName: 'Patch White /25', printRun: 25, valueMultiplier: 75, refractor: false, patched: true, hit: true, finish: 'white', group: 'reliquary', color: '#eef2f8' },
+  { name: 'RLQ_PATCH_PINK', displayName: 'Patch Pink /18', printRun: 18, valueMultiplier: 100, refractor: false, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#ec7fb0' },
+  { name: 'RLQ_PATCH_GOLD', displayName: 'Patch Gold /10', printRun: 10, valueMultiplier: 150, refractor: false, patched: true, hit: true, finish: 'gold', group: 'reliquary', color: '#f5b53d' },
+  { name: 'RLQ_PATCH_GOLD_SHIMMER', displayName: 'Patch Gold Shimmer /8', printRun: 8, valueMultiplier: 220, refractor: true, patched: true, hit: true, finish: 'gold', group: 'reliquary', color: '#ffcf6b' },
+  { name: 'RLQ_PATCH_GREEN_SHIMMER', displayName: 'Patch Green Shimmer /3', printRun: 3, valueMultiplier: 400, refractor: true, patched: true, hit: true, finish: 'patch', group: 'reliquary', color: '#6ee7a8' },
+  { name: 'RLQ_PATCH_BLACK', displayName: 'Black Finite OFL Patch 1/1', printRun: 1, valueMultiplier: 900, refractor: true, patched: true, hit: true, finish: 'black', group: 'reliquary', color: '#0c0e12' },
+
+  // ---- Reliquary: autograph rainbow ----
+  { name: 'RLQ_AUTO', displayName: 'Auto /99', printRun: 99, valueMultiplier: 120, refractor: false, signed: true, hit: true, finish: 'autogold', group: 'reliquary', color: '#e8c87a' },
+  { name: 'RLQ_AUTO_ORANGE', displayName: 'Auto Orange /60', printRun: 60, valueMultiplier: 160, refractor: false, signed: true, hit: true, finish: 'autogold', group: 'reliquary', color: '#f08a3c' },
+  { name: 'RLQ_AUTO_RED', displayName: 'Auto Red /50', printRun: 50, valueMultiplier: 200, refractor: false, signed: true, hit: true, finish: 'autogold', group: 'reliquary', color: '#e0564f' },
+  { name: 'RLQ_AUTO_OFL', displayName: 'Auto OFL Logo /35', printRun: 35, valueMultiplier: 280, refractor: false, signed: true, hit: true, finish: 'ofl', group: 'reliquary', color: '#c9a227' },
+  { name: 'RLQ_AUTO_GOLD', displayName: 'Auto Gold /10', printRun: 10, valueMultiplier: 450, refractor: false, signed: true, hit: true, finish: 'gold', group: 'reliquary', color: '#f5b53d' },
+  { name: 'RLQ_AUTO_GREEN_SHIMMER', displayName: 'Auto Green Shimmer /3', printRun: 3, valueMultiplier: 800, refractor: true, signed: true, hit: true, finish: 'autogold', group: 'reliquary', color: '#6ee7a8' },
+  { name: 'RLQ_AUTO_BLACK', displayName: 'Auto Black Finite 1/1', printRun: 1, valueMultiplier: 1400, refractor: true, signed: true, hit: true, finish: 'black', group: 'reliquary', color: '#0c0e12' },
+
+  // ---- Reliquary: Rookie Patch Auto rainbow ----
+  { name: 'RLQ_RPA', displayName: 'RPA /50', printRun: 50, valueMultiplier: 300, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#cdd5e2' },
+  { name: 'RLQ_RPA_OFL', displayName: 'RPA OFL Logo /35', printRun: 35, valueMultiplier: 420, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#c9a227' },
+  { name: 'RLQ_RPA_WHITE', displayName: 'RPA White /25', printRun: 25, valueMultiplier: 560, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#eef2f8' },
+  { name: 'RLQ_RPA_RED', displayName: 'RPA Red /15', printRun: 15, valueMultiplier: 750, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#e0564f' },
+  { name: 'RLQ_RPA_GOLD', displayName: 'RPA Gold /10', printRun: 10, valueMultiplier: 950, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#f5b53d' },
+  { name: 'RLQ_RPA_GOLD_SHIMMER', displayName: 'RPA Gold Shimmer /8', printRun: 8, valueMultiplier: 1200, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#ffcf6b' },
+  { name: 'RLQ_RPA_GREEN_SHIMMER', displayName: 'RPA Green Shimmer /3', printRun: 3, valueMultiplier: 1800, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#6ee7a8' },
+  { name: 'RLQ_RPA_BLACK', displayName: 'RPA Black Finite OFL Patch 1/1', printRun: 1, valueMultiplier: 3000, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#0c0e12' },
 ];
 
 export const PARALLEL_NAMES: ParallelName[] = PARALLELS.map((p) => p.name);
@@ -120,11 +209,28 @@ export const PARALLELS_BY_RARITY_DESC: ParallelName[] = [...PARALLEL_NAMES].reve
 
 // Per-set parallel lineups (most common -> rarest). A set not listed here uses
 // the generic lineup. Artistry runs its own numbered rainbow + auto + RPA tiers.
-const GENERIC_ORDER: ParallelName[] = PARALLELS.filter((p) => p.group !== 'artistry').map((p) => p.name);
+const GENERIC_ORDER: ParallelName[] = PARALLELS.filter((p) => p.group === 'generic').map((p) => p.name);
 const ARTISTRY_ORDER: ParallelName[] = ['BASE', ...PARALLELS.filter((p) => p.group === 'artistry').map((p) => p.name)];
+const RELIQUARY_ORDER: ParallelName[] = ['BASE', ...PARALLELS.filter((p) => p.group === 'reliquary').map((p) => p.name)];
 export const SET_PARALLEL_ORDER: Record<string, ParallelName[]> = {
   artistry: ARTISTRY_ORDER,
+  reliquary: RELIQUARY_ORDER,
 };
+
+/**
+ * Total numbered-card supply one full Reliquary player check-list represents
+ * (sum of every reliquary parallel's print run). Multiplied by the player count
+ * it gives the dedicated numbered supply, which we use to cap how many boxes can
+ * ever be opened — so the chase can't be exhausted into base-card fallback.
+ */
+export const RELIQUARY_NUMBERED_PER_PLAYER: number = PARALLELS
+  .filter((p) => p.group === 'reliquary' && p.printRun != null)
+  .reduce((sum, p) => sum + (p.printRun ?? 0), 0);
+
+/** Box cap = how many boxes the dedicated numbered supply can fill. */
+export function reliquaryBoxCap(playerCount: number, cardsPerBox: number): number {
+  return Math.floor((playerCount * RELIQUARY_NUMBERED_PER_PLAYER) / Math.max(1, cardsPerBox));
+}
 
 /** The parallels a set can yield, ordered most common -> rarest. */
 export function parallelOrderForSet(setKey: string | null | undefined): ParallelName[] {

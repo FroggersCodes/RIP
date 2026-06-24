@@ -41,6 +41,18 @@ export async function resolveBattleVsBot(challengerId: string, productId: string
         const bot = await tx.user.findFirst({ where: { isBot: true } });
         if (!bot) throw new AppError(500, 'No bot opponent configured');
 
+        // Limited print run: a battle opens two boxes (one per side). Claim both
+        // atomically so battles draw from the same finite supply as ripping.
+        if (product.totalBoxes != null) {
+          const claimed = await tx.product.updateMany({
+            where: { id: product.id, boxesOpened: { lte: product.totalBoxes - 2 } },
+            data: { boxesOpened: { increment: 2 } },
+          });
+          if (claimed.count === 0) {
+            throw new AppError(409, 'This box is sold out — not enough of the print run remains for a battle.');
+          }
+        }
+
         const wager = product.entryCost;
         await spendTokensAndCases(tx, challengerId, wager, product.caseCost);
 

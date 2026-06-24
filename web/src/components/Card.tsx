@@ -63,6 +63,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
     ice: 'finish-ice',
     white: 'finish-white',
     black: 'finish-black',
+    ofl: 'finish-ofl',
   };
   const tier = isRpa
     ? 'tier-rpa'
@@ -78,6 +79,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
     .replace(/\s*Finite$/, '')
     .trim();
   const isDarkPill = def.finish === 'black';
+  const isOfl = def.finish === 'ofl';
   const hasSig = !!def.signed;
   const sig = hasSig ? signaturePath(card.player.id) : null;
   const teamPrimary = card.player.teamPrimaryColor ?? '#1a2a4a';
@@ -135,6 +137,11 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               <div className="card-photo-scrim" />
               <div className="card-set-fx" />
               <div className="sheen" />
+              {isOfl && (
+                <div className="card-ofl-emblem">
+                  <img src="/ofl-logo.jpeg" alt="OFL" />
+                </div>
+              )}
               {hasPatch && !isRpa && (
                 <div className="card-patch">
                   <div className="card-patch-window">

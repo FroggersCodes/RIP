@@ -33,6 +33,10 @@ export function productView(p: Product) {
     guaranteeNumbered: p.guaranteeNumbered,
     description: p.description,
     topPlayerBias: p.topPlayerBias,
+    totalBoxes: p.totalBoxes,
+    boxesOpened: p.boxesOpened,
+    boxesRemaining: p.totalBoxes != null ? Math.max(0, p.totalBoxes - p.boxesOpened) : null,
+    soldOut: p.totalBoxes != null && p.boxesOpened >= p.totalBoxes,
     odds,
   };
 }

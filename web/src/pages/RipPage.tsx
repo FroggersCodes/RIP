@@ -36,8 +36,8 @@ export function RipPage() {
     }
   };
 
-  const canTokens = !!sel && (user?.tokens ?? 0) >= sel.entryCost && (user?.cases ?? 0) >= sel.caseCost;
-  const canDust = !!sel && sel.caseCost === 0 && (user?.dust ?? 0) >= sel.entryCost;
+  const canTokens = !!sel && !sel.soldOut && (user?.tokens ?? 0) >= sel.entryCost && (user?.cases ?? 0) >= sel.caseCost;
+  const canDust = !!sel && !sel.soldOut && sel.caseCost === 0 && (user?.dust ?? 0) >= sel.entryCost;
 
   return (
     <>
@@ -90,6 +90,19 @@ export function RipPage() {
                       📦 guaranteed numbered
                     </div>
                   )}
+                  {p.totalBoxes != null && (
+                    <div className="box-supply">
+                      <div className="box-supply-head">
+                        <span className={`box-supply-label ${p.soldOut ? 'sold-out' : ''}`}>
+                          {p.soldOut ? 'SOLD OUT' : `${num(p.boxesRemaining ?? 0)} / ${num(p.totalBoxes)} boxes left`}
+                        </span>
+                        <span className="muted mono" style={{ fontSize: 11 }}>{num(p.boxesOpened)} opened</span>
+                      </div>
+                      <span className={`box-supply-bar ${p.soldOut ? 'sold-out' : ''}`}>
+                        <span style={{ width: `${Math.max(2, ((p.boxesRemaining ?? 0) / p.totalBoxes) * 100)}%` }} />
+                      </span>
+                    </div>
+                  )}
                   <div className="odds">
                     {p.odds.map((o) => (
                       <div className="odds-row" key={o.parallel}>
@@ -138,7 +151,7 @@ export function RipPage() {
                   </button>
                 )}
                 <button className="btn btn-gold btn-lg" onClick={() => rip('tokens')} disabled={busy || !canTokens}>
-                  {busy ? 'Opening…' : !canTokens ? 'Not enough' : sel.packsPerBox > 1 ? 'OPEN BOX' : 'RIP PACK'}
+                  {busy ? 'Opening…' : sel.soldOut ? 'SOLD OUT' : !canTokens ? 'Not enough' : sel.packsPerBox > 1 ? 'OPEN BOX' : 'RIP PACK'}
                 </button>
               </div>
             </div>

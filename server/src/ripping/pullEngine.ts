@@ -200,23 +200,28 @@ export async function allocateWithFallback(
   if (idx < 0) idx = order.length - 1; // unknown -> base
   for (; idx < order.length; idx++) {
     const parallel = order[idx]!;
-    if (parallel === 'BASE') {
-      const base = await tx.cardTemplate.findUnique({
-        where: { playerId_parallel: { playerId, parallel: 'BASE' } },
+    // Unlimited parallels (Base, plus set-specific unnumbered tiers like the
+    // Reliquary base Patch) have no print run — allocate one with a null serial.
+    if (PARALLEL_MAP[parallel]?.printRun == null) {
+      const tmpl = await tx.cardTemplate.findUnique({
+        where: { playerId_parallel: { playerId, parallel } },
         select: { id: true, valueMultiplier: true },
       });
-      if (!base) throw new Error(`Missing Base template for player ${playerId}`);
+      if (!tmpl) {
+        if (parallel === 'BASE') throw new Error(`Missing Base template for player ${playerId}`);
+        continue; // no such template -> walk toward a more-common parallel
+      }
       const inst = await tx.cardInstance.create({
-        data: { templateId: base.id, serial: null, ownerId, setKey },
+        data: { templateId: tmpl.id, serial: null, ownerId, setKey },
         select: { id: true },
       });
       return {
         instanceId: inst.id,
-        templateId: base.id,
-        parallel: 'BASE',
+        templateId: tmpl.id,
+        parallel,
         serial: null,
         printRun: null,
-        valueMultiplier: base.valueMultiplier,
+        valueMultiplier: tmpl.valueMultiplier,
       };
     }
     const alloc = await allocateNumberedSerial(tx, playerId, parallel);
@@ -241,7 +246,7 @@ export async function allocateWithFallback(
 
 /** Weighted roll restricted to numbered parallels (used for box guarantees). */
 export function rollNumberedParallel(pullRates: Record<string, number>): ParallelName {
-  const entries = PARALLEL_NAMES.filter((n) => n !== 'BASE')
+  const entries = PARALLEL_NAMES.filter((n) => PARALLEL_MAP[n]?.printRun != null)
     .map((n) => [n, pullRates[n] ?? 0] as const)
     .filter(([, w]) => w > 0);
   const total = entries.reduce((a, [, w]) => a + w, 0);

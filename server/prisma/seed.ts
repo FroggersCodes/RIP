@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { pathToFileURL } from 'node:url';
-import { PARALLELS } from '@rip/shared';
+import { PARALLELS, reliquaryBoxCap } from '@rip/shared';
 import { prisma } from '../src/prisma';
 import { TEAMS, buildAllPlayers } from '../src/data/roster';
 
@@ -88,8 +88,26 @@ export async function seed() {
   };
   // Tier 4: Gold Standard — high-end; guaranteed 2 hits, all-numbered box.
   const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
-  // Tier 5: Reliquary — ultra; every card numbered, guaranteed 4 hits (dense patch/auto).
-  const RELIQUARY = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, PATCH_AUTO: 400, EMERALD: 700, SUPERFRACTOR: 150 };
+  // Tier 5: Reliquary — ultra; its own four-tier check-list. Every card numbered,
+  // guaranteed 4 hits. No BASE weight, so a box is all numbered reliquary parallels.
+  const RELIQUARY = {
+    // base rainbow
+    RLQ_RC: 1200, RLQ_GREEN: 1200, RLQ_ORANGE: 700, RLQ_RED: 600, RLQ_OFL: 300,
+    RLQ_WHITE: 220, RLQ_PINK: 150, RLQ_GOLD: 90, RLQ_GOLD_SHIMMER: 60, RLQ_GREEN_SHIMMER: 18, RLQ_BLACK: 3,
+    // patch rainbow
+    RLQ_PATCH: 500, RLQ_PATCH_RC: 300, RLQ_PATCH_GREEN: 300, RLQ_PATCH_ORANGE: 200, RLQ_PATCH_RED: 160,
+    RLQ_PATCH_OFL: 90, RLQ_PATCH_WHITE: 70, RLQ_PATCH_PINK: 45, RLQ_PATCH_GOLD: 30,
+    RLQ_PATCH_GOLD_SHIMMER: 18, RLQ_PATCH_GREEN_SHIMMER: 6, RLQ_PATCH_BLACK: 1,
+    // autograph rainbow
+    RLQ_AUTO: 300, RLQ_AUTO_ORANGE: 180, RLQ_AUTO_RED: 140, RLQ_AUTO_OFL: 80,
+    RLQ_AUTO_GOLD: 30, RLQ_AUTO_GREEN_SHIMMER: 8, RLQ_AUTO_BLACK: 1,
+    // rookie patch auto rainbow
+    RLQ_RPA: 60, RLQ_RPA_OFL: 36, RLQ_RPA_WHITE: 24, RLQ_RPA_RED: 14,
+    RLQ_RPA_GOLD: 9, RLQ_RPA_GOLD_SHIMMER: 6, RLQ_RPA_GREEN_SHIMMER: 3, RLQ_RPA_BLACK: 1,
+  };
+  // The whole Reliquary print run is finite: cap boxes at the dedicated numbered
+  // supply so the chase can never be exhausted into base-card fallback.
+  const reliquaryBoxes = reliquaryBoxCap(players.length, 8);
   await prisma.product.createMany({
     data: [
       {
@@ -115,7 +133,8 @@ export async function seed() {
       {
         name: 'Reliquary', year: 2026, entryCost: 100000, caseCost: 100, tier: 'reliquary',
         setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
-        description: 'Engraved-gold reliquary ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.',
+        totalBoxes: reliquaryBoxes,
+        description: `Engraved-gold reliquary ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
       },
     ],
   });
