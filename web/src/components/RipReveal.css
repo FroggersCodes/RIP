@@ -427,6 +427,70 @@
   100% { opacity: 0; transform: scale(3.4); }
 }
 
+/* ---------- flawless case (Reliquary): hinged gold lid swings open ---------- */
+.pack.case {
+  width: 288px;
+  aspect-ratio: 5 / 6.4;
+  perspective: 1100px;
+}
+/* gilded case shell + a center latch seam across the lid line */
+.pack.case .pack-art {
+  border: 1px solid #6b531d;
+  background:
+    linear-gradient(160deg, #211a09, #0a0905 50%, #1c1606),
+    repeating-linear-gradient(135deg, rgba(245, 181, 61, 0.06) 0 6px, transparent 6px 12px);
+  box-shadow: inset 0 0 0 2px rgba(245, 181, 61, 0.28), inset 0 0 50px rgba(245, 181, 61, 0.18);
+}
+.pack.case .pack-logo {
+  color: #ffe09a;
+  text-shadow: 0 0 14px rgba(245, 181, 61, 0.55), 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+.pack.case .pack-name {
+  color: #d8b65f;
+}
+/* gold latch sitting on the seam between lid and base */
+.pack.case .pack-burst::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 18px;
+  margin: -9px 0 0 -23px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffe6a6, #c9961f);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  z-index: 3;
+}
+.pack.case.tearing .pack-burst::before {
+  opacity: 0;
+}
+/* the lid (top half) hinges back on its top edge like a jewelry case */
+.pack.case .pack-top {
+  transform-origin: 50% 0%;
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+.pack.case .pack-bottom {
+  z-index: 1;
+}
+/* override the pack tear with a lid swing + a base that holds and glows */
+.pack.case.tearing .pack-top {
+  animation: case-lid var(--tear-dur, 0.7s) var(--tear-delay, 0.3s) cubic-bezier(0.34, 0.72, 0.28, 1) forwards;
+}
+.pack.case.tearing .pack-bottom {
+  animation: case-glow var(--burst-dur, 0.55s) var(--burst-delay, 0.4s) ease-out forwards;
+}
+@keyframes case-lid {
+  0% { transform: rotateX(0deg); }
+  100% { transform: rotateX(-168deg); filter: brightness(0.7); }
+}
+@keyframes case-glow {
+  to { box-shadow: inset 0 0 70px rgba(245, 181, 61, 0.6); filter: brightness(1.25); }
+}
+
 @media (max-width: 720px) {
   .reveal-grid,
   .reveal-grid.count-3,
