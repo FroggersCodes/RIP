@@ -55,6 +55,48 @@ enum Parallel {
   ART_RPA_10
   ART_RPA_3
   ART_RPA_1
+  // Reliquary — base rainbow
+  RLQ_RC
+  RLQ_GREEN
+  RLQ_ORANGE
+  RLQ_RED
+  RLQ_OFL
+  RLQ_WHITE
+  RLQ_PINK
+  RLQ_GOLD
+  RLQ_GOLD_SHIMMER
+  RLQ_GREEN_SHIMMER
+  RLQ_BLACK
+  // Reliquary — patch rainbow
+  RLQ_PATCH
+  RLQ_PATCH_RC
+  RLQ_PATCH_GREEN
+  RLQ_PATCH_ORANGE
+  RLQ_PATCH_RED
+  RLQ_PATCH_OFL
+  RLQ_PATCH_WHITE
+  RLQ_PATCH_PINK
+  RLQ_PATCH_GOLD
+  RLQ_PATCH_GOLD_SHIMMER
+  RLQ_PATCH_GREEN_SHIMMER
+  RLQ_PATCH_BLACK
+  // Reliquary — autograph rainbow
+  RLQ_AUTO
+  RLQ_AUTO_ORANGE
+  RLQ_AUTO_RED
+  RLQ_AUTO_OFL
+  RLQ_AUTO_GOLD
+  RLQ_AUTO_GREEN_SHIMMER
+  RLQ_AUTO_BLACK
+  // Reliquary — rookie patch auto rainbow
+  RLQ_RPA
+  RLQ_RPA_OFL
+  RLQ_RPA_WHITE
+  RLQ_RPA_RED
+  RLQ_RPA_GOLD
+  RLQ_RPA_GOLD_SHIMMER
+  RLQ_RPA_GREEN_SHIMMER
+  RLQ_RPA_BLACK
 }
 
 enum LineupRole {
@@ -183,6 +225,8 @@ model Product {
   isActive      Boolean @default(true)
   pullRates     Json // { "BASE": weight, "BLUE": weight, ... } per-card weights
   topPlayerBias Float   @default(0) // 0..1, bias hits toward top players
+  totalBoxes    Int?    // null = unlimited supply; otherwise a hard cap on boxes opened
+  boxesOpened   Int     @default(0) // how many boxes have been ripped (for limited products)
 
   battles Battle[]
 }

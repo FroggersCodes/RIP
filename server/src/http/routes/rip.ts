@@ -40,6 +40,18 @@ router.post(
     const result = await withTxRetry(() =>
       prisma.$transaction(
         async (tx) => {
+          // Limited print run: atomically claim a box before charging. The
+          // conditional update serializes concurrent rippers on the row, so the
+          // cap can never be oversold; 0 rows updated means the run is exhausted.
+          if (product.totalBoxes != null) {
+            const claimed = await tx.product.updateMany({
+              where: { id: product.id, boxesOpened: { lt: product.totalBoxes } },
+              data: { boxesOpened: { increment: 1 } },
+            });
+            if (claimed.count === 0) {
+              throw new AppError(409, 'This box is sold out — the entire print run has been opened.');
+            }
+          }
           if (pay === 'dust') {
             await spendDust(tx, uid, product.entryCost);
           } else {

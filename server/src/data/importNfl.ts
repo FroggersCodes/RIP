@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { PARALLELS, type Position } from '@rip/shared';
+import { PARALLELS, reliquaryBoxCap, type Position } from '@rip/shared';
 import { prisma } from '../prisma';
 
 /**
@@ -70,7 +70,18 @@ const ARTISTRY      = {
   ART_RPA_50: 30, ART_RPA_35: 20, ART_RPA_25: 14, ART_RPA_10: 8, ART_RPA_3: 3, ART_RPA_1: 1,
 };
 const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
-const RELIQUARY     = { BLUE: 300, PURPLE: 500, GOLD: 600, PATCH: 1000, BLACK: 800, AUTOGRAPH: 1800, PATCH_AUTO: 400, EMERALD: 700, SUPERFRACTOR: 150 };
+// Reliquary runs its own four-tier check-list; no BASE weight = every card numbered.
+const RELIQUARY     = {
+  RLQ_RC: 1200, RLQ_GREEN: 1200, RLQ_ORANGE: 700, RLQ_RED: 600, RLQ_OFL: 300,
+  RLQ_WHITE: 220, RLQ_PINK: 150, RLQ_GOLD: 90, RLQ_GOLD_SHIMMER: 60, RLQ_GREEN_SHIMMER: 18, RLQ_BLACK: 3,
+  RLQ_PATCH: 500, RLQ_PATCH_RC: 300, RLQ_PATCH_GREEN: 300, RLQ_PATCH_ORANGE: 200, RLQ_PATCH_RED: 160,
+  RLQ_PATCH_OFL: 90, RLQ_PATCH_WHITE: 70, RLQ_PATCH_PINK: 45, RLQ_PATCH_GOLD: 30,
+  RLQ_PATCH_GOLD_SHIMMER: 18, RLQ_PATCH_GREEN_SHIMMER: 6, RLQ_PATCH_BLACK: 1,
+  RLQ_AUTO: 300, RLQ_AUTO_ORANGE: 180, RLQ_AUTO_RED: 140, RLQ_AUTO_OFL: 80,
+  RLQ_AUTO_GOLD: 30, RLQ_AUTO_GREEN_SHIMMER: 8, RLQ_AUTO_BLACK: 1,
+  RLQ_RPA: 60, RLQ_RPA_OFL: 36, RLQ_RPA_WHITE: 24, RLQ_RPA_RED: 14,
+  RLQ_RPA_GOLD: 9, RLQ_RPA_GOLD_SHIMMER: 6, RLQ_RPA_GREEN_SHIMMER: 3, RLQ_RPA_BLACK: 1,
+};
 const PRODUCTS = [
   { name: 'Spark', year: 2026, entryCost: 80, caseCost: 0, tier: 'spark', setKey: 'spark', cardsPerPack: 6, topPlayerBias: 0.35, pullRates: SPARK, description: 'Entry-level 6-card rip. Electric blue foil, crackling static aesthetic. ~70% color parallel, ~25% hit per box.' },
   { name: 'Momentum', year: 2026, entryCost: 200, caseCost: 0, tier: 'momentum', setKey: 'momentum', cardsPerPack: 4, packsPerBox: 2, minHits: 1, topPlayerBias: 0.45, pullRates: MOMENTUM, description: '2-pack box (8 cards). Motion-blur speed-line design. Guaranteed ≥1 hit per box.' },
@@ -181,7 +192,18 @@ export async function importNflData(season = process.env.NFL_SEASON ?? '2024'): 
   await prisma.cardTemplate.createMany({
     data: dbPlayers.flatMap((pl) => PARALLELS.map((par) => ({ playerId: pl.id, parallel: par.name, printRun: par.printRun, valueMultiplier: par.valueMultiplier }))),
   });
-  await prisma.product.createMany({ data: PRODUCTS });
+  const reliquaryBoxes = reliquaryBoxCap(dbPlayers.length, 8);
+  await prisma.product.createMany({
+    data: PRODUCTS.map((p) =>
+      p.setKey === 'reliquary'
+        ? {
+            ...p,
+            totalBoxes: reliquaryBoxes,
+            description: `Vault-door ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
+          }
+        : p,
+    ),
+  });
   await prisma.leagueWeek.create({ data: { season: 1, weekNumber: 1, isCurrent: true } });
   await prisma.leagueState.upsert({ where: { id: 'singleton' }, create: { id: 'singleton', lastAdvanceAt: new Date() }, update: { lastAdvanceAt: new Date() } });
 

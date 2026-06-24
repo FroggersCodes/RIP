@@ -56,6 +56,10 @@ export interface Product {
   guaranteeNumbered: boolean;
   description: string;
   topPlayerBias: number;
+  totalBoxes: number | null;
+  boxesOpened: number;
+  boxesRemaining: number | null;
+  soldOut: boolean;
   odds: OddsRow[];
 }
 

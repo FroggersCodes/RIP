@@ -189,6 +189,45 @@
   font-family: var(--font-mono);
   color: var(--muted);
 }
+/* limited print run: boxes left / total */
+.box-supply {
+  margin-top: 8px;
+}
+.box-supply-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.box-supply-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+}
+.box-supply-label.sold-out {
+  color: #e0564f;
+  letter-spacing: 0.12em;
+}
+.box-supply-bar {
+  display: block;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.box-supply-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ffd479, #f5b53d);
+}
+.box-supply-bar.sold-out > span {
+  background: #e0564f;
+}
+
 .rip-bar {
   position: sticky;
   bottom: 0;
