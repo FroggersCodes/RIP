@@ -113,9 +113,9 @@ export async function seed() {
         description: 'Matte-black, embossed gold foil. 8-card premium box. Costs a case. All cards numbered, ≥2 hits guaranteed.',
       },
       {
-        name: 'Reliquary', year: 2026, entryCost: 2500, caseCost: 2, tier: 'reliquary',
+        name: 'Reliquary', year: 2026, entryCost: 100000, caseCost: 100, tier: 'reliquary',
         setKey: 'reliquary', cardsPerPack: 8, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
-        description: 'Engraved-gold reliquary ultra-premium. 8-card rip. Costs 2 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.',
+        description: 'Engraved-gold reliquary ultra-premium. 8-card rip. Costs 100 cases. Every card is numbered, ≥4 hits. Dense patch/auto odds.',
       },
     ],
   });

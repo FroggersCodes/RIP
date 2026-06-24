@@ -50,6 +50,8 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
   // Tier-based animation speed: Spark (1) = snappy, Reliquary (5) = dramatic and slow.
   const TIER_MULT: Record<number, number> = { 1: 0.45, 2: 0.75, 3: 1.0, 4: 1.5, 5: 2.2 };
   const tierLevel = SETS[cards[0]?.setKey ?? '']?.tierLevel ?? 1;
+  // Reliquary opens like a flawless case: a hinged gold lid swings open instead of a torn pack.
+  const isCase = cards[0]?.setKey === 'reliquary';
   const tearMult = TIER_MULT[tierLevel] ?? 1.0;
   const tearCss = {
     '--shake-dur':  `${(0.32 * tearMult).toFixed(2)}s`,
@@ -174,7 +176,7 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
 
       {!opened ? (
         <div className="pack-stage" style={{ ['--glow' as string]: glowColor }}>
-          <div className={`pack ${anyRefractor ? 'holo' : ''} ${tearing ? 'tearing' : ''}`} style={tearCss} onClick={rip}>
+          <div className={`pack ${anyRefractor ? 'holo' : ''} ${isCase ? 'case' : ''} ${tearing ? 'tearing' : ''}`} style={tearCss} onClick={rip}>
             <div className="pack-half pack-top">
               <div className="pack-art">
                 <span className="pack-logo">RIP<span className="gold">.</span></span>
@@ -192,7 +194,7 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
           {!tearing && (
             <>
               <button className="btn btn-gold btn-lg" onClick={rip} style={{ marginTop: 28 }}>
-                {packCount > 1 ? 'Open the box' : 'Rip it open'}
+                {isCase ? 'Unlatch the case' : packCount > 1 ? 'Open the box' : 'Rip it open'}
               </button>
               {subtitle && <div className="reveal-sub muted" style={{ marginTop: 10 }}>{subtitle}</div>}
             </>
