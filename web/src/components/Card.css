@@ -436,31 +436,142 @@
   opacity: 0.8;
 }
 
-/* ---------- GOLD STANDARD (tier 4) — matte black, embossed gold foil ---------- */
-.set-gold-standard .card-frame {
-  background: linear-gradient(140deg, #080806, #161200 38%, #c9a227 50%, #161200 62%, #080806);
-}
+/* ---------- GOLD STANDARD (tier 4) — matte black, embossed gold foil ----------
+   A black gallery slab framed in animated gold foil: a matte radial ground with
+   a faint diagonal weave, a thin inner gold ring with cut-in corner tabs, a foil
+   "GOLD STANDARD" serif wordmark crowning the front, and a foil-gilded name. */
+
+/* matte-black ground */
 .set-gold-standard .card-set-bg {
-  background:
-    radial-gradient(70% 45% at 50% 105%, rgba(201, 162, 39, 0.2) 0%, transparent 60%),
-    linear-gradient(160deg, #0a0905 0%, #060503 100%);
+  background: radial-gradient(125% 80% at 50% 8%, #1c1b17 0%, #0d0c0a 52%, #050504 100%);
 }
+/* faint diagonal weave */
 .set-gold-standard .card-set-bg::before {
   content: '';
   position: absolute;
   inset: 0;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background: repeating-linear-gradient(48deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 5px);
+}
+/* thin inner gold ring */
+.set-gold-standard .card-set-bg::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(212, 175, 106, 0.45);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+/* cut-in corner tabs (top-left + bottom-right), gilded */
+.set-gold-standard .card-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
   background:
-    repeating-linear-gradient( 45deg, rgba(201, 162, 39, 0.045) 0 1px, transparent 1px 9px),
-    repeating-linear-gradient(-45deg, rgba(201, 162, 39, 0.045) 0 1px, transparent 1px 9px);
+    linear-gradient(180deg, #f1dca0, #9a7a36) no-repeat left 7% top 9%,
+    linear-gradient(90deg, #9a7a36, #f1dca0) no-repeat left 4% top 21%,
+    linear-gradient(0deg, #f1dca0, #9a7a36) no-repeat right 7% bottom 9%,
+    linear-gradient(270deg, #9a7a36, #f1dca0) no-repeat right 4% bottom 21%;
+  background-size: 1px 15%, 7% 1px, 1px 15%, 7% 1px;
 }
+/* slow gold sheen sweeping across the slab */
 .set-gold-standard .card-set-fx {
-  opacity: 0.6;
-  background: linear-gradient(118deg, transparent 28%, rgba(201, 162, 39, 0.5) 46%, rgba(255, 240, 180, 0.22) 53%, transparent 68%);
-  animation: gold-standard-gleam 5s ease-in-out infinite;
+  opacity: 0.5;
+  background: linear-gradient(118deg, transparent 30%, rgba(247, 225, 160, 0.45) 47%, rgba(255, 243, 207, 0.25) 53%, transparent 70%);
+  background-size: 250% 100%;
+  mix-blend-mode: overlay;
+  animation: sheen-move 7s linear infinite;
 }
-@keyframes gold-standard-gleam {
-  0%, 100% { opacity: 0.25; }
-  50%       { opacity: 0.6; }
+
+/* gold foil frame on the base/plain parallels (rarer parallels keep their own
+   tier frame); higher specificity so it survives the tier-plain frame rule. */
+.set-gold-standard .card-frame,
+.card.set-gold-standard.tier-plain .card-frame {
+  background: linear-gradient(135deg, #5a4a25, #f1dca0 30%, #7a6230 50%, #d9b46b 72%, #6e5829);
+  background-size: 200% 200%;
+  animation: holo-shift 11s linear infinite;
+  box-shadow: 0 0 0 1px rgba(212, 175, 106, 0.35), var(--shadow-card);
+}
+
+/* foil "GOLD STANDARD" serif wordmark crowning the front face */
+.set-gold-standard .card-face-front .card-inner::before {
+  content: 'GOLD STANDARD';
+  position: absolute;
+  z-index: 5;
+  top: 4.2%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 8px;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-transform: uppercase;
+  background: linear-gradient(100deg, #f9efc8, #e6c574, #b58a3b, #f4e3a6, #caa052, #fff3cf);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holo-shift 8s linear infinite;
+}
+.card-lg.set-gold-standard .card-face-front .card-inner::before {
+  font-size: 10px;
+}
+
+/* RC badge to the right, rendered as a gilded coin */
+.set-gold-standard .card-face-front .card-head {
+  justify-content: flex-end;
+}
+.set-gold-standard .card-rc-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 8px;
+  color: #ecd5a0;
+  background: radial-gradient(circle at 35% 30%, rgba(212, 175, 106, 0.3), rgba(0, 0, 0, 0.35));
+  border: 1px solid rgba(212, 175, 106, 0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* foil-gilded name + muted-gold subline */
+.set-gold-standard .card-name {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  background: linear-gradient(100deg, #f9efc8, #e6c574, #b58a3b, #f4e3a6, #caa052, #fff3cf);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holo-shift 9s linear infinite;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.set-gold-standard .card-sub {
+  color: #b39c6b;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+.set-gold-standard .card-serial {
+  color: #d6bd84;
+}
+/* back: gold serif wordmark */
+.set-gold-standard .card-setmark {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #e6c574;
+}
+.set-gold-standard .card-setyear {
+  color: rgba(230, 197, 116, 0.7);
 }
 
 /* ---------- RELIQUARY (tier 5) — engraved-gold cathedral reliquary ----------
