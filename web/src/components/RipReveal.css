@@ -427,68 +427,81 @@
   100% { opacity: 0; transform: scale(3.4); }
 }
 
-/* ---------- flawless case (Reliquary): hinged gold lid swings open ---------- */
-.pack.case {
-  width: 288px;
-  aspect-ratio: 5 / 6.4;
-  perspective: 1100px;
+/* ---------- Reliquary gold-foil pack (after the briefcase cinematic) ---------- */
+.pack.gold {
+  filter: drop-shadow(0 0 30px rgba(245, 181, 61, 0.5)) drop-shadow(0 18px 40px rgba(0, 0, 0, 0.65));
 }
-/* gilded case shell + a center latch seam across the lid line */
-.pack.case .pack-art {
+.pack.gold:hover {
+  filter: drop-shadow(0 0 46px rgba(245, 181, 61, 0.7)) drop-shadow(0 18px 40px rgba(0, 0, 0, 0.65));
+}
+.pack.gold .pack-art {
   border: 1px solid #6b531d;
   background:
-    linear-gradient(160deg, #211a09, #0a0905 50%, #1c1606),
-    repeating-linear-gradient(135deg, rgba(245, 181, 61, 0.06) 0 6px, transparent 6px 12px);
-  box-shadow: inset 0 0 0 2px rgba(245, 181, 61, 0.28), inset 0 0 50px rgba(245, 181, 61, 0.18);
+    linear-gradient(135deg, #6e4a14 0%, #e7c878 15%, #fff4cf 27%, #a07d2a 44%, #3a1a08 60%, #e7c878 82%, #7a5418 100%);
+  background-size: 200% 200%;
+  animation: poGold 13s linear infinite;
+  box-shadow: inset 0 0 0 2px rgba(255, 245, 205, 0.4), inset 0 0 50px rgba(58, 26, 8, 0.5);
 }
-.pack.case .pack-logo {
-  color: #ffe09a;
-  text-shadow: 0 0 14px rgba(245, 181, 61, 0.55), 0 2px 8px rgba(0, 0, 0, 0.7);
+.pack.gold .pack-logo {
+  color: #2a1206;
+  text-shadow: 0 1px 2px rgba(255, 244, 207, 0.5);
 }
-.pack.case .pack-name {
-  color: #d8b65f;
+.pack.gold .pack-name {
+  color: #3a1a08;
 }
-/* gold latch sitting on the seam between lid and base */
-.pack.case .pack-burst::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 46px;
-  height: 18px;
-  margin: -9px 0 0 -23px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #ffe6a6, #c9961f);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  opacity: 1;
-  transition: opacity 0.2s ease;
-  z-index: 3;
-}
-.pack.case.tearing .pack-burst::before {
-  opacity: 0;
-}
-/* the lid (top half) hinges back on its top edge like a jewelry case */
-.pack.case .pack-top {
-  transform-origin: 50% 0%;
-  transform-style: preserve-3d;
+
+/* ---------- Reliquary sealed briefcase cinematic ---------- */
+.rlq-case-stage {
+  position: relative;
   z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in 0.3s ease;
 }
-.pack.case .pack-bottom {
-  z-index: 1;
+.rlq-case-head {
+  position: absolute;
+  top: 4%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 5;
 }
-/* override the pack tear with a lid swing + a base that holds and glows */
-.pack.case.tearing .pack-top {
-  animation: case-lid var(--tear-dur, 0.7s) var(--tear-delay, 0.3s) cubic-bezier(0.34, 0.72, 0.28, 1) forwards;
+.rlq-kicker {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  font-size: 11px;
+  color: #c79a3e;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
-.pack.case.tearing .pack-bottom {
-  animation: case-glow var(--burst-dur, 0.55s) var(--burst-delay, 0.4s) ease-out forwards;
+.rlq-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 30px;
+  color: #f3ead6;
+  line-height: 1;
 }
-@keyframes case-lid {
-  0% { transform: rotateX(0deg); }
-  100% { transform: rotateX(-168deg); filter: brightness(0.7); }
+
+@keyframes poGold {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
-@keyframes case-glow {
-  to { box-shadow: inset 0 0 70px rgba(245, 181, 61, 0.6); filter: brightness(1.25); }
+@keyframes poSheen {
+  0% { background-position: 220% 0; }
+  100% { background-position: -120% 0; }
+}
+@keyframes cbFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+@keyframes cbDust {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  16% { opacity: 1; }
+  100% { transform: translateY(-210px) scale(0.3); opacity: 0; }
 }
 
 @media (max-width: 720px) {
