@@ -4,8 +4,7 @@ import {
   PARALLEL_MAP,
   computeMarketValue,
   isHit,
-  RELIQUARY_PACK,
-  RELIQUARY_SLOT_POOLS,
+  packStructureForSet,
   type ParallelName,
   type Position,
 } from '@rip/shared';
@@ -350,18 +349,21 @@ export async function openPack(tx: Tx, args: OpenPackArgs): Promise<PulledCard[]
   // Dev force: if set to a valid parallel, every card is rolled as that tier.
   const forced =
     args.force && PARALLEL_NAMES.includes(args.force as ParallelName) ? (args.force as ParallelName) : null;
-  // Reliquary uses a fixed slot structure per pack (base / base-rookie / numbered
-  // x3 / auto x2 / patch x2 / RPA) instead of a flat weighted roll. Each slot
-  // draws from its own category sub-pool, weighted by the product's pull table.
-  const useSlots =
-    !forced && args.setKey === 'reliquary' && args.count % RELIQUARY_PACK.length === 0;
+  // Some sets (Reliquary, Gold Standard) open as a fixed slot run instead of a
+  // flat weighted roll: each slot draws from its own category sub-pool, weighted
+  // by the product's pull table. Falls back to a flat roll when the count isn't a
+  // whole number of packs.
+  const struct = forced ? null : packStructureForSet(args.setKey);
+  const useSlots = !!struct && struct.pack.length > 0 && args.count % struct.pack.length === 0;
 
   const cards: PulledCard[] = [];
   for (let i = 0; i < args.count; i++) {
+    const slotPool =
+      useSlots && struct ? struct.pools[struct.pack[i % struct.pack.length]!] ?? [] : [];
     const rolled = forced
       ? forced
       : useSlots
-        ? rollFromPool(rates, RELIQUARY_SLOT_POOLS[RELIQUARY_PACK[i % RELIQUARY_PACK.length]!])
+        ? rollFromPool(rates, slotPool)
         : rollParallel(rates);
     const player = pickPlayer(rolled, args.topPlayerBias, args.pool);
     const resolved = await allocateWithFallback(tx, player.id, rolled, args.ownerId, args.setKey);

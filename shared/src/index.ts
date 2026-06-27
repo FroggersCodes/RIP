@@ -84,7 +84,35 @@ export type ParallelName =
   | 'RLQ_RPA_GOLD'
   | 'RLQ_RPA_GOLD_SHIMMER'
   | 'RLQ_RPA_GREEN_SHIMMER'
-  | 'RLQ_RPA_BLACK';
+  | 'RLQ_RPA_BLACK'
+  // Gold Standard — its own checklist (base RC + numbered / auto / patch / RPA rainbows)
+  | 'GS_RC'
+  | 'GS_GOLD'
+  | 'GS_GREEN'
+  | 'GS_BLUE'
+  | 'GS_PURPLE'
+  | 'GS_RED'
+  | 'GS_ORANGE'
+  | 'GS_BLACK'
+  | 'GS_GOLD_VINYL'
+  | 'GS_SUPER'
+  | 'GS_AUTO'
+  | 'GS_AUTO_RED'
+  | 'GS_AUTO_GOLD'
+  | 'GS_AUTO_BLACK'
+  | 'GS_AUTO_VINYL'
+  | 'GS_AUTO_1OF1'
+  | 'GS_PATCH'
+  | 'GS_PATCH_RED'
+  | 'GS_PATCH_GOLD'
+  | 'GS_PATCH_BLACK'
+  | 'GS_PATCH_VINYL'
+  | 'GS_PATCH_1OF1'
+  | 'GS_RPA'
+  | 'GS_RPA_GOLD'
+  | 'GS_RPA_BLACK'
+  | 'GS_RPA_VINYL'
+  | 'GS_RPA_1OF1';
 export type LineupRoleName = 'QB' | 'WR1' | 'WR2' | 'RB' | 'TE' | 'FLEX';
 
 export interface ParallelDef {
@@ -108,7 +136,7 @@ export interface ParallelDef {
   /** Visual finish class suffix (`finish-<x>`) the web card renders. */
   finish?: string;
   /** Which lineup a parallel belongs to (gates the per-set fallback walk). */
-  group?: 'generic' | 'artistry' | 'reliquary';
+  group?: 'generic' | 'artistry' | 'reliquary' | 'gold-standard';
   color: string;
 }
 
@@ -202,6 +230,41 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'RLQ_RPA_GOLD_SHIMMER', displayName: 'RPA Gold Shimmer /8', printRun: 8, valueMultiplier: 1200, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#ffcf6b' },
   { name: 'RLQ_RPA_GREEN_SHIMMER', displayName: 'RPA Green Shimmer /3', printRun: 3, valueMultiplier: 1800, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#6ee7a8' },
   { name: 'RLQ_RPA_BLACK', displayName: 'RPA Black Finite OFL Patch 1/1', printRun: 1, valueMultiplier: 3000, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'reliquary', color: '#0c0e12' },
+
+  // ---- Gold Standard: base RC + numbered colour rainbow ----
+  { name: 'GS_RC', displayName: 'Rookie /399', printRun: 399, valueMultiplier: 2.5, refractor: false, rookie: true, finish: 'plain', group: 'gold-standard', color: '#cdd5e2' },
+  { name: 'GS_GOLD', displayName: 'Gold /299', printRun: 299, valueMultiplier: 2, refractor: false, finish: 'gold', group: 'gold-standard', color: '#f5b53d' },
+  { name: 'GS_GREEN', displayName: 'Green /199', printRun: 199, valueMultiplier: 3, refractor: false, finish: 'plain', group: 'gold-standard', color: '#3fae5e' },
+  { name: 'GS_BLUE', displayName: 'Blue /149', printRun: 149, valueMultiplier: 4, refractor: false, finish: 'plain', group: 'gold-standard', color: '#4f8fe0' },
+  { name: 'GS_PURPLE', displayName: 'Purple /99', printRun: 99, valueMultiplier: 6, refractor: false, finish: 'plain', group: 'gold-standard', color: '#a855f7' },
+  { name: 'GS_RED', displayName: 'Red /49', printRun: 49, valueMultiplier: 12, refractor: false, finish: 'plain', group: 'gold-standard', color: '#e0564f' },
+  { name: 'GS_ORANGE', displayName: 'Orange /25', printRun: 25, valueMultiplier: 20, refractor: false, hit: true, finish: 'plain', group: 'gold-standard', color: '#f08a3c' },
+  { name: 'GS_BLACK', displayName: 'Black /10', printRun: 10, valueMultiplier: 45, refractor: false, hit: true, finish: 'black', group: 'gold-standard', color: '#0c0e12' },
+  { name: 'GS_GOLD_VINYL', displayName: 'Gold Vinyl /5', printRun: 5, valueMultiplier: 90, refractor: true, hit: true, finish: 'gold', group: 'gold-standard', color: '#ffcf6b' },
+  { name: 'GS_SUPER', displayName: 'Superfractor 1/1', printRun: 1, valueMultiplier: 400, refractor: true, hit: true, finish: 'gold', group: 'gold-standard', color: '#f5b53d' },
+
+  // ---- Gold Standard: autograph rainbow ----
+  { name: 'GS_AUTO', displayName: 'Auto /99', printRun: 99, valueMultiplier: 60, refractor: false, signed: true, hit: true, finish: 'autogold', group: 'gold-standard', color: '#e8c87a' },
+  { name: 'GS_AUTO_RED', displayName: 'Auto Red /49', printRun: 49, valueMultiplier: 100, refractor: false, signed: true, hit: true, finish: 'autogold', group: 'gold-standard', color: '#e0564f' },
+  { name: 'GS_AUTO_GOLD', displayName: 'Auto Gold /25', printRun: 25, valueMultiplier: 150, refractor: false, signed: true, hit: true, finish: 'gold', group: 'gold-standard', color: '#f5b53d' },
+  { name: 'GS_AUTO_BLACK', displayName: 'Auto Black /10', printRun: 10, valueMultiplier: 250, refractor: false, signed: true, hit: true, finish: 'black', group: 'gold-standard', color: '#0c0e12' },
+  { name: 'GS_AUTO_VINYL', displayName: 'Auto Gold Vinyl /5', printRun: 5, valueMultiplier: 450, refractor: true, signed: true, hit: true, finish: 'gold', group: 'gold-standard', color: '#ffcf6b' },
+  { name: 'GS_AUTO_1OF1', displayName: 'Auto Superfractor 1/1', printRun: 1, valueMultiplier: 900, refractor: true, signed: true, hit: true, finish: 'black', group: 'gold-standard', color: '#0c0e12' },
+
+  // ---- Gold Standard: patch rainbow ----
+  { name: 'GS_PATCH', displayName: 'Patch /99', printRun: 99, valueMultiplier: 30, refractor: false, patched: true, hit: true, finish: 'patch', group: 'gold-standard', color: '#94a3b8' },
+  { name: 'GS_PATCH_RED', displayName: 'Patch Red /49', printRun: 49, valueMultiplier: 50, refractor: false, patched: true, hit: true, finish: 'patch', group: 'gold-standard', color: '#e0564f' },
+  { name: 'GS_PATCH_GOLD', displayName: 'Patch Gold /25', printRun: 25, valueMultiplier: 80, refractor: false, patched: true, hit: true, finish: 'gold', group: 'gold-standard', color: '#f5b53d' },
+  { name: 'GS_PATCH_BLACK', displayName: 'Patch Black /10', printRun: 10, valueMultiplier: 150, refractor: false, patched: true, hit: true, finish: 'black', group: 'gold-standard', color: '#0c0e12' },
+  { name: 'GS_PATCH_VINYL', displayName: 'Patch Gold Vinyl /5', printRun: 5, valueMultiplier: 280, refractor: true, patched: true, hit: true, finish: 'gold', group: 'gold-standard', color: '#ffcf6b' },
+  { name: 'GS_PATCH_1OF1', displayName: 'Patch Superfractor 1/1', printRun: 1, valueMultiplier: 600, refractor: true, patched: true, hit: true, finish: 'black', group: 'gold-standard', color: '#0c0e12' },
+
+  // ---- Gold Standard: Rookie Patch Auto rainbow (random slot only) ----
+  { name: 'GS_RPA', displayName: 'RPA /49', printRun: 49, valueMultiplier: 120, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'gold-standard', color: '#cdd5e2' },
+  { name: 'GS_RPA_GOLD', displayName: 'RPA Gold /25', printRun: 25, valueMultiplier: 200, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'gold-standard', color: '#f5b53d' },
+  { name: 'GS_RPA_BLACK', displayName: 'RPA Black /10', printRun: 10, valueMultiplier: 350, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'gold-standard', color: '#0c0e12' },
+  { name: 'GS_RPA_VINYL', displayName: 'RPA Gold Vinyl /5', printRun: 5, valueMultiplier: 600, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'gold-standard', color: '#ffcf6b' },
+  { name: 'GS_RPA_1OF1', displayName: 'RPA Superfractor 1/1', printRun: 1, valueMultiplier: 1200, refractor: true, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'gold-standard', color: '#e0b85a' },
 ];
 
 export const PARALLEL_NAMES: ParallelName[] = PARALLELS.map((p) => p.name);
@@ -214,9 +277,11 @@ export const PARALLELS_BY_RARITY_DESC: ParallelName[] = [...PARALLEL_NAMES].reve
 const GENERIC_ORDER: ParallelName[] = PARALLELS.filter((p) => p.group === 'generic').map((p) => p.name);
 const ARTISTRY_ORDER: ParallelName[] = ['BASE', ...PARALLELS.filter((p) => p.group === 'artistry').map((p) => p.name)];
 const RELIQUARY_ORDER: ParallelName[] = ['BASE', ...PARALLELS.filter((p) => p.group === 'reliquary').map((p) => p.name)];
+const GOLD_STANDARD_ORDER: ParallelName[] = ['BASE', ...PARALLELS.filter((p) => p.group === 'gold-standard').map((p) => p.name)];
 export const SET_PARALLEL_ORDER: Record<string, ParallelName[]> = {
   artistry: ARTISTRY_ORDER,
   reliquary: RELIQUARY_ORDER,
+  'gold-standard': GOLD_STANDARD_ORDER,
 };
 
 // Reliquary packs aren't a flat weighted roll — each pack is a fixed run of
@@ -236,6 +301,37 @@ export const RELIQUARY_SLOT_POOLS: Record<ReliquarySlot, ParallelName[]> = {
   patch: rlqPool((p) => !!p.patched && !p.signed),             // patch rainbow
   rpa: rlqPool((p) => !!p.rpa),                                // rookie patch auto rainbow
 };
+
+// Gold Standard pack: also a fixed slot run (8 cards) drawing from its own
+// checklist — base x2, a rookie RC /399, two numbered, an auto, a patch, and a
+// "random" finale that can be any auto / patch / RPA.
+export const GOLD_STANDARD_PACK: string[] = [
+  'base', 'base', 'rookie', 'numbered', 'numbered', 'auto', 'patch', 'random',
+];
+const gsPool = (pred: (p: ParallelDef) => boolean): ParallelName[] =>
+  PARALLELS.filter((p) => p.group === 'gold-standard' && pred(p)).map((p) => p.name);
+export const GOLD_STANDARD_SLOT_POOLS: Record<string, ParallelName[]> = {
+  base: ['BASE'],
+  rookie: gsPool((p) => !!p.rookie),                                // GS_RC /399
+  numbered: gsPool((p) => !p.signed && !p.patched && !p.rookie),    // numbered colour rainbow
+  auto: gsPool((p) => !!p.signed && !p.patched),                    // autograph rainbow
+  patch: gsPool((p) => !!p.patched && !p.signed),                   // patch rainbow
+  random: gsPool((p) => !!p.signed || !!p.patched),                 // any auto / patch / RPA
+};
+
+// Sets that open as a fixed slot run (vs a flat weighted roll). The engine reads
+// this to pick each slot's parallel from its own category sub-pool.
+export interface SetPackStructure {
+  pack: string[];
+  pools: Record<string, ParallelName[]>;
+}
+export const SET_PACK_STRUCTURE: Record<string, SetPackStructure> = {
+  reliquary: { pack: RELIQUARY_PACK, pools: RELIQUARY_SLOT_POOLS },
+  'gold-standard': { pack: GOLD_STANDARD_PACK, pools: GOLD_STANDARD_SLOT_POOLS },
+};
+export function packStructureForSet(setKey: string | null | undefined): SetPackStructure | null {
+  return SET_PACK_STRUCTURE[setKey ?? ''] ?? null;
+}
 
 /**
  * Box cap for the limited Reliquary print run. Each pack draws a fixed number of
