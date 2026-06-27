@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { PARALLEL_MAP, rarityDescForSet, SETS } from '@rip/shared';
 import { Card, type CardData } from './Card';
+import { GoldStandardOpening } from './GoldStandardOpening';
 import { money } from '../lib/format';
 import './RipReveal.css';
 
@@ -59,6 +60,9 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
   // Reliquary is the flawless case: a sealed gold briefcase plays a cinematic
   // open, then hands off to a gold-foil pack that rips like any other.
   const isReliquary = cards[0]?.setKey === 'reliquary';
+  // Gold Standard plays its own box-opening cinematic in place of the
+  // tap-to-rip pack stage, then hands straight off to the card reveal.
+  const isGoldStandard = cards[0]?.setKey === 'gold-standard';
   const tearMult = TIER_MULT[tierLevel] ?? 1.0;
   const tearCss = {
     '--shake-dur':  `${(0.32 * tearMult).toFixed(2)}s`,
@@ -200,6 +204,16 @@ export function RipReveal({ cards, packSize, title, subtitle, footer, onClose }:
       {!opened ? (
         isReliquary && caseStage !== 'done' ? (
           <ReliquaryCase stage={caseStage} title={title} subtitle={subtitle} onOpen={openCase} />
+        ) : isGoldStandard ? (
+          <GoldStandardOpening
+            title={title}
+            subtitle={subtitle}
+            onDone={() => {
+              setFlash(true);
+              setOpened(true);
+              timers.current.push(window.setTimeout(() => setFlash(false), 420));
+            }}
+          />
         ) : (
         <div className="pack-stage" style={{ ['--glow' as string]: glowColor }}>
           <div className={`pack ${anyRefractor ? 'holo' : ''} ${isReliquary ? 'gold' : ''} ${tearing ? 'tearing' : ''}`} style={tearCss} onClick={rip}>
