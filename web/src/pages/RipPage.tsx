@@ -23,9 +23,8 @@ export function RipPage() {
     p.gemCost > 0 ? `${num(p.gemCost)} 💎` : `${num(p.entryCost)} tokens${p.caseCost ? ` + ${p.caseCost} case` : ''}`;
 
   // Average pull rate per pack. Commons (>=1 expected per pack) show a count;
-  // rarer cards show "1 : N packs".
-  const packRate = (percentPerCard: number, cardsPerPack: number): string => {
-    const perPack = (percentPerCard / 100) * cardsPerPack;
+  // rarer cards show "1 : N packs". perPack is computed slot-exact server-side.
+  const packRate = (perPack: number): string => {
     if (perPack <= 0) return '—';
     if (perPack >= 1) return `${perPack >= 1.95 ? Math.round(perPack) : perPack.toFixed(1)}/pack`;
     const oneIn = Math.round(1 / perPack);
@@ -125,7 +124,7 @@ export function RipPage() {
                         <span className="odds-name" style={{ color: o.parallel === 'BLACK' ? '#cfd6e2' : o.color }}>
                           {o.displayName.replace(/\s*1\/1/, '')}
                         </span>
-                        <span className="odds-pct">{packRate(o.percent, p.cardsPerPack)}</span>
+                        <span className="odds-pct">{packRate(o.perPack)}</span>
                       </div>
                     ))}
                   </div>
