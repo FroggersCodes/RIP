@@ -86,8 +86,22 @@ export async function seed() {
     // rookie patch autos
     ART_RPA_50: 30, ART_RPA_35: 20, ART_RPA_25: 14, ART_RPA_10: 8, ART_RPA_3: 3, ART_RPA_1: 1,
   };
-  // Tier 4: Gold Standard — high-end; guaranteed 2 hits, all-numbered box.
-  const GOLD_STANDARD = { BASE: 2000, BLUE: 400, PURPLE: 600, GOLD: 800, PATCH: 900, BLACK: 600, AUTOGRAPH: 1300, PATCH_AUTO: 120, EMERALD: 250, SUPERFRACTOR: 30 };
+  // Tier 4: Gold Standard — high-end with its own checklist + fixed 8-slot pack
+  // (base x2, RC /399, numbered x2, auto, patch, random). Weights bias the roll
+  // WITHIN each slot's category pool.
+  const GOLD_STANDARD = {
+    // rookie RC /399 (its own slot)
+    GS_RC: 100,
+    // numbered colour rainbow
+    GS_GOLD: 1000, GS_GREEN: 700, GS_BLUE: 500, GS_PURPLE: 300, GS_RED: 150,
+    GS_ORANGE: 70, GS_BLACK: 25, GS_GOLD_VINYL: 8, GS_SUPER: 1,
+    // autograph rainbow
+    GS_AUTO: 1000, GS_AUTO_RED: 400, GS_AUTO_GOLD: 150, GS_AUTO_BLACK: 50, GS_AUTO_VINYL: 12, GS_AUTO_1OF1: 1,
+    // patch rainbow
+    GS_PATCH: 1000, GS_PATCH_RED: 400, GS_PATCH_GOLD: 150, GS_PATCH_BLACK: 50, GS_PATCH_VINYL: 12, GS_PATCH_1OF1: 1,
+    // rookie patch auto rainbow (eligible for the random slot)
+    GS_RPA: 60, GS_RPA_GOLD: 24, GS_RPA_BLACK: 9, GS_RPA_VINYL: 4, GS_RPA_1OF1: 1,
+  };
   // Tier 5: Reliquary — ultra; its own four-tier check-list. Every card numbered,
   // guaranteed 4 hits. No BASE weight, so a box is all numbered reliquary parallels.
   const RELIQUARY = {
@@ -127,8 +141,8 @@ export async function seed() {
       },
       {
         name: 'Gold Standard', year: 2026, entryCost: 1000, caseCost: 1, tier: 'gold-standard',
-        setKey: 'gold-standard', cardsPerPack: 8, minHits: 2, guaranteeNumbered: true, topPlayerBias: 0.65, pullRates: GOLD_STANDARD,
-        description: 'Matte-black, embossed gold foil. 8-card premium box. Costs a case. All cards numbered, ≥2 hits guaranteed.',
+        setKey: 'gold-standard', cardsPerPack: 8, topPlayerBias: 0.65, pullRates: GOLD_STANDARD,
+        description: 'Matte-black, embossed gold foil. Fixed 8-card pack: 2 base, a Rookie /399, 2 numbered, an auto, a patch, and a random auto/patch/RPA. Costs a case.',
       },
       {
         name: 'Reliquary', year: 2026, entryCost: 0, caseCost: 0, gemCost: 50, tier: 'reliquary',
