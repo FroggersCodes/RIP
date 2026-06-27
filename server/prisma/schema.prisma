@@ -121,7 +121,7 @@ model User {
   passwordHash     String
   tokens           Int       @default(0)
   cases            Int       @default(0)
-  dust             Int       @default(0)
+  gems             Int       @default(0)
   rating           Int       @default(1000)
   isBot            Boolean   @default(false)
   dailyStreak      Int       @default(0)
@@ -137,6 +137,7 @@ model User {
   missions            MissionProgress[]
   listingsSelling     Listing[]         @relation("seller")
   listingsBought      Listing[]         @relation("buyer")
+  setCompletions      SetCompletion[]
 }
 
 model Team {
@@ -215,6 +216,7 @@ model Product {
   year          Int
   entryCost     Int // tokens
   caseCost      Int     @default(0) // premium currency for chase products
+  gemCost       Int     @default(0) // >0 = gem-only product (paid purely in gems)
   tier          String
   setKey        String  @default("chrome") // visual set theme for cards from this product
   cardsPerPack  Int     @default(5)
@@ -370,7 +372,21 @@ model LeagueState {
   updatedAt     DateTime  @updatedAt
 }
 
-// Per-user mission progress (one row per user/mission/period). Earn tokens & dust.
+// Records a one-time gem reward claimed for completing a set's base checklist.
+// The unique (userId, setKey) prevents a set from paying out gems more than once.
+model SetCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  setKey      String
+  gemsAwarded Int
+  claimedAt   DateTime @default(now())
+
+  @@unique([userId, setKey])
+  @@index([userId])
+}
+
+// Per-user mission progress (one row per user/mission/period). Earn tokens & cases.
 model MissionProgress {
   id           String   @id @default(cuid())
   userId       String
@@ -381,7 +397,6 @@ model MissionProgress {
   target       Int
   claimed      Boolean  @default(false)
   rewardTokens Int      @default(0)
-  rewardDust   Int      @default(0)
   rewardCases  Int      @default(0)
   updatedAt    DateTime @updatedAt
 

@@ -19,12 +19,15 @@ export function RipPage() {
   const products = data?.products ?? [];
   const sel = products.find((p) => p.id === selected) ?? products[0] ?? null;
 
-  const rip = async (pay: 'tokens' | 'dust') => {
+  const costLabel = (p: Product) =>
+    p.gemCost > 0 ? `${num(p.gemCost)} 💎` : `${num(p.entryCost)} tokens${p.caseCost ? ` + ${p.caseCost} case` : ''}`;
+
+  const rip = async () => {
     if (!sel) return;
     setBusy(true);
     setError(null);
     try {
-      const r = await api<RipResult>('/rip', { method: 'POST', body: { productId: sel.id, pay } });
+      const r = await api<RipResult>('/rip', { method: 'POST', body: { productId: sel.id } });
       setUser(r.user);
       setPackName(r.product.name);
       setRevealPackSize(sel.packsPerBox > 1 ? sel.cardsPerPack : r.cards.length);
@@ -36,8 +39,13 @@ export function RipPage() {
     }
   };
 
-  const canTokens = !!sel && !sel.soldOut && (user?.tokens ?? 0) >= sel.entryCost && (user?.cases ?? 0) >= sel.caseCost;
-  const canDust = !!sel && !sel.soldOut && sel.caseCost === 0 && (user?.dust ?? 0) >= sel.entryCost;
+  const isGem = !!sel && sel.gemCost > 0;
+  const canAfford =
+    !!sel &&
+    !sel.soldOut &&
+    (isGem
+      ? (user?.gems ?? 0) >= sel.gemCost
+      : (user?.tokens ?? 0) >= sel.entryCost && (user?.cases ?? 0) >= sel.caseCost);
 
   return (
     <>
@@ -78,9 +86,7 @@ export function RipPage() {
                     {p.description}
                   </div>
                   <div className="between" style={{ marginTop: 8 }}>
-                    <span className="product-cost">
-                      {num(p.entryCost)} tokens{p.caseCost ? ` + ${p.caseCost} case` : ''}
-                    </span>
+                    <span className={`product-cost ${p.gemCost > 0 ? 'gem-text' : ''}`}>{costLabel(p)}</span>
                     <span className="muted mono" style={{ fontSize: 12 }}>
                       {p.packsPerBox > 1 ? `${p.packsPerBox} packs · ${p.cardsPerPack * p.packsPerBox} cards` : `${p.cardsPerPack} cards`}
                     </span>
@@ -138,20 +144,19 @@ export function RipPage() {
                   <span className="product-name" style={{ fontSize: 17 }}>
                     {sel.name}
                   </span>
-                  <span className="product-cost">
-                    {num(sel.entryCost)} tokens{sel.caseCost ? ` + ${sel.caseCost} case` : ''}
-                  </span>
+                  <span className={`product-cost ${isGem ? 'gem-text' : ''}`}>{costLabel(sel)}</span>
                 </div>
                 {error && <div className="error-text" style={{ marginTop: 4 }}>{error}</div>}
               </div>
               <div className="row">
-                {canDust && (
-                  <button className="btn" onClick={() => rip('dust')} disabled={busy}>
-                    Use {num(sel.entryCost)} dust
-                  </button>
-                )}
-                <button className="btn btn-gold btn-lg" onClick={() => rip('tokens')} disabled={busy || !canTokens}>
-                  {busy ? 'Opening…' : sel.soldOut ? 'SOLD OUT' : !canTokens ? 'Not enough' : sel.packsPerBox > 1 ? 'OPEN BOX' : 'RIP PACK'}
+                <button className="btn btn-gold btn-lg" onClick={rip} disabled={busy || !canAfford}>
+                  {busy
+                    ? 'Opening…'
+                    : sel.soldOut
+                      ? 'SOLD OUT'
+                      : !canAfford
+                        ? isGem ? 'Not enough gems' : 'Not enough'
+                        : sel.packsPerBox > 1 ? 'OPEN BOX' : 'RIP PACK'}
                 </button>
               </div>
             </div>

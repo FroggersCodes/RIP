@@ -26,6 +26,7 @@ export function productView(p: Product) {
     year: p.year,
     entryCost: p.entryCost,
     caseCost: p.caseCost,
+    gemCost: p.gemCost,
     tier: p.tier,
     setKey: p.setKey,
     cardsPerPack: p.cardsPerPack,

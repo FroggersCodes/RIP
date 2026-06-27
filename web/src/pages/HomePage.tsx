@@ -31,7 +31,7 @@ export function HomePage() {
     }
   };
   const rewardText = (m: Mission) =>
-    [m.rewardTokens && `${m.rewardTokens} tokens`, m.rewardDust && `${m.rewardDust} dust`, m.rewardCases && `${m.rewardCases} case`]
+    [m.rewardTokens && `${m.rewardTokens} tokens`, m.rewardCases && `${m.rewardCases} case`]
       .filter(Boolean)
       .join(' + ');
   const gotw = useApi(
@@ -172,7 +172,7 @@ export function HomePage() {
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || 'Failed');
       await refresh();
-      setImportMsg('Topped up +1,000,000 tokens, +10,000 cases, +100,000 dust.');
+      setImportMsg('Topped up +1,000,000 tokens, +10,000 cases, +1,000 gems.');
     } catch (e) {
       setImportMsg(`Error: ${e instanceof Error ? e.message : 'failed'}`);
     } finally {
@@ -256,8 +256,8 @@ export function HomePage() {
             <div className="kpi">{num(user?.cases ?? 0)}</div>
           </div>
           <div className="hero-bal">
-            <div className="label">Dust</div>
-            <div className="kpi">{num(user?.dust ?? 0)}</div>
+            <div className="label">Gems</div>
+            <div className="kpi gem-text">{num(user?.gems ?? 0)}</div>
           </div>
         </div>
         <div className="daily-card">
@@ -340,7 +340,7 @@ export function HomePage() {
 
       {missions.data && (
         <div className="panel panel-p" style={{ marginTop: 16 }}>
-          <div className="section-title">Missions · earn tokens &amp; dust</div>
+          <div className="section-title">Missions · earn tokens &amp; cases</div>
           <div style={{ marginTop: 8 }}>
             {missions.data.missions.map((m) => (
               <div className="mission-row" key={m.key}>

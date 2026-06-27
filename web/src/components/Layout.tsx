@@ -8,6 +8,7 @@ const LINKS: [string, string][] = [
   ['/battle', 'Battle'],
   ['/lineup', 'Lineup'],
   ['/collection', 'Collection'],
+  ['/sets', 'Sets'],
   ['/market', 'Market'],
   ['/teams', 'Teams'],
   ['/standings', 'Standings'],
@@ -42,9 +43,9 @@ export function Layout() {
                 <span className="ic" style={{ background: 'var(--blue)' }} />
                 {num(user.cases)}
               </span>
-              <span className="bal" title="Dust">
-                <span className="ic" style={{ background: 'var(--purple)' }} />
-                {num(user.dust)}
+              <span className="bal" title="Gems">
+                <span className="ic gem-ic" style={{ background: 'var(--gem)' }} />
+                {num(user.gems)}
               </span>
               <button className="btn btn-sm btn-ghost" onClick={logout}>
                 {user.username} · Logout

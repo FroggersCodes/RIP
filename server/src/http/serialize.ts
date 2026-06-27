@@ -8,7 +8,7 @@ export function publicUser(u: User) {
     email: u.email,
     tokens: u.tokens,
     cases: u.cases,
-    dust: u.dust,
+    gems: u.gems,
     rating: u.rating,
     dailyStreak: u.dailyStreak,
     lastDailyClaimAt: u.lastDailyClaimAt,
