@@ -39,8 +39,9 @@ export interface OddsRow {
   printRun: number | null;
   refractor: boolean;
   color: string;
-  percent: number;
-  oneIn: number | null;
+  /** Expected copies of this parallel per pack (slot-exact for slotted sets). */
+  perPack: number;
+  oneInPacks: number | null;
 }
 
 export interface Product {
