@@ -109,6 +109,10 @@ export interface SetChecklistTeam {
   abbreviation: string;
   total: number;
   owned: number;
+  gems: number;
+  complete: boolean;
+  claimed: boolean;
+  claimable: boolean;
   players: SetChecklistPlayer[];
 }
 export interface SetProgress {
@@ -116,12 +120,12 @@ export interface SetProgress {
   label: string;
   wordmark: string;
   tierLevel: number;
-  gems: number;
+  gemsPerTeam: number;
   total: number;
   owned: number;
-  complete: boolean;
-  claimed: boolean;
-  claimable: boolean;
+  teamsTotal: number;
+  teamsComplete: number;
+  teamsClaimed: number;
   teams: SetChecklistTeam[];
 }
 export interface SetsResponse {
