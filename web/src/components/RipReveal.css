@@ -515,3 +515,17 @@
     font-size: 26px;
   }
 }
+
+/* Gold Standard cinematic — skip affordance over the box-opening scene. */
+.gs-open-stage .gs-skip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 5;
+}
