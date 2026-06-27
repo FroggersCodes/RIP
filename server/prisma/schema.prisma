@@ -372,17 +372,18 @@ model LeagueState {
   updatedAt     DateTime  @updatedAt
 }
 
-// Records a one-time gem reward claimed for completing a set's base checklist.
-// The unique (userId, setKey) prevents a set from paying out gems more than once.
+// Records a one-time gem reward claimed for completing one team's base checklist
+// within a set. The unique (userId, setKey, teamAbbr) prevents double payouts.
 model SetCompletion {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   setKey      String
+  teamAbbr    String
   gemsAwarded Int
   claimedAt   DateTime @default(now())
 
-  @@unique([userId, setKey])
+  @@unique([userId, setKey, teamAbbr])
   @@index([userId])
 }
 

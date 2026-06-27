@@ -984,11 +984,23 @@
   padding: 8px 10px;
   background: rgba(255, 255, 255, 0.02);
 }
+.set-team.complete {
+  border-color: rgba(34, 211, 238, 0.4);
+}
+.set-team.claimed {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.05);
+}
 .set-team-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text);
 }
 .set-team-abbr {
   font-family: var(--font-display);
@@ -996,10 +1008,31 @@
   font-size: 13px;
   letter-spacing: 0.05em;
 }
+.set-team-bar {
+  display: block;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  margin: 7px 0;
+}
+.set-team-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gem), #67e8f9);
+}
+.set-team-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 24px;
+}
 .set-team-players {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  margin-top: 8px;
 }
 .set-chip {
   display: flex;

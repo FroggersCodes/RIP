@@ -10,11 +10,12 @@ ALTER TABLE "MissionProgress" DROP COLUMN "rewardDust";
 -- AlterTable: products can be priced purely in gems.
 ALTER TABLE "Product" ADD COLUMN     "gemCost" INTEGER NOT NULL DEFAULT 0;
 
--- CreateTable: one row per claimed set-completion gem reward.
+-- CreateTable: one row per claimed team-within-a-set gem reward.
 CREATE TABLE "SetCompletion" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "setKey" TEXT NOT NULL,
+    "teamAbbr" TEXT NOT NULL,
     "gemsAwarded" INTEGER NOT NULL,
     "claimedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -25,7 +26,7 @@ CREATE TABLE "SetCompletion" (
 CREATE INDEX "SetCompletion_userId_idx" ON "SetCompletion"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SetCompletion_userId_setKey_key" ON "SetCompletion"("userId", "setKey");
+CREATE UNIQUE INDEX "SetCompletion_userId_setKey_teamAbbr_key" ON "SetCompletion"("userId", "setKey", "teamAbbr");
 
 -- AddForeignKey
 ALTER TABLE "SetCompletion" ADD CONSTRAINT "SetCompletion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

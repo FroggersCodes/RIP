@@ -326,21 +326,23 @@ export function setOf(key: string | null | undefined): SetDef {
 }
 
 // ---- Set completion (the Collection / "Sets" tracker) ----
-// A set is "completed" by owning the BASE card of every player in that set's
-// theme. Completing one awards gems — the only way to earn the premium currency.
+// Completion is tracked per TEAM within a set: own the BASE card of every player
+// on a team (in that set's theme) to claim that team's small gem reward. Gems are
+// the only way to earn the premium currency, and deliberately hard to accrue.
 // Reliquary (no base cards) and the legacy sets are intentionally not tracked.
 export const TRACKED_SETS: SetKey[] = ['spark', 'momentum', 'artistry', 'gold-standard'];
 
-/** Gems awarded for completing a set's full base checklist. Tunable economy knob. */
-export const SET_COMPLETION_GEMS: Record<string, number> = {
-  spark: 25,
-  momentum: 40,
-  artistry: 60,
-  'gold-standard': 100,
+/** Gems awarded for completing one team's base checklist within a set. Kept small
+ * on purpose — finishing a whole set is a long grind. Tunable economy knob. */
+export const TEAM_SET_GEMS: Record<string, number> = {
+  spark: 2,
+  momentum: 3,
+  artistry: 5,
+  'gold-standard': 8,
 };
 
-export function gemsForSet(setKey: string | null | undefined): number {
-  return SET_COMPLETION_GEMS[setKey ?? ''] ?? 0;
+export function gemsForTeamSet(setKey: string | null | undefined): number {
+  return TEAM_SET_GEMS[setKey ?? ''] ?? 0;
 }
 
 export function isTrackedSet(setKey: string | null | undefined): boolean {

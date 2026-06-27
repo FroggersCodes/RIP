@@ -4,7 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { num } from '../lib/format';
-import type { SetsResponse, SetProgress, User } from '../api/types';
+import type { SetsResponse, SetChecklistTeam, User } from '../api/types';
 
 export function SetsPage() {
   const { setUser } = useAuth();
@@ -16,11 +16,15 @@ export function SetsPage() {
 
   const sets = data?.sets ?? [];
 
-  const claim = async (s: SetProgress) => {
-    setBusy(s.setKey);
+  const claim = async (setKey: string, team: SetChecklistTeam) => {
+    const id = `${setKey}|${team.abbreviation}`;
+    setBusy(id);
     setError(null);
     try {
-      const r = await api<{ gemsAwarded: number; user: User }>(`/cards/sets/${s.setKey}/claim`, { method: 'POST' });
+      const r = await api<{ gemsAwarded: number; user: User }>(
+        `/cards/sets/${setKey}/teams/${team.abbreviation}/claim`,
+        { method: 'POST' },
+      );
       setUser(r.user);
       reload();
     } catch (e) {
@@ -35,9 +39,9 @@ export function SetsPage() {
       <div className="page-head">
         <h1>Sets</h1>
         <p>
-          Track your base checklist for every set. Own the base card of all{' '}
-          {sets[0] ? num(sets[0].total) : ''} players in a set to complete it and claim{' '}
-          <span className="gem-text">💎 gems</span> — the only way to earn the Reliquary's currency.
+          Complete a team's base checklist within a set to claim a small{' '}
+          <span className="gem-text">💎 gem</span> reward. Finishing a whole set is a long grind —
+          gems are how you afford the Reliquary.
         </p>
       </div>
 
@@ -53,29 +57,18 @@ export function SetsPage() {
         <div className="sets-list">
           {sets.map((s) => {
             const pct = s.total > 0 ? (s.owned / s.total) * 100 : 0;
-            const expanded = open === s.setKey;
             return (
-              <div key={s.setKey} className={`panel panel-p set-panel ${s.complete ? 'complete' : ''}`}>
+              <div key={s.setKey} className="panel panel-p set-panel">
                 <div className="set-head">
                   <div>
                     <div className="set-wordmark">{s.label}</div>
                     <div className="muted mono" style={{ fontSize: 12, marginTop: 2 }}>
-                      base set · tier {s.tierLevel}
+                      base set · {num(s.gemsPerTeam)} 💎 per team · {s.teamsClaimed}/{s.teamsTotal} teams claimed
                     </div>
                   </div>
                   <div className="set-reward">
-                    <div className="gem-text mono set-reward-amt">{num(s.gems)} 💎</div>
-                    {s.claimed ? (
-                      <span className="mission-done">✓ claimed</span>
-                    ) : s.claimable ? (
-                      <button className="btn btn-gold" disabled={busy === s.setKey} onClick={() => claim(s)}>
-                        {busy === s.setKey ? 'Claiming…' : 'Claim reward'}
-                      </button>
-                    ) : (
-                      <span className="muted" style={{ fontSize: 12 }}>
-                        {num(s.total - s.owned)} to go
-                      </span>
-                    )}
+                    <div className="gem-text mono set-reward-amt">+{num(s.gemsPerTeam)} 💎</div>
+                    <span className="muted" style={{ fontSize: 12 }}>per team</span>
                   </div>
                 </div>
 
@@ -88,37 +81,52 @@ export function SetsPage() {
                   </span>
                 </div>
 
-                <button className="btn btn-sm btn-ghost" style={{ marginTop: 4 }} onClick={() => setOpen(expanded ? null : s.setKey)}>
-                  {expanded ? 'Hide checklist' : 'Show checklist'}
-                </button>
-
-                {expanded && (
-                  <div className="set-teams">
-                    {s.teams.map((t) => (
-                      <div key={t.abbreviation} className="set-team">
-                        <div className="set-team-head">
+                <div className="set-teams">
+                  {s.teams.map((t) => {
+                    const id = `${s.setKey}|${t.abbreviation}`;
+                    const expanded = open === id;
+                    const tpct = t.total > 0 ? (t.owned / t.total) * 100 : 0;
+                    return (
+                      <div key={t.abbreviation} className={`set-team ${t.complete ? 'complete' : ''} ${t.claimed ? 'claimed' : ''}`}>
+                        <button className="set-team-head" onClick={() => setOpen(expanded ? null : id)}>
                           <span className="set-team-abbr">{t.abbreviation}</span>
                           <span className="muted mono" style={{ fontSize: 11 }}>
                             {t.owned}/{t.total}
                           </span>
-                        </div>
-                        <div className="set-team-players">
-                          {t.players.map((p) => (
-                            <button
-                              key={p.id}
-                              className={`set-chip ${p.owned ? 'owned' : 'missing'}`}
-                              onClick={() => nav(`/players/${p.id}`)}
-                              title={`${p.name} · ${p.position}`}
-                            >
-                              <span className="set-chip-mark">{p.owned ? '✓' : '○'}</span>
-                              <span className="set-chip-name">{p.name}</span>
+                        </button>
+                        <span className="set-team-bar">
+                          <span style={{ width: `${Math.max(3, tpct)}%` }} />
+                        </span>
+                        <div className="set-team-foot">
+                          {t.claimed ? (
+                            <span className="mission-done">✓ claimed</span>
+                          ) : t.claimable ? (
+                            <button className="btn btn-sm btn-gold" disabled={busy === id} onClick={() => claim(s.setKey, t)}>
+                              {busy === id ? '…' : `Claim ${num(t.gems)} 💎`}
                             </button>
-                          ))}
+                          ) : (
+                            <span className="muted" style={{ fontSize: 11 }}>{t.total - t.owned} to go</span>
+                          )}
                         </div>
+                        {expanded && (
+                          <div className="set-team-players">
+                            {t.players.map((p) => (
+                              <button
+                                key={p.id}
+                                className={`set-chip ${p.owned ? 'owned' : 'missing'}`}
+                                onClick={() => nav(`/players/${p.id}`)}
+                                title={`${p.name} · ${p.position}`}
+                              >
+                                <span className="set-chip-mark">{p.owned ? '✓' : '○'}</span>
+                                <span className="set-chip-name">{p.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
