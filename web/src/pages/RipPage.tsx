@@ -22,6 +22,17 @@ export function RipPage() {
   const costLabel = (p: Product) =>
     p.gemCost > 0 ? `${num(p.gemCost)} 💎` : `${num(p.entryCost)} tokens${p.caseCost ? ` + ${p.caseCost} case` : ''}`;
 
+  // Average pull rate per pack. Commons (>=1 expected per pack) show a count;
+  // rarer cards show "1 : N packs".
+  const packRate = (percentPerCard: number, cardsPerPack: number): string => {
+    const perPack = (percentPerCard / 100) * cardsPerPack;
+    if (perPack <= 0) return '—';
+    if (perPack >= 1) return `${perPack >= 1.95 ? Math.round(perPack) : perPack.toFixed(1)}/pack`;
+    const oneIn = Math.round(1 / perPack);
+    if (oneIn <= 1) return '~1/pack';
+    return `1:${oneIn.toLocaleString()}`;
+  };
+
   const rip = async () => {
     if (!sel) return;
     setBusy(true);
@@ -71,7 +82,6 @@ export function RipPage() {
         <>
           <div className="product-grid">
             {products.map((p) => {
-              const maxPct = Math.max(...p.odds.map((o) => o.percent));
               return (
                 <div
                   key={p.id}
@@ -115,19 +125,7 @@ export function RipPage() {
                         <span className="odds-name" style={{ color: o.parallel === 'BLACK' ? '#cfd6e2' : o.color }}>
                           {o.displayName.replace(/\s*1\/1/, '')}
                         </span>
-                        <span className="odds-bar">
-                          <span
-                            style={{
-                              width: `${Math.max(3, (o.percent / maxPct) * 100)}%`,
-                              background: o.parallel === 'BLACK' ? '#cfd6e2' : o.color,
-                            }}
-                          />
-                        </span>
-                        <span className="odds-pct">
-                          {o.percent < 0.5 && o.oneIn
-                            ? `1:${o.oneIn.toLocaleString()}`
-                            : `${o.percent < 1 ? o.percent.toFixed(2) : o.percent.toFixed(1)}%`}
-                        </span>
+                        <span className="odds-pct">{packRate(o.percent, p.cardsPerPack)}</span>
                       </div>
                     ))}
                   </div>

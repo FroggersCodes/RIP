@@ -164,7 +164,7 @@
 }
 .odds-row {
   display: grid;
-  grid-template-columns: 90px 1fr 54px;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
   font-size: 12px;
@@ -173,21 +173,11 @@
   font-family: var(--font-mono);
   font-weight: 600;
 }
-.odds-bar {
-  height: 6px;
-  border-radius: 4px;
-  background: var(--surface-3);
-  overflow: hidden;
-}
-.odds-bar > span {
-  display: block;
-  height: 100%;
-  border-radius: 4px;
-}
 .odds-pct {
   text-align: right;
   font-family: var(--font-mono);
   color: var(--muted);
+  white-space: nowrap;
 }
 /* limited print run: boxes left / total */
 .box-supply {
