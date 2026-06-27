@@ -3,7 +3,7 @@ import { AppError } from '../errors';
 import { grant } from '../economy/wallet';
 import type { Tx } from '../prisma';
 
-export type MissionEvent = 'rip' | 'battle' | 'battle_win' | 'breakdown' | 'equip' | 'daily';
+export type MissionEvent = 'rip' | 'battle' | 'battle_win' | 'equip' | 'daily';
 
 export interface MissionDef {
   key: string;
@@ -12,21 +12,19 @@ export interface MissionDef {
   event: MissionEvent;
   target: number;
   rewardTokens?: number;
-  rewardDust?: number;
   rewardCases?: number;
 }
 
 export const MISSIONS: MissionDef[] = [
   // Daily — reset every UTC day; the recurring earn loop.
-  { key: 'daily_claim', label: 'Claim your daily pack', period: 'DAILY', event: 'daily', target: 1, rewardTokens: 25, rewardDust: 5 },
+  { key: 'daily_claim', label: 'Claim your daily pack', period: 'DAILY', event: 'daily', target: 1, rewardTokens: 30 },
   { key: 'daily_rip', label: 'Rip 3 packs', period: 'DAILY', event: 'rip', target: 3, rewardTokens: 75 },
   { key: 'daily_battle', label: 'Play a head-to-head', period: 'DAILY', event: 'battle', target: 1, rewardTokens: 50 },
-  { key: 'daily_breakdown', label: 'Break down 5 cards', period: 'DAILY', event: 'breakdown', target: 5, rewardDust: 40 },
   { key: 'daily_lineup', label: 'Set your lineup', period: 'DAILY', event: 'equip', target: 1, rewardTokens: 30 },
   // One-time onboarding.
   { key: 'onboard_rip', label: 'Open your first pack', period: 'ONCE', event: 'rip', target: 1, rewardTokens: 150 },
   { key: 'onboard_win', label: 'Win your first battle', period: 'ONCE', event: 'battle_win', target: 1, rewardCases: 1 },
-  { key: 'onboard_lineup', label: 'Equip your first card', period: 'ONCE', event: 'equip', target: 1, rewardDust: 50 },
+  { key: 'onboard_lineup', label: 'Equip your first card', period: 'ONCE', event: 'equip', target: 1, rewardTokens: 75 },
 ];
 
 function periodKeyFor(period: MissionDef['period']): string {
@@ -46,7 +44,6 @@ export async function bumpMission(userId: string, event: MissionEvent, amount = 
         progress: Math.min(amount, m.target),
         target: m.target,
         rewardTokens: m.rewardTokens ?? 0,
-        rewardDust: m.rewardDust ?? 0,
         rewardCases: m.rewardCases ?? 0,
       },
       update: { progress: { increment: amount } },
@@ -67,7 +64,6 @@ export interface MissionView {
   claimed: boolean;
   claimable: boolean;
   rewardTokens: number;
-  rewardDust: number;
   rewardCases: number;
 }
 
@@ -88,7 +84,6 @@ export async function listMissions(userId: string): Promise<MissionView[]> {
       claimed,
       claimable: progress >= m.target && !claimed,
       rewardTokens: m.rewardTokens ?? 0,
-      rewardDust: m.rewardDust ?? 0,
       rewardCases: m.rewardCases ?? 0,
     };
   });
@@ -105,7 +100,7 @@ export async function claimMission(userId: string, key: string): Promise<Mission
     if (!row || row.progress < def.target) throw new AppError(400, 'Mission not complete yet');
     if (row.claimed) throw new AppError(400, 'Reward already claimed');
     await tx.missionProgress.update({ where: { id: row.id }, data: { claimed: true } });
-    await grant(tx, userId, { tokens: def.rewardTokens ?? 0, cases: def.rewardCases ?? 0, dust: def.rewardDust ?? 0 });
+    await grant(tx, userId, { tokens: def.rewardTokens ?? 0, cases: def.rewardCases ?? 0 });
     return def;
   });
 }

@@ -907,3 +907,132 @@
     padding-top: 0;
   }
 }
+
+/* ---------- Gems + Sets tracker ---------- */
+.gem-text {
+  color: var(--gem);
+  font-weight: 700;
+}
+.gem-ic {
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+}
+
+.sets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.set-panel.complete {
+  border-color: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25) inset;
+}
+.set-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.set-wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+}
+.set-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.set-reward-amt {
+  font-size: 16px;
+}
+.set-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.set-progress-bar {
+  flex: 1;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+.set-progress-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gem), #67e8f9);
+}
+.set-progress-label {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 84px;
+  text-align: right;
+}
+.set-teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.set-team {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.set-team-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.set-team-abbr {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+.set-team-players {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.set-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.set-chip:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.set-chip.owned {
+  color: var(--text);
+}
+.set-chip.owned .set-chip-mark {
+  color: var(--gem);
+}
+.set-chip.missing .set-chip-mark {
+  color: var(--muted-2);
+}
+.set-chip-mark {
+  font-weight: 700;
+  width: 12px;
+}
+.set-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

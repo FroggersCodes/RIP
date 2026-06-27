@@ -22,7 +22,7 @@ router.post(
     const uid = userId(req);
     const def = await claimMission(uid, req.params.key);
     const user = await prisma.user.findUniqueOrThrow({ where: { id: uid } });
-    res.json({ claimed: def.key, reward: { tokens: def.rewardTokens ?? 0, dust: def.rewardDust ?? 0, cases: def.rewardCases ?? 0 }, user: publicUser(user) });
+    res.json({ claimed: def.key, reward: { tokens: def.rewardTokens ?? 0, cases: def.rewardCases ?? 0 }, user: publicUser(user) });
   }),
 );
 

@@ -66,9 +66,9 @@ router.post(
   asyncHandler(async (_req, res) => {
     const r = await prisma.user.updateMany({
       where: { isBot: false },
-      data: { tokens: { increment: 1_000_000 }, cases: { increment: 10_000 }, dust: { increment: 100_000 } },
+      data: { tokens: { increment: 1_000_000 }, cases: { increment: 10_000 }, gems: { increment: 1_000 } },
     });
-    res.json({ granted: r.count, tokens: 1_000_000, cases: 10_000, dust: 100_000 });
+    res.json({ granted: r.count, tokens: 1_000_000, cases: 10_000, gems: 1_000 });
   }),
 );
 

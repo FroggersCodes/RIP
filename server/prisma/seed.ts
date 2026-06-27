@@ -32,7 +32,7 @@ export async function seed() {
     data: { username: '__bot__', passwordHash: botHash, isBot: true, tokens: 1_000_000, cases: 0, rating: 1000 },
   });
   await prisma.user.create({
-    data: { username: 'demo', email: 'demo@rip.gg', passwordHash: demoHash, tokens: 5000, cases: 5, dust: 0, rating: 1000 },
+    data: { username: 'demo', email: 'demo@rip.gg', passwordHash: demoHash, tokens: 5000, cases: 5, gems: 200, rating: 1000 },
   });
 
   console.log('Creating teams...');
@@ -131,10 +131,10 @@ export async function seed() {
         description: 'Matte-black, embossed gold foil. 8-card premium box. Costs a case. All cards numbered, ≥2 hits guaranteed.',
       },
       {
-        name: 'Reliquary', year: 2026, entryCost: 100000, caseCost: 100, tier: 'reliquary',
+        name: 'Reliquary', year: 2026, entryCost: 0, caseCost: 0, gemCost: 50, tier: 'reliquary',
         setKey: 'reliquary', cardsPerPack: 10, minHits: 4, guaranteeNumbered: true, topPlayerBias: 0.75, pullRates: RELIQUARY,
         totalBoxes: reliquaryBoxes,
-        description: `Engraved-gold reliquary ultra-premium. Fixed 10-card pack: base, base rookie, 3 numbered, 2 autos, 2 patches, an RPA. Costs 100 cases. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
+        description: `Engraved-gold reliquary ultra-premium. Fixed 10-card pack: base, base rookie, 3 numbered, 2 autos, 2 patches, an RPA. Gem-only — costs 50 💎, earned by completing sets. Limited to ${reliquaryBoxes.toLocaleString()} boxes — once they're gone, they're gone.`,
       },
     ],
   });

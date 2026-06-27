@@ -6,7 +6,7 @@ export interface User {
   email: string | null;
   tokens: number;
   cases: number;
-  dust: number;
+  gems: number;
   rating: number;
   dailyStreak: number;
   lastDailyClaimAt: string | null;
@@ -49,6 +49,7 @@ export interface Product {
   year: number;
   entryCost: number;
   caseCost: number;
+  gemCost: number;
   tier: string;
   setKey: string;
   cardsPerPack: number;
@@ -94,9 +95,37 @@ export interface Collection {
     numbered: number;
     base: number;
     totalValue: number;
-    breakdownable: number;
-    breakdownDust: number;
   };
+}
+
+export interface SetChecklistPlayer {
+  id: string;
+  name: string;
+  position: Position;
+  owned: boolean;
+}
+export interface SetChecklistTeam {
+  name: string;
+  abbreviation: string;
+  total: number;
+  owned: number;
+  players: SetChecklistPlayer[];
+}
+export interface SetProgress {
+  setKey: string;
+  label: string;
+  wordmark: string;
+  tierLevel: number;
+  gems: number;
+  total: number;
+  owned: number;
+  complete: boolean;
+  claimed: boolean;
+  claimable: boolean;
+  teams: SetChecklistTeam[];
+}
+export interface SetsResponse {
+  sets: SetProgress[];
 }
 
 export interface LineupSlotView {
@@ -276,7 +305,6 @@ export interface Mission {
   claimed: boolean;
   claimable: boolean;
   rewardTokens: number;
-  rewardDust: number;
   rewardCases: number;
 }
 

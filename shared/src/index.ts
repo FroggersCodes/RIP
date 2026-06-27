@@ -325,6 +325,28 @@ export function setOf(key: string | null | undefined): SetDef {
   return SETS[key ?? 'spark'] ?? SETS.spark!;
 }
 
+// ---- Set completion (the Collection / "Sets" tracker) ----
+// A set is "completed" by owning the BASE card of every player in that set's
+// theme. Completing one awards gems — the only way to earn the premium currency.
+// Reliquary (no base cards) and the legacy sets are intentionally not tracked.
+export const TRACKED_SETS: SetKey[] = ['spark', 'momentum', 'artistry', 'gold-standard'];
+
+/** Gems awarded for completing a set's full base checklist. Tunable economy knob. */
+export const SET_COMPLETION_GEMS: Record<string, number> = {
+  spark: 25,
+  momentum: 40,
+  artistry: 60,
+  'gold-standard': 100,
+};
+
+export function gemsForSet(setKey: string | null | undefined): number {
+  return SET_COMPLETION_GEMS[setKey ?? ''] ?? 0;
+}
+
+export function isTrackedSet(setKey: string | null | undefined): boolean {
+  return TRACKED_SETS.includes((setKey ?? '') as SetKey);
+}
+
 export const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];
 
 export const LINEUP_ROLES: LineupRoleName[] = ['QB', 'WR1', 'WR2', 'RB', 'TE', 'FLEX'];
@@ -393,12 +415,6 @@ export function normalizeOdds(weights: Record<string, number>): Record<string, n
   const out: Record<string, number> = {};
   for (const [k, v] of Object.entries(weights)) out[k] = v / total;
   return out;
-}
-
-// Dust returned when a card is broken down — scales with its market value, so
-// breaking down a hit pays far more than base filler. Used by server and client.
-export function dustForBreakdown(marketValue: number): number {
-  return Math.max(3, Math.round(marketValue * 0.3));
 }
 
 // Competitive rank ladder derived from rating.

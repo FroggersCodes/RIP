@@ -13,22 +13,22 @@ export async function spendTokensAndCases(tx: Tx, userId: string, tokens: number
   if (n === 0) throw new InsufficientFundsError('Not enough tokens or cases');
 }
 
-export async function spendDust(tx: Tx, userId: string, dust: number): Promise<void> {
+export async function spendGems(tx: Tx, userId: string, gems: number): Promise<void> {
   const n = await tx.$executeRaw`
-    UPDATE "User" SET dust = dust - ${dust}
-    WHERE id = ${userId} AND dust >= ${dust}`;
-  if (n === 0) throw new InsufficientFundsError('Not enough dust');
+    UPDATE "User" SET gems = gems - ${gems}
+    WHERE id = ${userId} AND gems >= ${gems}`;
+  if (n === 0) throw new InsufficientFundsError('Not enough gems');
 }
 
 export async function grant(
   tx: Tx,
   userId: string,
-  amounts: { tokens?: number; cases?: number; dust?: number },
+  amounts: { tokens?: number; cases?: number; gems?: number },
 ): Promise<void> {
   await tx.$executeRaw`
     UPDATE "User"
     SET tokens = tokens + ${amounts.tokens ?? 0},
         cases = cases + ${amounts.cases ?? 0},
-        dust = dust + ${amounts.dust ?? 0}
+        gems = gems + ${amounts.gems ?? 0}
     WHERE id = ${userId}`;
 }
