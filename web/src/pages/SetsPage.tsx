@@ -9,7 +9,7 @@ import type { SetsResponse, SetChecklistTeam, User } from '../api/types';
 export function SetsPage() {
   const { setUser } = useAuth();
   const nav = useNavigate();
-  const { data, loading, reload } = useApi(() => api<SetsResponse>('/cards/sets'), []);
+  const { data, loading, error: loadError, reload } = useApi(() => api<SetsResponse>('/cards/sets'), []);
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +50,13 @@ export function SetsPage() {
       {loading ? (
         <div className="center" style={{ padding: 60 }}>
           <div className="spin" />
+        </div>
+      ) : loadError ? (
+        <div className="empty">
+          <div className="error-text" style={{ marginBottom: 12 }}>Couldn’t load sets — {loadError}</div>
+          <button className="btn" onClick={() => reload()}>
+            Retry
+          </button>
         </div>
       ) : sets.length === 0 ? (
         <div className="empty">No trackable sets yet.</div>
