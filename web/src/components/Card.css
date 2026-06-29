@@ -574,10 +574,12 @@
   color: rgba(230, 197, 116, 0.7);
 }
 
-/* ---------- RELIQUARY (tier 5) — engraved-gold cathedral reliquary ----------
-   The pinnacle set: an ornate animated gold frame around an arched photo niche,
-   over an oxblood damask interior, finished with a serif nameplate, a gold
-   RELIQUARY wordmark and a foil serial. */
+/* ---------- RELIQUARY (tier 5) — cathedral shrine ----------
+   Redesigned to match the shrine sketch: a segmented stone arch crowns the
+   niche, a script "Reliquary" wordmark sits at the keystone, slender curved
+   pillars frame the full player, and a curved nameplate banner caps the foot.
+   The architecture is an SVG overlay (.reliquary-frame, drawn in Card.tsx);
+   this block sets the gold metal frame, the oxblood ground and the nameplate. */
 .set-reliquary .card-frame {
   background: linear-gradient(135deg, #6e4a14 0%, #e7c878 16%, #fff4cf 30%, #d8af52 46%, #8a6320 62%, #f0d488 80%, #b88a34 100%);
   background-size: 220% 220%;
@@ -610,16 +612,6 @@
     repeating-conic-gradient(from 0deg at 84px 84px, rgba(231, 200, 120, 0.3) 0deg 5deg, transparent 5deg 22deg);
   background-size: 56px 56px, 112px 112px;
 }
-/* thin gold frame line just inside the metal border */
-.set-reliquary .card-set-bg::after {
-  content: '';
-  position: absolute;
-  inset: 7px;
-  border: 1px solid rgba(199, 154, 62, 0.5);
-  border-radius: 8px;
-  box-shadow: inset 0 0 0 2px rgba(20, 8, 9, 0.35);
-  pointer-events: none;
-}
 /* gold reliquary sheen sweeping across the card */
 .set-reliquary .card-set-fx {
   opacity: 0.55;
@@ -629,41 +621,53 @@
   animation: sheen-move 6.5s linear infinite;
 }
 
-/* ---- front: photo set into an arched gold niche ---- */
-.set-reliquary .card-face-front .card-photo {
-  inset: auto;
-  top: 9%;
-  left: 9%;
-  right: 9%;
-  height: 51%;
-  border-radius: 50% 50% 8px 8px / 44% 44% 6px 6px;
-  overflow: hidden;
-  box-shadow:
-    0 0 0 3px #0b0708,
-    0 0 0 5px rgba(199, 154, 62, 0.85),
-    0 10px 22px rgba(0, 0, 0, 0.6);
-}
-/* RELIQUARY wordmark crowning the niche (front only) */
-.set-reliquary .card-face-front .card-inner::before {
-  content: 'RELIQUARY';
+/* ---- the SVG shrine architecture overlay ---- */
+.reliquary-frame {
   position: absolute;
-  z-index: 5;
-  top: 3.4%;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: var(--font-display);
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+.reliquary-frame .rlq-pillar {
+  stroke: rgba(28, 12, 8, 0.7);
+  stroke-width: 0.5;
+}
+.reliquary-frame .rlq-wordmark {
+  font-family: var(--font-serif);
+  font-style: italic;
   font-weight: 700;
-  font-size: 9px;
-  letter-spacing: 0.34em;
-  color: #e7c878;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
-/* ---- serif nameplate ---- */
+/* the lone patch sits to the right of the niche, like the sketch */
+.set-reliquary .card-patch {
+  left: auto;
+  right: 13%;
+  transform: none;
+  top: 41%;
+}
+/* RPA patch drops into the niche so it clears the arch wordmark and pillars */
+.set-reliquary .card-rpa-patch {
+  top: 39%;
+  right: 15%;
+}
+
+/* ---- front: full-bleed player in the niche; scrim grounds the nameplate ---- */
+.set-reliquary .card-face-front .card-photo-scrim {
+  background: linear-gradient(180deg, rgba(8, 5, 6, 0.5) 0%, transparent 26%, transparent 50%, rgba(10, 5, 6, 0.92) 84%);
+}
+
+/* ---- serif nameplate over the banner ---- */
+.set-reliquary .card-face-front .card-plate {
+  z-index: 4;
+}
 .set-reliquary .card-plate {
   text-align: center;
-  padding: 10px 12px 12px;
+  padding: 9px 12px 11px;
 }
 .set-reliquary .card-name {
   font-family: var(--font-serif);
@@ -672,6 +676,7 @@
   line-height: 0.96;
   letter-spacing: 0.01em;
   color: #f6edd8;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 .card-sm.set-reliquary .card-name {
   font-size: 18px;
@@ -703,6 +708,10 @@
 .set-reliquary .card-plate-row {
   justify-content: center;
   gap: 10px;
+}
+/* the front shows just the player + team, like the sketch — serial lives on back */
+.set-reliquary .card-face-front .card-plate-row {
+  display: none;
 }
 .set-reliquary .card-serial {
   font-family: var(--font-display);
