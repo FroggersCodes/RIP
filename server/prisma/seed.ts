@@ -85,6 +85,8 @@ export async function seed() {
     ART_RAINBOW_AUTO: 28, ART_PURPLE_ICE_AUTO: 20, ART_GOLD_AUTO: 12, ART_WHITE_AUTO: 5, ART_BLACK_AUTO: 1,
     // rookie patch autos
     ART_RPA_50: 30, ART_RPA_35: 20, ART_RPA_25: 14, ART_RPA_10: 8, ART_RPA_3: 3, ART_RPA_1: 1,
+    // Canvas Kings — marquee case-hit insert (~1:24 packs)
+    ART_CANVAS_KINGS: 76,
   };
   // Tier 4: Gold Standard — high-end with its own checklist + fixed 8-slot pack
   // (base x2, RC /399, numbered x2, auto, patch, random). Weights bias the roll

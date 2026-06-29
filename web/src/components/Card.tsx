@@ -64,12 +64,16 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
     white: 'finish-white',
     black: 'finish-black',
     ofl: 'finish-ofl',
+    'canvas-kings': 'finish-canvas-kings',
   };
+  const isCanvasKings = def.finish === 'canvas-kings';
   const tier = isRpa
     ? 'tier-rpa'
-    : card.refractor
-      ? 'refractor'
-      : FINISH_TIER[def.finish ?? 'plain'] ?? 'tier-plain';
+    : isCanvasKings
+      ? 'finish-canvas-kings'
+      : card.refractor
+        ? 'refractor'
+        : FINISH_TIER[def.finish ?? 'plain'] ?? 'tier-plain';
 
   const set = setOf(card.setKey);
   const isArtistry = set.key === 'artistry';
@@ -85,6 +89,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
   const teamPrimary = card.player.teamPrimaryColor ?? '#1a2a4a';
   const teamSecondary = card.player.teamSecondaryColor ?? '#0c1422';
   const hasPatch = !!def.patched;
+  const ckGradId = `ck-rb-${card.player.id}`;
 
   const handleClick = () => {
     if (onClick) {
@@ -128,11 +133,62 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
         {/* ── FRONT ── clean: photo + name + position + serial + hit type badges */}
         <div className="card-face card-face-front">
           <div className="card-frame">
+            {isCanvasKings ? (
+              /* Canvas Kings — marquee case-hit insert: graph-paper canvas, the
+                 player set into a dashed cut-out window, a rainbow paint swash, and
+                 a black plate with the gold-foil wordmark. */
+              <div className="card-inner ck-inner">
+                <div className="ck-bg" />
+                <div className="ck-top">Artistry 2026 · Case Hit</div>
+                <div className="ck-window">
+                  <PlayerPortrait player={card.player} fill />
+                </div>
+                <svg className="ck-swash" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id={ckGradId} x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#7b2ff7" />
+                      <stop offset="18%" stopColor="#2f6df7" />
+                      <stop offset="36%" stopColor="#23c1c9" />
+                      <stop offset="52%" stopColor="#3fbf54" />
+                      <stop offset="68%" stopColor="#f2c41d" />
+                      <stop offset="84%" stopColor="#f2811d" />
+                      <stop offset="100%" stopColor="#e23b3b" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M-10 150 C 80 90, 150 200, 230 120 S 360 70, 420 110"
+                    fill="none"
+                    stroke={`url(#${ckGradId})`}
+                    strokeWidth="46"
+                    strokeLinecap="round"
+                    opacity="0.92"
+                  />
+                  <path
+                    d="M-10 150 C 80 90, 150 200, 230 120 S 360 70, 420 110"
+                    fill="none"
+                    stroke={`url(#${ckGradId})`}
+                    strokeWidth="13"
+                    strokeLinecap="round"
+                    opacity="0.6"
+                    transform="translate(0,-24)"
+                  />
+                </svg>
+                <div className="ck-plate">
+                  <div className="ck-wordmark">Canvas Kings</div>
+                  <div className="ck-player">
+                    <span className="ck-name">{card.player.name}</span>
+                    <span className="ck-pos">{card.player.position} · {card.player.teamAbbr}</span>
+                  </div>
+                </div>
+                <div className="sheen" />
+              </div>
+            ) : (
             <div className="card-inner">
               <div className="card-set-bg" />
               <div className="card-photo">
                 <PlayerPortrait player={card.player} fill />
               </div>
+              {isArtistry && <div className="card-art-halftone" />}
               {isArtistry && <div className="card-art-wave" />}
               <div className="card-photo-scrim" />
               <div className="card-set-fx" />
@@ -174,11 +230,25 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               )}
 
               <div className="card-head">
-                <div style={{ display: 'flex', gap: 4 }}>
-                  {card.player.isRookie && <span className="card-rc-badge">RC</span>}
-                </div>
+                {isArtistry ? (
+                  <>
+                    <span className="card-art-brand">
+                      Artistry<span className="card-art-year">2026 · Football</span>
+                    </span>
+                    {card.serial != null ? (
+                      <span className="card-art-serial">{card.serial} / {card.printRun}</span>
+                    ) : (
+                      card.player.isRookie && <span className="card-rc-badge">RC</span>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    {card.player.isRookie && <span className="card-rc-badge">RC</span>}
+                  </div>
+                )}
               </div>
               <div className="card-plate">
+                {isArtistry && <span className="card-art-spotlight" />}
                 <div className="card-name">{card.player.name}</div>
                 <div className="card-sub">{card.player.position} · {card.player.teamAbbr}</div>
                 <div className="card-plate-row">
@@ -188,6 +258,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 

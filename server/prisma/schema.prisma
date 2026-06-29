@@ -55,6 +55,8 @@ enum Parallel {
   ART_RPA_10
   ART_RPA_3
   ART_RPA_1
+  // Artistry Canvas Kings insert (marquee case hit)
+  ART_CANVAS_KINGS
   // Reliquary — base rainbow
   RLQ_RC
   RLQ_GREEN

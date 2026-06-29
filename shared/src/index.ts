@@ -42,6 +42,8 @@ export type ParallelName =
   | 'ART_RPA_10'
   | 'ART_RPA_3'
   | 'ART_RPA_1'
+  // Artistry "Canvas Kings" — marquee case-hit insert (unnumbered, ~1:24)
+  | 'ART_CANVAS_KINGS'
   // Reliquary — its own four-tier checklist (base / patch / auto / RPA rainbows)
   // Base rainbow
   | 'RLQ_RC'
@@ -184,6 +186,13 @@ export const PARALLELS: ParallelDef[] = [
   { name: 'ART_RPA_10', displayName: 'RPA /10', printRun: 10, valueMultiplier: 180, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#f5b53d' },
   { name: 'ART_RPA_3', displayName: 'RPA /3', printRun: 3, valueMultiplier: 400, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#eef2f8' },
   { name: 'ART_RPA_1', displayName: 'RPA Team Patch 1/1', printRun: 1, valueMultiplier: 1000, refractor: false, signed: true, patched: true, rpa: true, hit: true, finish: 'rpa', group: 'artistry', color: '#e0b85a' },
+
+  // ---- Artistry: Canvas Kings (marquee case-hit insert) ----
+  // Unnumbered insert that falls ~1:24 packs. Listed last in the artistry group so
+  // it sits at the rare end of the fallback order: an unlimited tier here can never
+  // intercept a sold-out parallel's walk down toward Base (that walk only moves
+  // toward more-common tiers). Its own roll always allocates (printRun null).
+  { name: 'ART_CANVAS_KINGS', displayName: 'Canvas Kings', printRun: null, valueMultiplier: 18, refractor: false, hit: true, finish: 'canvas-kings', group: 'artistry', color: '#e6c06a' },
 
   // ---- Reliquary: base rainbow ----
   { name: 'RLQ_RC', displayName: 'Base RC /99', printRun: 99, valueMultiplier: 2, refractor: false, rookie: true, finish: 'plain', group: 'reliquary', color: '#9aa3b2' },
