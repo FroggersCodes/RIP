@@ -48,6 +48,121 @@ function PatchSwatch({ primary, secondary }: { primary: string; secondary: strin
   );
 }
 
+/**
+ * Reliquary shrine frame — the cathedral architecture from the redesign sketch:
+ * a segmented stone arch crowning the niche, a script "Reliquary" wordmark at the
+ * keystone, slender curved pillars framing the full player, and a curved
+ * nameplate banner at the foot. Drawn as a crisp SVG overlay so the voussoirs and
+ * sweeping curves stay sharp at every card size. The card-inner is exactly 5:7,
+ * matching this 100×140 viewBox, so it fills without distortion.
+ */
+function ReliquaryFrame({ idBase }: { idBase: string }) {
+  const goldId = `rlq-gold-${idBase}`;
+  const stoneId = `rlq-stone-${idBase}`;
+  const bannerId = `rlq-banner-${idBase}`;
+
+  // Segmented arch: voussoir blocks arrayed along an elliptical band, apex at
+  // top-centre and springing down to the two top corners.
+  const cx = 50, cy = 40;
+  const aoX = 47, aoY = 34;     // outer arch radii
+  const aiX = 37.5, aiY = 25;   // inner arch radii
+  const segs = 13;
+  const phiMax = (80 * Math.PI) / 180;
+  const at = (rx: number, ry: number, phi: number): [number, number] => [
+    cx + rx * Math.sin(phi),
+    cy - ry * Math.cos(phi),
+  ];
+  const voussoirs: string[] = [];
+  const dividers: [number, number, number, number][] = [];
+  for (let i = 0; i <= segs; i++) {
+    const phi = -phiMax + 2 * phiMax * (i / segs);
+    const [ox, oy] = at(aoX, aoY, phi);
+    const [ix, iy] = at(aiX, aiY, phi);
+    dividers.push([ix, iy, ox, oy]);
+    if (i < segs) {
+      const phi1 = -phiMax + 2 * phiMax * ((i + 1) / segs);
+      const [ox1, oy1] = at(aoX, aoY, phi1);
+      const [ix1, iy1] = at(aiX, aiY, phi1);
+      voussoirs.push(`${ox},${oy} ${ox1},${oy1} ${ix1},${iy1} ${ix},${iy}`);
+    }
+  }
+
+  return (
+    <svg className="reliquary-frame" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={goldId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#8a6320" />
+          <stop offset="22%" stopColor="#f3dd97" />
+          <stop offset="48%" stopColor="#fff6d6" />
+          <stop offset="74%" stopColor="#d8af52" />
+          <stop offset="100%" stopColor="#7d5a1e" />
+        </linearGradient>
+        <linearGradient id={stoneId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff4cf" />
+          <stop offset="55%" stopColor="#d8af52" />
+          <stop offset="100%" stopColor="#8a6320" />
+        </linearGradient>
+        <linearGradient id={bannerId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(40,17,19,0.2)" />
+          <stop offset="40%" stopColor="rgba(26,12,14,0.92)" />
+          <stop offset="100%" stopColor="rgba(15,8,9,0.98)" />
+        </linearGradient>
+      </defs>
+
+      {/* curved side pillars framing the niche */}
+      <path
+        className="rlq-pillar"
+        d="M3.8,34 L5,114 L11,114 C13.5,86 13.8,58 13.2,35.6 Z"
+        fill={`url(#${goldId})`}
+      />
+      <path
+        className="rlq-pillar"
+        d="M96.2,34 L95,114 L89,114 C86.5,86 86.2,58 86.8,35.6 Z"
+        fill={`url(#${goldId})`}
+      />
+
+      {/* segmented stone arch */}
+      {voussoirs.map((pts, i) => (
+        <polygon
+          key={i}
+          points={pts}
+          fill={`url(#${stoneId})`}
+          stroke="rgba(28,12,8,0.85)"
+          strokeWidth="0.5"
+        />
+      ))}
+      {dividers.map(([x1, y1, x2, y2], i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(28,12,8,0.7)" strokeWidth="0.5" />
+      ))}
+      {/* springing line tying the arch to the pillars */}
+      <line x1="13.2" y1="35.6" x2="86.8" y2="35.6" stroke={`url(#${goldId})`} strokeWidth="1.4" />
+
+      {/* curved nameplate banner */}
+      <path d="M2,140 L2,115 C20,108 80,108 98,115 L98,140 Z" fill={`url(#${bannerId})`} />
+      <path
+        d="M2,115 C20,108 80,108 98,115"
+        fill="none"
+        stroke={`url(#${goldId})`}
+        strokeWidth="1.6"
+      />
+
+      {/* script wordmark crowning the niche */}
+      <text
+        className="rlq-wordmark"
+        x="50"
+        y="25.5"
+        textAnchor="middle"
+        fill={`url(#${stoneId})`}
+        stroke="rgba(10,5,6,0.65)"
+        strokeWidth="0.5"
+        paintOrder="stroke"
+      >
+        Reliquary
+      </text>
+    </svg>
+  );
+}
+
 export function Card({ card, size = 'md', faded, onClick }: Props) {
   const [flipped, setFlipped] = useState(false);
 
@@ -77,6 +192,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
 
   const set = setOf(card.setKey);
   const isArtistry = set.key === 'artistry';
+  const isReliquary = set.key === 'reliquary';
   const shortName = def.displayName
     .replace(/\s*1\/1.*$/, '')
     .replace(/\s*\/\d.*$/, '')
@@ -193,6 +309,7 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               <div className="card-photo-scrim" />
               <div className="card-set-fx" />
               <div className="sheen" />
+              {isReliquary && <ReliquaryFrame idBase={card.player.id} />}
               {isOfl && (
                 <div className="card-ofl-emblem">
                   <img src="/ofl-logo.jpeg" alt="OFL" />
