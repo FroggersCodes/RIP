@@ -1042,3 +1042,265 @@
 .card-sm .card-ofl-emblem img {
   width: 52%;
 }
+
+/* ============================================================
+   ARTISTRY — gallery redesign (2026)
+   Gold "gallery" frame, a vivid two-tone pop field driven by the parallel
+   --accent, halftone texture, the player set into a gilt window, a foil
+   "Artistry" wordmark, a gold serial pill and a spotlit nameplate.
+   ============================================================ */
+.set-artistry .card-frame {
+  border-radius: 16px;
+  padding: 5px;
+  background: linear-gradient(150deg, #e7cd83, #b1832f 26%, #f6e6ac 50%, #9a7330 72%, #e3c074);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), var(--shadow-card);
+}
+.set-artistry .card-inner {
+  border-radius: 11px;
+  background: #160f0a;
+}
+/* two-tone pop field — accent up top sweeping into a magenta→violet base */
+.set-artistry .card-set-bg {
+  background:
+    radial-gradient(78% 55% at 80% 16%, color-mix(in srgb, var(--accent) 50%, #ff96b6) 0%, transparent 62%),
+    radial-gradient(72% 58% at 22% 104%, color-mix(in srgb, var(--accent) 60%, #5a23d4) 0%, transparent 60%),
+    linear-gradient(158deg,
+      color-mix(in srgb, var(--accent) 42%, #ff9e74) 0%,
+      color-mix(in srgb, var(--accent) 60%, #ec47a0) 46%,
+      color-mix(in srgb, var(--accent) 52%, #7a2fd6) 100%);
+}
+/* drop the old canvas weave; the halftone layer carries the texture now */
+.set-artistry .card-set-bg::before { content: none; }
+.card-art-halftone {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1.5px);
+  background-size: 7px 7px;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+/* player set into a gilt gallery window in the upper register */
+.set-artistry .card-face-front .card-photo {
+  inset: auto;
+  top: 12%;
+  left: 8%;
+  right: 8%;
+  height: 50%;
+  z-index: 2;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #15110c;
+  box-shadow:
+    0 0 0 2px #1a140f,
+    0 0 0 5px color-mix(in srgb, #ecd089 78%, var(--accent)),
+    0 0 0 7px #14100b,
+    0 8px 18px rgba(0, 0, 0, 0.55);
+}
+/* keep the scrim from greying out the pop field above the name */
+.set-artistry .card-photo-scrim {
+  background: linear-gradient(180deg, transparent 56%, rgba(20, 8, 26, 0.55) 80%, rgba(20, 8, 26, 0.85) 100%);
+}
+
+/* foil "Artistry" wordmark + league line, top-left */
+.set-artistry .card-face-front .card-head {
+  top: 7%;
+  align-items: flex-start;
+}
+.card-art-brand {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-serif, Georgia, serif);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  background: linear-gradient(180deg, #fbeeb8, #e2bd66 55%, #b78a31);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+.card-art-year {
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-weight: 700;
+  font-size: 7px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.9);
+}
+/* gold serial pill, top-right */
+.card-art-serial {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: #4a370e;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f7e6a8, #dcb464 60%, #b88a30);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* spotlit nameplate over the pop field */
+.set-artistry .card-face-front .card-plate {
+  padding: 12px 13px 13px;
+}
+.card-art-spotlight {
+  display: block;
+  width: 64px;
+  height: 9px;
+  margin-bottom: 7px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 30%, #ffd34d), transparent);
+  filter: blur(0.5px);
+}
+.set-artistry .card-face-front .card-name {
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.card-sm.set-artistry .card-face-front .card-name { font-size: 18px; }
+.card-lg.set-artistry .card-face-front .card-name { font-size: 26px; }
+.set-artistry .card-face-front .card-sub {
+  color: rgba(255, 255, 255, 0.86);
+  font-weight: 600;
+}
+/* serial now lives in the header pill — hide the bottom row on the front */
+.set-artistry .card-face-front .card-plate-row { display: none; }
+
+/* signature / RPA panels drop below the gallery window, over the pop field */
+.set-artistry .card-sig {
+  top: auto;
+  bottom: 21%;
+  left: 8%;
+  right: 8%;
+  background: linear-gradient(180deg, rgba(243, 236, 218, 0.96), rgba(231, 220, 196, 0.96));
+  border-radius: 8px;
+  padding: 7px 6px 5px;
+}
+.set-artistry .card-sig .card-sig-svg path { stroke: #243a8c !important; }
+.set-artistry .card-rpa-patch { top: auto; bottom: 40%; }
+.set-artistry .card-rpa-sig { bottom: 20%; }
+/* the old sweeping wave is replaced by the pop field + gilt window */
+.set-artistry .card-art-wave { display: none; }
+
+/* ============================================================
+   CANVAS KINGS — Artistry marquee case-hit insert
+   ============================================================ */
+.card.finish-canvas-kings .card-frame {
+  border-radius: 16px;
+  padding: 4px;
+  background: linear-gradient(150deg, #e7cd83, #a9792a 28%, #f6e6ac 50%, #8f6a2b 72%, #e3c074);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 22px rgba(230, 192, 106, 0.35), var(--shadow-card);
+}
+.ck-inner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #efe8d6;
+  aspect-ratio: 5 / 7;
+}
+/* fine graph-paper canvas */
+.ck-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(#cfc6ae 1px, transparent 1px) 0 0 / 100% 11px,
+    linear-gradient(90deg, #cfc6ae 1px, transparent 1px) 0 0 / 11px 100%,
+    linear-gradient(#d8cfb7 1px, transparent 1px) 0 0 / 100% 55px,
+    linear-gradient(90deg, #d8cfb7 1px, transparent 1px) 0 0 / 55px 100%,
+    linear-gradient(160deg, #f3ecdb 0%, #e7dec9 100%);
+}
+.ck-top {
+  position: absolute;
+  z-index: 3;
+  top: 5%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 8px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #6e6650;
+}
+/* player set into a dashed cut-out window */
+.ck-window {
+  position: absolute;
+  z-index: 2;
+  top: 11%;
+  left: 13%;
+  right: 13%;
+  height: 39%;
+  border: 1.5px dashed #b7ad92;
+  border-radius: 5px;
+  overflow: hidden;
+}
+/* rainbow paint swash sweeping across the lower-middle, below the window */
+.ck-swash {
+  position: absolute;
+  z-index: 1;
+  left: -4%;
+  right: -4%;
+  bottom: 19%;
+  height: 44%;
+  pointer-events: none;
+}
+/* black plate with the gold-foil wordmark */
+.ck-plate {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 10px 10px;
+  text-align: center;
+  background: linear-gradient(180deg, #2a2722, #141210);
+  border-top: 2px solid #cBA85a;
+}
+.ck-wordmark {
+  font-family: var(--font-serif, Georgia, serif);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1;
+  background: linear-gradient(180deg, #fbefbf 0%, #e8c66e 46%, #b6852b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.card-sm .ck-wordmark { font-size: 17px; }
+.card-lg .ck-wordmark { font-size: 26px; }
+.ck-player {
+  margin-top: 5px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 9px;
+}
+.ck-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: #fff;
+}
+.ck-pos {
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #e8c66e;
+}
+.card.finish-canvas-kings .sheen {
+  opacity: 0.5;
+  animation: sheen-move 4.4s ease-in-out infinite;
+}

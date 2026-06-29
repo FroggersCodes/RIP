@@ -31,10 +31,6 @@ export function Layout() {
                 {label}
               </NavLink>
             ))}
-            {/* Static design showcase page (served from web/public, outside the SPA router). */}
-            <a href="/artistry-2026.html" className="nav-link">
-              Artistry
-            </a>
           </nav>
           <div className="grow" />
           {user && (
