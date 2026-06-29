@@ -1136,12 +1136,15 @@
 }
 /* gold serial pill, top-right */
 .card-art-serial {
+  flex: none;
+  align-self: flex-start;
+  white-space: nowrap;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 12px;
-  letter-spacing: 0.02em;
+  font-size: 11px;
+  letter-spacing: 0.01em;
   color: #4a370e;
-  padding: 3px 10px;
+  padding: 2px 9px;
   border-radius: 999px;
   background: linear-gradient(180deg, #f7e6a8, #dcb464 60%, #b88a30);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.6);
@@ -1175,19 +1178,44 @@
 /* serial now lives in the header pill — hide the bottom row on the front */
 .set-artistry .card-face-front .card-plate-row { display: none; }
 
-/* signature / RPA panels drop below the gallery window, over the pop field */
+/* Signed / RPA Artistry cards: shrink the gallery window so the signature
+   (or patch+sig) panel sits cleanly between the window and the nameplate,
+   instead of floating over the name. */
+.set-artistry .card-face-front .card-inner:has(.card-sig) .card-photo,
+.set-artistry .card-face-front .card-inner:has(.card-rpa-sig) .card-photo {
+  top: 8%;
+  height: 36%;
+}
+/* stronger scrim on signed cards so the white name reads over the pop field */
+.set-artistry .card-face-front .card-inner:has(.card-sig) .card-photo-scrim,
+.set-artistry .card-face-front .card-inner:has(.card-rpa-sig) .card-photo-scrim {
+  background: linear-gradient(180deg, transparent 64%, rgba(20, 8, 26, 0.82) 84%, rgba(20, 8, 26, 0.92) 100%);
+}
 .set-artistry .card-sig {
-  top: auto;
-  bottom: 21%;
+  top: 47%;
+  bottom: auto;
   left: 8%;
   right: 8%;
-  background: linear-gradient(180deg, rgba(243, 236, 218, 0.96), rgba(231, 220, 196, 0.96));
+  background: linear-gradient(180deg, rgba(243, 236, 218, 0.97), rgba(231, 220, 196, 0.97));
   border-radius: 8px;
-  padding: 7px 6px 5px;
+  padding: 6px 6px 4px;
 }
+.set-artistry .card-sig .card-sig-svg { width: 72%; }
 .set-artistry .card-sig .card-sig-svg path { stroke: #243a8c !important; }
-.set-artistry .card-rpa-patch { top: auto; bottom: 40%; }
-.set-artistry .card-rpa-sig { bottom: 20%; }
+.set-artistry .card-sig .auto-badge { font-size: 8px; padding: 1px 7px; }
+.set-artistry .card-rpa-patch { top: 9%; bottom: auto; right: 9%; }
+.set-artistry .card-rpa-patch .card-patch-swatch { width: 38px; }
+.set-artistry .card-rpa-sig {
+  top: 47%;
+  bottom: auto;
+  left: 8%;
+  right: 8%;
+  background: linear-gradient(180deg, rgba(243, 236, 218, 0.97), rgba(231, 220, 196, 0.97));
+  border-color: rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+}
+.set-artistry .card-rpa-sig .card-sig-svg path { stroke: #243a8c !important; }
+.set-artistry .card-rpa-sig .auto-badge { font-size: 8px; padding: 1px 7px; }
 /* the old sweeping wave is replaced by the pop field + gilt window */
 .set-artistry .card-art-wave { display: none; }
 
