@@ -575,18 +575,21 @@
 }
 
 /* ---------- RELIQUARY (tier 5) — cathedral shrine ----------
-   Redesigned to match the shrine sketch: a segmented stone arch crowns the
-   niche, a script "Reliquary" wordmark sits at the keystone, slender curved
-   pillars frame the full player, and a curved nameplate banner caps the foot.
-   The architecture is an SVG overlay (.reliquary-frame, drawn in Card.tsx);
-   this block sets the gold metal frame, the oxblood ground and the nameplate. */
+   Redesigned to match the shrine sketch: a script "Reliquary" wordmark across
+   the top, a flatter segmented stone arch, slender curved side rails framing the
+   full player, and a curved nameplate banner — all over a light ivory niche.
+   The architecture is an SVG overlay (.reliquary-frame, drawn in Card.tsx). The
+   FRONT is the bright shrine; the BACK keeps the rich oxblood detail panel.
+   Front rules use the `.card.set-reliquary` prefix so the ivory niche beats the
+   per-parallel tier frames (tier-patch, tier-rpa, finish-black, refractor). */
 .set-reliquary .card-frame {
   background: linear-gradient(135deg, #6e4a14 0%, #e7c878 16%, #fff4cf 30%, #d8af52 46%, #8a6320 62%, #f0d488 80%, #b88a34 100%);
   background-size: 220% 220%;
   animation: holo-shift 14s linear infinite;
   box-shadow: 0 0 0 1px rgba(255, 245, 205, 0.5), var(--shadow-card);
 }
-/* engraved gold inner border ring */
+
+/* BACK keeps the oxblood ground + engraved gold ring */
 .set-reliquary .card-inner {
   background: radial-gradient(125% 100% at 50% 0%, #3a161a 0%, #1a0c0e 72%, #140a0b 100%);
   box-shadow:
@@ -595,30 +598,34 @@
     inset 0 0 0 5px rgba(20, 8, 9, 0.85),
     inset 0 0 40px rgba(0, 0, 0, 0.7);
 }
-/* oxblood ground */
 .set-reliquary .card-set-bg {
   background:
     radial-gradient(120% 70% at 50% 0%, rgba(120, 30, 40, 0.4) 0%, transparent 58%),
     linear-gradient(160deg, #1a0c0e 0%, #120809 100%);
 }
-/* woven damask texture */
-.set-reliquary .card-set-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.16;
-  background:
-    repeating-conic-gradient(from 0deg at 28px 28px, rgba(231, 200, 120, 0.4) 0deg 6deg, transparent 6deg 24deg),
-    repeating-conic-gradient(from 0deg at 84px 84px, rgba(231, 200, 120, 0.3) 0deg 5deg, transparent 5deg 22deg);
-  background-size: 56px 56px, 112px 112px;
+
+/* FRONT — bright ivory shrine niche */
+.card.set-reliquary .card-face-front .card-inner {
+  background: radial-gradient(120% 95% at 50% 6%, #fffdf6 0%, #f5ead2 58%, #ecdfbe 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(120, 90, 40, 0.4),
+    inset 0 0 18px rgba(150, 115, 55, 0.18);
 }
-/* gold reliquary sheen sweeping across the card */
-.set-reliquary .card-set-fx {
-  opacity: 0.55;
-  background: linear-gradient(115deg, transparent 40%, rgba(255, 248, 222, 0.4) 49%, transparent 58%);
+.card.set-reliquary .card-face-front .card-set-bg {
+  background: radial-gradient(100% 70% at 50% 0%, rgba(255, 246, 222, 0.6), transparent 60%);
+}
+.card.set-reliquary .card-face-front .card-set-fx {
+  opacity: 0.35;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 252, 240, 0.7) 50%, transparent 58%);
   background-size: 250% 100%;
-  mix-blend-mode: overlay;
+  mix-blend-mode: screen;
   animation: sheen-move 6.5s linear infinite;
+}
+/* photo blends into the niche and fades into the cream nameplate band */
+.card.set-reliquary .card-face-front .card-photo-scrim {
+  background: linear-gradient(180deg,
+    rgba(255, 250, 238, 0.16) 0%, transparent 28%, transparent 56%,
+    rgba(244, 233, 205, 0.66) 80%, rgba(239, 225, 191, 0.95) 100%);
 }
 
 /* ---- the SVG shrine architecture overlay ---- */
@@ -629,89 +636,124 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 1px 1px rgba(120, 90, 40, 0.35));
 }
-.reliquary-frame .rlq-pillar {
-  stroke: rgba(28, 12, 8, 0.7);
-  stroke-width: 0.5;
+.reliquary-frame .rlq-rail {
+  stroke: rgba(120, 88, 34, 0.55);
+  stroke-width: 0.4;
 }
 .reliquary-frame .rlq-wordmark {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  letter-spacing: 0.01em;
 }
 
-/* the lone patch sits to the right of the niche, like the sketch */
-.set-reliquary .card-patch {
-  left: auto;
-  right: 13%;
-  transform: none;
-  top: 41%;
-}
-/* RPA patch drops into the niche so it clears the arch wordmark and pillars */
-.set-reliquary .card-rpa-patch {
-  top: 39%;
-  right: 15%;
-}
-
-/* ---- front: full-bleed player in the niche; scrim grounds the nameplate ---- */
-.set-reliquary .card-face-front .card-photo-scrim {
-  background: linear-gradient(180deg, rgba(8, 5, 6, 0.5) 0%, transparent 26%, transparent 50%, rgba(10, 5, 6, 0.92) 84%);
-}
-
-/* ---- serif nameplate over the banner ---- */
-.set-reliquary .card-face-front .card-plate {
+/* ---- game-worn swatches: a pair, centred in the niche (sketch-style) ---- */
+.rlq-patches {
+  position: absolute;
   z-index: 4;
+  left: 0;
+  right: 0;
+  top: 44%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  pointer-events: none;
 }
+.rlq-patches .card-patch-window {
+  padding: 2.5px;
+}
+.rlq-patches .card-patch-swatch {
+  width: 46px;
+}
+.card-sm .rlq-patches .card-patch-swatch {
+  width: 38px;
+}
+.rlq-patches-rpa {
+  top: 33%;
+}
+.rlq-patches-rpa .card-patch-swatch {
+  width: 40px;
+}
+
+/* ---- signature: dark ink on a cream slip ---- */
+.set-reliquary .card-sig {
+  top: 47%;
+  background: rgba(253, 246, 227, 0.86);
+  border: 1px solid rgba(150, 115, 55, 0.35);
+}
+.set-reliquary .card-rpa-sig {
+  top: 53%;
+  bottom: auto;
+  background: rgba(253, 246, 227, 0.86);
+  border-color: rgba(150, 115, 55, 0.35);
+}
+.set-reliquary .card-sig .card-sig-svg path,
+.set-reliquary .card-rpa-sig .card-sig-svg path {
+  stroke: #3a2410 !important;
+}
+
+/* ---- nameplate ---- */
 .set-reliquary .card-plate {
   text-align: center;
   padding: 9px 12px 11px;
-}
-.set-reliquary .card-name {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 23px;
-  line-height: 0.96;
-  letter-spacing: 0.01em;
-  color: #f6edd8;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
-}
-.card-sm.set-reliquary .card-name {
-  font-size: 18px;
-}
-.card-lg.set-reliquary .card-name {
-  font-size: 28px;
-}
-.set-reliquary .card-sub {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 4px;
-  color: #cbb389;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-size: 9px;
-}
-.set-reliquary .card-sub::before,
-.set-reliquary .card-sub::after {
-  content: '';
-  height: 1px;
-  width: 22px;
-  background: linear-gradient(90deg, transparent, #c79a3e);
-}
-.set-reliquary .card-sub::after {
-  background: linear-gradient(90deg, #c79a3e, transparent);
 }
 .set-reliquary .card-plate-row {
   justify-content: center;
   gap: 10px;
 }
 /* the front shows just the player + team, like the sketch — serial lives on back */
+.set-reliquary .card-face-front .card-plate {
+  z-index: 4;
+}
 .set-reliquary .card-face-front .card-plate-row {
   display: none;
+}
+.set-reliquary .card-face-front .card-name {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 0.96;
+  letter-spacing: 0.01em;
+  color: #3a2410;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.card-sm.set-reliquary .card-face-front .card-name {
+  font-size: 18px;
+}
+.card-lg.set-reliquary .card-face-front .card-name {
+  font-size: 28px;
+}
+.set-reliquary .card-face-front .card-sub {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: #7a5a2a;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+.set-reliquary .card-face-front .card-sub::before,
+.set-reliquary .card-face-front .card-sub::after {
+  content: '';
+  height: 1px;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, #b58a3a);
+}
+.set-reliquary .card-face-front .card-sub::after {
+  background: linear-gradient(90deg, #b58a3a, transparent);
+}
+
+/* ---- back: serif gold wordmark + gold serial pill ---- */
+.set-reliquary .card-face-back .card-name {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: #f6edd8;
 }
 .set-reliquary .card-serial {
   font-family: var(--font-display);
@@ -725,7 +767,6 @@
   text-shadow: none;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
-/* back: gold wordmark + parallel pill */
 .set-reliquary .card-setmark {
   color: #e7c878;
 }
