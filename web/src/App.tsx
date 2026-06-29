@@ -15,6 +15,7 @@ import { PlayerDetailPage } from './pages/PlayerDetailPage';
 import { StandingsPage } from './pages/StandingsPage';
 import { StatsPage } from './pages/StatsPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
+import { AdminPage } from './pages/AdminPage';
 
 export function App() {
   const { user, loading } = useAuth();
@@ -51,6 +52,7 @@ export function App() {
         <Route path="/standings" element={<StandingsPage />} />
         <Route path="/stats" element={<StatsPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
