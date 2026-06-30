@@ -213,6 +213,8 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                  the approved reference). Base/Auto/Dual share a wide photo; Relic
                  (RPA) uses a narrow photo beside a single patch window. */
               <div className="card-inner rlq-inner">
+                {/* gold sunburst + glow behind the cut-out player */}
+                <div className="rlq-detail" aria-hidden="true" />
                 <div className={`rlq-photo ${rlqVariant === 'relic' ? 'rlq-photo-relic' : ''}`}>
                   <PlayerPortrait player={card.player} fill />
                 </div>
