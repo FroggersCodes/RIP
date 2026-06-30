@@ -49,97 +49,72 @@ function PatchSwatch({ primary, secondary }: { primary: string; secondary: strin
 }
 
 /**
- * Reliquary frame — drawn straight from the sketch's border: a segmented angled
- * "fan" in each top corner, slender curved side rails that bow inward, a curved
- * nameplate banner at the foot, and a script "Reliquary" wordmark across the top.
- * Crisp SVG overlay; the card-inner is exactly 5:7, matching this 100×140
- * viewBox, so it fills without distortion.
+ * Reliquary gold-foil frame — ported 1:1 from the approved reference design (a
+ * white card with a gold line-art frame): a double rounded border, a segmented
+ * fan in each top corner, a swag curve linking them, inward-bowing side rails and
+ * a curved white nameplate at the foot. Drawn in the reference's own 360×504
+ * coordinate space (5:7), stretched to fill the card without distortion.
  */
 function ReliquaryFrame({ idBase }: { idBase: string }) {
-  const goldId = `rlq-gold-${idBase}`;
-  const stoneId = `rlq-stone-${idBase}`;
-  const plateId = `rlq-plate-${idBase}`;
-  const gold = `url(#${goldId})`;
-
-  // A segmented quarter-fan rounding a top corner: two concentric arcs centred on
-  // the corner, sliced by radial dividers — drawn as OUTLINE only (no fill).
-  const R = 34, r = 26, n = 4;
-  const fan = (ccx: number, ccy: number, a0: number, a1: number) => {
-    const outer: string[] = [];
-    const inner: string[] = [];
-    const divs: [number, number, number, number][] = [];
-    for (let i = 0; i <= n; i++) {
-      const t = a0 + (a1 - a0) * (i / n);
-      const ox = ccx + R * Math.cos(t), oy = ccy + R * Math.sin(t);
-      const ix = ccx + r * Math.cos(t), iy = ccy + r * Math.sin(t);
-      outer.push(`${ox},${oy}`);
-      inner.push(`${ix},${iy}`);
-      divs.push([ix, iy, ox, oy]);
-    }
-    return { outer: outer.join(' '), inner: inner.join(' '), divs };
-  };
-  const fans = [fan(7, 7, 0, Math.PI / 2), fan(93, 7, Math.PI / 2, Math.PI)];
-
-  // The niche window — the only place the player photo shows. Everything outside
-  // it (top corners, side margins, nameplate) is the frame/border "mat".
-  const niche =
-    'M12,40 L88,40 C89,68 89,94 87,112 C60,107 40,107 13,112 C11,94 11,68 12,40 Z';
-
+  const gid = `rlq-gold-${idBase}`;
   return (
-    <svg className="reliquary-frame" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">
+    <svg className="reliquary-frame" viewBox="0 0 360 504" preserveAspectRatio="none" aria-hidden="true">
       <defs>
-        <linearGradient id={goldId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#9a7224" />
-          <stop offset="24%" stopColor="#f1d893" />
-          <stop offset="50%" stopColor="#fff6d6" />
-          <stop offset="76%" stopColor="#d8af52" />
-          <stop offset="100%" stopColor="#8a6320" />
-        </linearGradient>
-        <linearGradient id={stoneId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#16243f" />
-          <stop offset="100%" stopColor="#070c18" />
-        </linearGradient>
-        <linearGradient id={plateId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#9a7224" />
-          <stop offset="50%" stopColor="#f1d893" />
-          <stop offset="100%" stopColor="#9a7224" />
+        <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#7a5e18" />
+          <stop offset=".18" stopColor="#d9b349" />
+          <stop offset=".34" stopColor="#fff4c4" />
+          <stop offset=".5" stopColor="#c79f34" />
+          <stop offset=".68" stopColor="#f0d27e" />
+          <stop offset=".85" stopColor="#a8852a" />
+          <stop offset="1" stopColor="#7a5e18" />
         </linearGradient>
       </defs>
-
-      {/* mat: fills the whole border, leaving only the niche window for the photo */}
-      <path d={`M0,0 H100 V140 H0 Z ${niche}`} fillRule="evenodd" fill={`url(#${stoneId})`} />
-
-      {/* curved side rails that bow inward */}
-      <path d="M6,42 C10,66 10,90 7,114 L10,114 C13,90 13,66 9,42 Z" fill={gold} />
-      <path d="M94,42 C90,66 90,90 93,114 L90,114 C87,90 87,66 91,42 Z" fill={gold} />
-      {/* niche outline (curved sides + nameplate top) */}
-      <path d={niche} fill="none" stroke={gold} strokeWidth="1" />
-
-      {/* segmented corner fans — outline only */}
-      {fans.map((f, fi) => (
-        <g key={fi}>
-          <polyline points={f.outer} fill="none" stroke={gold} strokeWidth="1" />
-          <polyline points={f.inner} fill="none" stroke={gold} strokeWidth="0.8" />
-          {f.divs.map(([x1, y1, x2, y2], i) => (
-            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={gold} strokeWidth="0.8" />
-          ))}
-        </g>
-      ))}
-
-      {/* script wordmark across the top, between the fans */}
-      <text
-        className="rlq-wordmark"
-        x="50"
-        y="16"
-        textAnchor="middle"
-        fill={gold}
-        stroke="rgba(40,26,8,0.5)"
-        strokeWidth="0.3"
-        paintOrder="stroke"
-      >
-        Reliquary
-      </text>
+      {/* white nameplate fill */}
+      <path d="M12 432 Q180 400 348 432 L348 480 Q348 487 341 487 L19 487 Q12 487 12 480 Z" fill="#fffdf6" />
+      <g fill="none" stroke={`url(#${gid})`} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="9" y="9" width="342" height="486" rx="9" />
+        <rect x="17" y="17" width="326" height="470" rx="6" strokeWidth="1.1" opacity="0.5" />
+        {/* top-left corner fan */}
+        <path d="M 104 14 A 90 90 0 0 1 14 104" />
+        <path d="M 72 14 A 58 58 0 0 1 14 72" />
+        <line x1="72" y1="14" x2="104" y2="14" />
+        <line x1="70.02" y1="29.01" x2="100.93" y2="37.29" />
+        <line x1="64.23" y1="43" x2="91.94" y2="59" />
+        <line x1="55.01" y1="55.01" x2="77.64" y2="77.64" />
+        <line x1="43" y1="64.23" x2="59" y2="91.94" />
+        <line x1="29.01" y1="70.02" x2="37.29" y2="100.93" />
+        <line x1="14" y1="72" x2="14" y2="104" />
+        {/* top-right corner fan */}
+        <path d="M 346 104 A 90 90 0 0 1 256 14" />
+        <path d="M 346 72 A 58 58 0 0 1 288 14" />
+        <line x1="346" y1="72" x2="346" y2="104" />
+        <line x1="330.99" y1="70.02" x2="322.71" y2="100.93" />
+        <line x1="317" y1="64.23" x2="301" y2="91.94" />
+        <line x1="304.99" y1="55.01" x2="282.36" y2="77.64" />
+        <line x1="295.77" y1="43" x2="268.06" y2="59" />
+        <line x1="289.98" y1="29.01" x2="259.07" y2="37.29" />
+        <line x1="288" y1="14" x2="256" y2="14" />
+        {/* swag + side rails + nameplate top */}
+        <path d="M80 75 Q180 141 280 75" />
+        <path d="M14 104 C 14 196, 60 250, 24 426" />
+        <path d="M346 104 C 346 196, 300 250, 336 426" />
+        <path d="M12 432 Q180 400 348 432" />
+      </g>
     </svg>
+  );
+}
+
+/** A gold-framed game-worn relic window: a colored swatch with woven texture, a
+ *  dashed inset border and (optionally) a dashed centre seam. */
+function RlqWindow({ color, seam, className }: { color: string; seam?: boolean; className: string }) {
+  return (
+    <div className={`rlq-win ${className}`}>
+      <div className="rlq-swatch" style={{ backgroundColor: color }}>
+        <div className="rlq-swatch-dash" />
+        {seam && <div className="rlq-swatch-seam" />}
+      </div>
+    </div>
   );
 }
 
@@ -186,6 +161,10 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
   const teamSecondary = card.player.teamSecondaryColor ?? '#0c1422';
   const hasPatch = !!def.patched;
   const ckGradId = `ck-rb-${card.player.id}`;
+  // Reliquary maps each parallel onto one of the reference layouts:
+  // RPA → relic (photo + 1 patch + sig), patch → dual (2 patches), auto → sig.
+  const rlqVariant = isRpa ? 'relic' : hasPatch ? 'dual' : hasSig ? 'auto' : 'base';
+  const rlqShowSig = rlqVariant === 'auto' || rlqVariant === 'relic';
 
   const handleClick = () => {
     if (onClick) {
@@ -229,7 +208,35 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
         {/* ── FRONT ── clean: photo + name + position + serial + hit type badges */}
         <div className="card-face card-face-front">
           <div className="card-frame">
-            {isCanvasKings ? (
+            {isReliquary ? (
+              /* Reliquary — white card with a gold foil line-art frame (1:1 with
+                 the approved reference). Base/Auto/Dual share a wide photo; Relic
+                 (RPA) uses a narrow photo beside a single patch window. */
+              <div className="card-inner rlq-inner">
+                <div className={`rlq-photo ${rlqVariant === 'relic' ? 'rlq-photo-relic' : ''}`}>
+                  <PlayerPortrait player={card.player} fill />
+                </div>
+
+                {rlqVariant === 'relic' && (
+                  <RlqWindow color={teamPrimary} seam className="rlq-win-relic" />
+                )}
+                {rlqVariant === 'dual' && (
+                  <>
+                    <RlqWindow color={teamPrimary} className="rlq-win-dual-a" />
+                    <RlqWindow color={teamSecondary} className="rlq-win-dual-b" />
+                  </>
+                )}
+                {rlqShowSig && (
+                  <div className="rlq-sig">{card.player.name}</div>
+                )}
+
+                <ReliquaryFrame idBase={card.player.id} />
+
+                <div className="rlq-wordmark">Reliquary</div>
+                <div className="rlq-name">{card.player.name}</div>
+                <div className="rlq-team">{card.player.teamAbbr}</div>
+              </div>
+            ) : isCanvasKings ? (
               /* Canvas Kings — marquee case-hit insert: graph-paper canvas, the
                  player set into a dashed cut-out window, a rainbow paint swash, and
                  a black plate with the gold-foil wordmark. */
@@ -289,13 +296,12 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
               <div className="card-photo-scrim" />
               <div className="card-set-fx" />
               <div className="sheen" />
-              {isReliquary && <ReliquaryFrame idBase={card.player.id} />}
               {isOfl && (
                 <div className="card-ofl-emblem">
                   <img src="/ofl-logo.jpeg" alt="OFL" />
                 </div>
               )}
-              {!isReliquary && hasPatch && !isRpa && (
+              {hasPatch && !isRpa && (
                 <div className="card-patch">
                   <div className="card-patch-window">
                     <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
@@ -304,57 +310,20 @@ export function Card({ card, size = 'md', faded, onClick }: Props) {
                 </div>
               )}
 
-              {!isReliquary && sig && !isRpa && (
+              {sig && !isRpa && (
                 <div className="card-sig">
                   {sigSvg}
                   <span className="auto-badge">✒ AUTO</span>
                 </div>
               )}
 
-              {!isReliquary && isRpa && sig && (
+              {isRpa && sig && (
                 <>
                   <div className="card-rpa-patch">
                     <div className="card-patch-window">
                       <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
                     </div>
                     <span className="patch-badge">PATCH</span>
-                  </div>
-                  <div className="card-rpa-sig">
-                    {sigSvg}
-                    <span className="auto-badge">✒ RPA</span>
-                  </div>
-                </>
-              )}
-
-              {/* Reliquary hits, sketch-style: a pair of game-worn swatches
-                  (auto adds the signature; RPA shows both swatches + signature). */}
-              {isReliquary && hasPatch && !sig && (
-                <div className="rlq-patches">
-                  <div className="card-patch-window">
-                    <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
-                  </div>
-                  <div className="card-patch-window">
-                    <PatchSwatch primary={teamSecondary} secondary={teamPrimary} />
-                  </div>
-                </div>
-              )}
-
-              {isReliquary && sig && !hasPatch && (
-                <div className="card-sig">
-                  {sigSvg}
-                  <span className="auto-badge">✒ AUTO</span>
-                </div>
-              )}
-
-              {isReliquary && isRpa && sig && (
-                <>
-                  <div className="rlq-patches rlq-patches-rpa">
-                    <div className="card-patch-window">
-                      <PatchSwatch primary={teamPrimary} secondary={teamSecondary} />
-                    </div>
-                    <div className="card-patch-window">
-                      <PatchSwatch primary={teamSecondary} secondary={teamPrimary} />
-                    </div>
                   </div>
                   <div className="card-rpa-sig">
                     {sigSvg}
