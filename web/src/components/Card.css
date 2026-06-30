@@ -582,25 +582,11 @@
    rules use the `.card.set-reliquary` prefix so the navy interior beats the
    per-parallel tier frames (tier-patch, tier-rpa, finish-black, refractor). */
 .set-reliquary .card-frame {
-  position: relative;
-  padding: 5px;
-  background: linear-gradient(135deg, #5e4012 0%, #caa24e 14%, #fff1c8 30%, #b8893a 46%, #7a5a1e 60%, #e8c878 78%, #9a7228 100%);
+  padding: 4px;
+  background: linear-gradient(135deg, #6e4a14 0%, #e7c878 16%, #fff4cf 30%, #d8af52 46%, #8a6320 62%, #f0d488 80%, #b88a34 100%);
   background-size: 220% 220%;
-  animation: holo-shift 16s linear infinite;
-  box-shadow: 0 0 0 1px rgba(60, 40, 12, 0.85), 0 0 0 2px rgba(255, 240, 200, 0.22), var(--shadow-card);
-}
-/* fine engraved texture on the gold border (shows on the ring around the photo) */
-.set-reliquary .card-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 13px;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 3px);
-  mix-blend-mode: overlay;
-  opacity: 0.5;
+  animation: holo-shift 14s linear infinite;
+  box-shadow: 0 0 0 1px rgba(60, 40, 12, 0.8), var(--shadow-card);
 }
 
 /* BACK keeps the oxblood detail panel */
@@ -654,9 +640,10 @@
 }
 .reliquary-frame .rlq-wordmark {
   font-family: var(--font-serif);
+  font-style: italic;
   font-weight: 600;
-  font-size: 7.4px;
-  letter-spacing: 0.34em;
+  font-size: 11px;
+  letter-spacing: 0.02em;
 }
 
 /* ---- game-worn swatches: a pair, centred on the photo ---- */
