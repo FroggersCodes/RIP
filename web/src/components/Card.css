@@ -609,6 +609,11 @@
   background: radial-gradient(120% 95% at 50% 0%, #1a2742 0%, #0c1326 58%, #060a16 100%);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.7), inset 0 0 26px rgba(0, 0, 0, 0.6);
 }
+/* the photo sits inside the niche window; the SVG mat clips it to the curve so
+   the top corners and margins stay frame/border, not player picture */
+.card.set-reliquary .card-face-front .card-photo {
+  inset: 28% 11% 20% 11%;
+}
 .card.set-reliquary .card-face-front .card-set-bg {
   background:
     radial-gradient(110% 80% at 50% 0%, rgba(60, 90, 150, 0.16), transparent 60%),

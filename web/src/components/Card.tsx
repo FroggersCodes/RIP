@@ -61,29 +61,29 @@ function ReliquaryFrame({ idBase }: { idBase: string }) {
   const plateId = `rlq-plate-${idBase}`;
   const gold = `url(#${goldId})`;
 
-  // A segmented quarter-fan rounding a top corner: a band between two arcs
-  // centred on the corner, sliced into voussoir blocks by radial dividers.
-  const R = 35, r = 27, n = 4;
+  // A segmented quarter-fan rounding a top corner: two concentric arcs centred on
+  // the corner, sliced by radial dividers — drawn as OUTLINE only (no fill).
+  const R = 34, r = 26, n = 4;
   const fan = (ccx: number, ccy: number, a0: number, a1: number) => {
-    const polys: string[] = [];
+    const outer: string[] = [];
+    const inner: string[] = [];
     const divs: [number, number, number, number][] = [];
     for (let i = 0; i <= n; i++) {
       const t = a0 + (a1 - a0) * (i / n);
       const ox = ccx + R * Math.cos(t), oy = ccy + R * Math.sin(t);
       const ix = ccx + r * Math.cos(t), iy = ccy + r * Math.sin(t);
+      outer.push(`${ox},${oy}`);
+      inner.push(`${ix},${iy}`);
       divs.push([ix, iy, ox, oy]);
-      if (i < n) {
-        const t1 = a0 + (a1 - a0) * ((i + 1) / n);
-        const ox1 = ccx + R * Math.cos(t1), oy1 = ccy + R * Math.sin(t1);
-        const ix1 = ccx + r * Math.cos(t1), iy1 = ccy + r * Math.sin(t1);
-        polys.push(`${ox},${oy} ${ox1},${oy1} ${ix1},${iy1} ${ix},${iy}`);
-      }
     }
-    return { polys, divs };
+    return { outer: outer.join(' '), inner: inner.join(' '), divs };
   };
-  const left = fan(7, 7, 0, Math.PI / 2);
-  const right = fan(93, 7, Math.PI / 2, Math.PI);
-  const fans = [left, right];
+  const fans = [fan(7, 7, 0, Math.PI / 2), fan(93, 7, Math.PI / 2, Math.PI)];
+
+  // The niche window — the only place the player photo shows. Everything outside
+  // it (top corners, side margins, nameplate) is the frame/border "mat".
+  const niche =
+    'M12,40 L88,40 C89,68 89,94 87,112 C60,107 40,107 13,112 C11,94 11,68 12,40 Z';
 
   return (
     <svg className="reliquary-frame" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">
@@ -96,9 +96,8 @@ function ReliquaryFrame({ idBase }: { idBase: string }) {
           <stop offset="100%" stopColor="#8a6320" />
         </linearGradient>
         <linearGradient id={stoneId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff6d8" />
-          <stop offset="55%" stopColor="#e6c879" />
-          <stop offset="100%" stopColor="#a9802f" />
+          <stop offset="0%" stopColor="#16243f" />
+          <stop offset="100%" stopColor="#070c18" />
         </linearGradient>
         <linearGradient id={plateId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#9a7224" />
@@ -107,27 +106,25 @@ function ReliquaryFrame({ idBase }: { idBase: string }) {
         </linearGradient>
       </defs>
 
+      {/* mat: fills the whole border, leaving only the niche window for the photo */}
+      <path d={`M0,0 H100 V140 H0 Z ${niche}`} fillRule="evenodd" fill={`url(#${stoneId})`} />
+
       {/* curved side rails that bow inward */}
       <path d="M6,42 C10,66 10,90 7,114 L10,114 C13,90 13,66 9,42 Z" fill={gold} />
       <path d="M94,42 C90,66 90,90 93,114 L90,114 C87,90 87,66 91,42 Z" fill={gold} />
-      {/* horizontal rule tying the corner fans to the rails */}
-      <line x1="7" y1="42" x2="93" y2="42" stroke={gold} strokeWidth="1" />
+      {/* niche outline (curved sides + nameplate top) */}
+      <path d={niche} fill="none" stroke={gold} strokeWidth="1" />
 
-      {/* segmented corner fans */}
+      {/* segmented corner fans — outline only */}
       {fans.map((f, fi) => (
         <g key={fi}>
-          {f.polys.map((pts, i) => (
-            <polygon key={i} points={pts} fill={`url(#${stoneId})`} stroke="rgba(60,38,8,0.85)" strokeWidth="0.5" />
-          ))}
+          <polyline points={f.outer} fill="none" stroke={gold} strokeWidth="1" />
+          <polyline points={f.inner} fill="none" stroke={gold} strokeWidth="0.8" />
           {f.divs.map(([x1, y1, x2, y2], i) => (
-            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(60,38,8,0.7)" strokeWidth="0.5" />
+            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={gold} strokeWidth="0.8" />
           ))}
         </g>
       ))}
-
-      {/* curved nameplate banner */}
-      <path d="M3,140 L3,114 C20,108 80,108 97,114 L97,140 Z" fill={`url(#${plateId})`} opacity="0.18" />
-      <path d="M3,114 C20,108 80,108 97,114" fill="none" stroke={gold} strokeWidth="1.4" />
 
       {/* script wordmark across the top, between the fans */}
       <text
