@@ -49,44 +49,29 @@ function PatchSwatch({ primary, secondary }: { primary: string; secondary: strin
 }
 
 /**
- * Reliquary shrine frame — the cathedral architecture from the redesign sketch:
- * a script "Reliquary" wordmark across the top, a flatter segmented stone arch
- * crowning the niche, slender curved side rails framing the full player, and a
- * curved nameplate banner at the foot. Drawn over a light ivory interior, as a
- * crisp SVG overlay so the voussoirs and sweeping curves stay sharp at every
- * card size. The card-inner is exactly 5:7, matching this 100×140 viewBox, so it
- * fills without distortion.
+ * Reliquary frame — a Panini National Treasures-style ornate gold border: a
+ * double beaded inner frame line, baroque scroll flourishes in all four corners,
+ * a serif "Reliquary" wordmark crowning the top and a gold nameplate rule at the
+ * foot. Drawn as a crisp SVG overlay over the dark interior. The card-inner is
+ * exactly 5:7, matching this 100×140 viewBox, so it fills without distortion.
  */
 function ReliquaryFrame({ idBase }: { idBase: string }) {
   const goldId = `rlq-gold-${idBase}`;
-  const stoneId = `rlq-stone-${idBase}`;
-  const plateId = `rlq-plate-${idBase}`;
+  const gold = `url(#${goldId})`;
 
-  // Flatter doorway arch: voussoir blocks along an elliptical band, apex at the
-  // top centre, springing down to the upper corners. Pale stone fill, gold edges.
-  const cx = 50, cy = 44;
-  const aoX = 40.5, aoY = 24; // outer arch radii (apex y ≈ 20, springing aligns to rails)
-  const aiX = 35.7, aiY = 16; // inner arch radii (apex y ≈ 28)
-  const segs = 15;
-  const phiMax = (72 * Math.PI) / 180;
-  const at = (rx: number, ry: number, phi: number): [number, number] => [
-    cx + rx * Math.sin(phi),
-    cy - ry * Math.cos(phi),
-  ];
-  const voussoirs: string[] = [];
-  const dividers: [number, number, number, number][] = [];
-  for (let i = 0; i <= segs; i++) {
-    const phi = -phiMax + 2 * phiMax * (i / segs);
-    const [ox, oy] = at(aoX, aoY, phi);
-    const [ix, iy] = at(aiX, aiY, phi);
-    dividers.push([ix, iy, ox, oy]);
-    if (i < segs) {
-      const phi1 = -phiMax + 2 * phiMax * ((i + 1) / segs);
-      const [ox1, oy1] = at(aoX, aoY, phi1);
-      const [ix1, iy1] = at(aiX, aiY, phi1);
-      voussoirs.push(`${ox},${oy} ${ox1},${oy1} ${ix1},${iy1} ${ix},${iy}`);
-    }
-  }
+  // One corner flourish, drawn for the top-left, then mirrored into the other
+  // three corners. A baroque double quarter-scroll with volute curls + a stud.
+  const ornament = (
+    <g className="rlq-orn">
+      <path d="M5,34 C5,17 17,5 34,5" fill="none" stroke={gold} strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M9.5,34 C9.5,20.5 20.5,9.5 34,9.5" fill="none" stroke={gold} strokeWidth="0.8" strokeLinecap="round" />
+      <path d="M34,5 c-4.6,0 -7.8,3.1 -7.8,6.7 0,2.5 1.9,4.1 3.9,3.2 1.9,-0.8 2.1,-3.6 0.2,-4.7" fill="none" stroke={gold} strokeWidth="0.8" strokeLinecap="round" />
+      <path d="M5,34 c0,-4.6 3.1,-7.8 6.7,-7.8 2.5,0 4.1,1.9 3.2,3.9 -0.8,1.9 -3.6,2.1 -4.7,0.2" fill="none" stroke={gold} strokeWidth="0.8" strokeLinecap="round" />
+      <circle cx="9.2" cy="9.2" r="1.8" fill={gold} />
+      <path d="M19,7 q5,-3 9,1" fill="none" stroke={gold} strokeWidth="0.7" strokeLinecap="round" />
+      <path d="M7,19 q-3,5 1,9" fill="none" stroke={gold} strokeWidth="0.7" strokeLinecap="round" />
+    </g>
+  );
 
   return (
     <svg className="reliquary-frame" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">
@@ -98,54 +83,37 @@ function ReliquaryFrame({ idBase }: { idBase: string }) {
           <stop offset="76%" stopColor="#d8af52" />
           <stop offset="100%" stopColor="#8a6320" />
         </linearGradient>
-        <linearGradient id={stoneId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fffaf0" />
-          <stop offset="60%" stopColor="#f3e6c6" />
-          <stop offset="100%" stopColor="#e6d3a6" />
-        </linearGradient>
-        <linearGradient id={plateId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fdf6e3" />
-          <stop offset="100%" stopColor="#efe1bf" />
-        </linearGradient>
       </defs>
 
-      {/* slender curved side rails framing the niche */}
-      <path className="rlq-rail" d="M11.5,37 C16,62 16,88 13.5,113 L16,113 C18.5,88 18.5,62 16,37 Z" fill={`url(#${goldId})`} />
-      <path className="rlq-rail" d="M88.5,37 C84,62 84,88 86.5,113 L84,113 C81.5,88 81.5,62 84,37 Z" fill={`url(#${goldId})`} />
+      {/* double beaded inner frame line */}
+      <rect x="4.5" y="4.5" width="91" height="131" rx="6" fill="none" stroke={gold} strokeWidth="1.3" />
+      <rect x="7.4" y="7.4" width="85.2" height="125.2" rx="4.2" fill="none" stroke={gold} strokeWidth="0.6" strokeDasharray="0.5 1.5" opacity="0.85" />
 
-      {/* segmented stone arch */}
-      {voussoirs.map((pts, i) => (
-        <polygon
-          key={i}
-          points={pts}
-          fill={`url(#${stoneId})`}
-          stroke="rgba(120,88,34,0.85)"
-          strokeWidth="0.6"
-        />
-      ))}
-      {dividers.map(([x1, y1, x2, y2], i) => (
-        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(120,88,34,0.7)" strokeWidth="0.5" />
-      ))}
-      {/* lintel line tying the arch springing to the rails */}
-      <line x1="13.5" y1="38" x2="86.5" y2="38" stroke={`url(#${goldId})`} strokeWidth="1.2" />
+      {/* baroque corner flourishes */}
+      {ornament}
+      <g transform="translate(100,0) scale(-1,1)">{ornament}</g>
+      <g transform="translate(0,140) scale(1,-1)">{ornament}</g>
+      <g transform="translate(100,140) scale(-1,-1)">{ornament}</g>
 
-      {/* curved nameplate banner */}
-      <path d="M2,140 L2,114 C20,108 80,108 98,114 L98,140 Z" fill={`url(#${plateId})`} />
-      <path d="M2,114 C20,108 80,108 98,114" fill="none" stroke={`url(#${goldId})`} strokeWidth="1.6" />
-
-      {/* script wordmark across the very top */}
+      {/* serif wordmark crowning the top, flanked by short rules */}
+      <line x1="20" y1="14.5" x2="34" y2="14.5" stroke={gold} strokeWidth="0.7" />
+      <line x1="66" y1="14.5" x2="80" y2="14.5" stroke={gold} strokeWidth="0.7" />
       <text
         className="rlq-wordmark"
         x="50"
-        y="15"
+        y="17.5"
         textAnchor="middle"
-        fill={`url(#${goldId})`}
-        stroke="rgba(90,62,18,0.55)"
-        strokeWidth="0.35"
+        fill={gold}
+        stroke="rgba(40,26,8,0.5)"
+        strokeWidth="0.3"
         paintOrder="stroke"
       >
-        Reliquary
+        RELIQUARY
       </text>
+
+      {/* gold nameplate rule at the foot */}
+      <line x1="12" y1="113" x2="88" y2="113" stroke={gold} strokeWidth="1.1" />
+      <circle cx="50" cy="113" r="1.5" fill={gold} />
     </svg>
   );
 }
