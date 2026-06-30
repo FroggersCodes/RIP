@@ -574,33 +574,18 @@
   color: rgba(230, 197, 116, 0.7);
 }
 
-/* ---------- RELIQUARY (tier 5) — National Treasures ----------
-   Modelled on Panini National Treasures: a wide, engraved ornate gold border
-   with baroque scroll flourishes in every corner (drawn as the .reliquary-frame
-   SVG overlay), a deep navy-black interior carrying the full player photo, a
-   serif "RELIQUARY" wordmark up top and a gilded nameplate at the foot. Front
-   rules use the `.card.set-reliquary` prefix so the navy interior beats the
-   per-parallel tier frames (tier-patch, tier-rpa, finish-black, refractor). */
+/* ---------- RELIQUARY (tier 5) — white card, gold foil frame ----------
+   Ported 1:1 from the approved reference: a white card with a gold line-art
+   frame (segmented corner fans + swag + bowed rails + curved nameplate, drawn by
+   the .reliquary-frame SVG), the player photo set into the upper register, a gold
+   italic "Reliquary" wordmark, a gold condensed nameplate, a blue cursive on-card
+   autograph, and gold-framed game-worn relic windows. FRONT rules use the
+   `.card.set-reliquary` prefix so the white card beats the per-parallel tier
+   frames; the BACK keeps the oxblood detail panel. */
 .set-reliquary .card-frame {
-  position: relative;
-  padding: 5px;
-  background: linear-gradient(135deg, #5e4012 0%, #caa24e 14%, #fff1c8 30%, #b8893a 46%, #7a5a1e 60%, #e8c878 78%, #9a7228 100%);
-  background-size: 220% 220%;
-  animation: holo-shift 16s linear infinite;
-  box-shadow: 0 0 0 1px rgba(60, 40, 12, 0.85), 0 0 0 2px rgba(255, 240, 200, 0.22), var(--shadow-card);
-}
-/* fine engraved texture on the gold border (shows on the ring around the photo) */
-.set-reliquary .card-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 13px;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 3px);
-  mix-blend-mode: overlay;
-  opacity: 0.5;
+  padding: 0;
+  background: #fffdf6;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.18), var(--shadow-card);
 }
 
 /* BACK keeps the oxblood detail panel */
@@ -612,158 +597,144 @@
     inset 0 0 0 5px rgba(20, 8, 9, 0.85),
     inset 0 0 40px rgba(0, 0, 0, 0.7);
 }
-.set-reliquary .card-set-bg {
-  background:
-    radial-gradient(120% 70% at 50% 0%, rgba(120, 30, 40, 0.4) 0%, transparent 58%),
-    linear-gradient(160deg, #1a0c0e 0%, #120809 100%);
-}
 
-/* FRONT — deep navy-black interior behind the photo */
+/* FRONT — white card */
 .card.set-reliquary .card-face-front .card-inner {
-  background: radial-gradient(120% 95% at 50% 0%, #1a2742 0%, #0c1326 58%, #060a16 100%);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.7), inset 0 0 26px rgba(0, 0, 0, 0.6);
-}
-.card.set-reliquary .card-face-front .card-set-bg {
-  background:
-    radial-gradient(110% 80% at 50% 0%, rgba(60, 90, 150, 0.16), transparent 60%),
-    linear-gradient(160deg, #0e1628 0%, #070b16 100%);
-}
-.card.set-reliquary .card-face-front .card-set-fx {
-  opacity: 0.5;
-  background: linear-gradient(115deg, transparent 40%, rgba(255, 244, 206, 0.4) 49%, transparent 58%);
-  background-size: 250% 100%;
-  mix-blend-mode: screen;
-  animation: sheen-move 6.5s linear infinite;
-}
-/* photo grounds into a dark nameplate band at the foot */
-.card.set-reliquary .card-face-front .card-photo-scrim {
-  background: linear-gradient(180deg,
-    rgba(6, 10, 22, 0.34) 0%, transparent 24%, transparent 52%,
-    rgba(6, 10, 22, 0.9) 82%, rgba(5, 8, 16, 0.97) 100%);
+  background: #ffffff;
+  box-shadow: none;
 }
 
-/* ---- the ornate gold frame overlay ---- */
+/* the SVG gold frame fills the card in its own 360×504 space */
 .reliquary-frame {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 2;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
-}
-.reliquary-frame .rlq-wordmark {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 7.4px;
-  letter-spacing: 0.34em;
 }
 
-/* ---- game-worn swatches: a pair, centred on the photo ---- */
-.rlq-patches {
+/* player photo — set into the upper register (base / auto / dual) */
+.rlq-photo {
   position: absolute;
-  z-index: 4;
+  inset: 22.2% 7.8% 19% 7.8%;
+  z-index: 1;
+  overflow: hidden;
+}
+/* relic (RPA): a narrow photo beside the patch window */
+.rlq-photo-relic {
+  inset: 23.8% 51.1% 34.5% 7.2%;
+}
+
+/* ---- gold-framed game-worn relic windows ---- */
+.rlq-win {
+  position: absolute;
+  z-index: 1;
+  padding: 2px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #a8852a, #fff4c4 45%, #b08d2c);
+  box-shadow: 0 4px 11px rgba(0, 0, 0, 0.32);
+}
+.rlq-swatch {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  overflow: hidden;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.13) 0 1px, transparent 1px 4px);
+}
+.rlq-swatch-dash {
+  position: absolute;
+  inset: 4px;
+  border: 1.2px dashed rgba(255, 246, 222, 0.75);
+  border-radius: 2px;
+}
+.rlq-swatch-seam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: 1.2px dashed rgba(20, 20, 20, 0.45);
+}
+.rlq-win-relic { inset: 29% 10% 39.7% 54.4%; }
+.rlq-win-dual-a { inset: 57.9% 55% 22.6% 17.8%; }
+.rlq-win-dual-b { inset: 57.9% 17.8% 22.6% 55%; }
+
+/* ---- on-card autograph: blue cursive, slightly rotated ---- */
+.rlq-sig {
+  position: absolute;
+  z-index: 1;
+  top: 64%;
   left: 0;
   right: 0;
-  top: 45%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
+  text-align: center;
+  transform: rotate(-7deg);
+  font-family: 'Mr Dafoe', 'Segoe Script', cursive;
+  font-size: 24px;
+  line-height: 1;
+  color: #16357a;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
   pointer-events: none;
 }
-.rlq-patches .card-patch-window {
-  padding: 2.5px;
-}
-.rlq-patches .card-patch-swatch {
-  width: 46px;
-}
-.card-sm .rlq-patches .card-patch-swatch {
-  width: 38px;
-}
-.rlq-patches-rpa {
-  top: 32%;
-}
-.rlq-patches-rpa .card-patch-swatch {
-  width: 40px;
-}
+.card-sm .rlq-sig { font-size: 19px; }
+.card-lg .rlq-sig { font-size: 30px; }
 
-/* ---- signature: light ink on a dark slip ---- */
-.set-reliquary .card-sig {
-  top: 46%;
-  background: rgba(8, 12, 22, 0.52);
-  border: 1px solid rgba(212, 175, 106, 0.32);
-}
-.set-reliquary .card-rpa-sig {
-  top: 52%;
-  bottom: auto;
-  background: rgba(8, 12, 22, 0.52);
-  border-color: rgba(212, 175, 106, 0.32);
-}
-.set-reliquary .card-sig .card-sig-svg path,
-.set-reliquary .card-rpa-sig .card-sig-svg path {
-  stroke: #ecdfb4 !important;
-}
-
-/* ---- nameplate ---- */
-.set-reliquary .card-plate {
+/* ---- gold-foil text: wordmark, nameplate, team ---- */
+.rlq-wordmark,
+.rlq-name {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
   text-align: center;
-  padding: 9px 12px 11px;
-}
-.set-reliquary .card-plate-row {
-  justify-content: center;
-  gap: 10px;
-}
-/* the ornate frame owns the top corners — keep the RC badge to the back */
-.set-reliquary .card-face-front .card-head {
-  display: none;
-}
-/* the front shows just the player + team — serial lives on the back */
-.set-reliquary .card-face-front .card-plate {
-  z-index: 4;
-}
-.set-reliquary .card-face-front .card-plate-row {
-  display: none;
-}
-.set-reliquary .card-face-front .card-name {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 23px;
-  line-height: 0.96;
-  letter-spacing: 0.01em;
-  background: linear-gradient(180deg, #fbeec2 0%, #e3c373 58%, #bd9540 100%);
+  background: linear-gradient(100deg, #7a5e18 0%, #d9b349 20%, #fff4c4 38%, #c79f34 52%, #f0d27e 68%, #a8852a 86%, #7a5e18 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.85));
+  animation: rlq-shimmer 6s linear infinite;
 }
-.card-sm.set-reliquary .card-face-front .card-name {
-  font-size: 18px;
+.rlq-wordmark {
+  top: 5.6%;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 2px;
 }
-.card-lg.set-reliquary .card-face-front .card-name {
-  font-size: 28px;
+.rlq-name {
+  top: 85.5%;
+  font-family: 'Oswald', var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  text-transform: none;
 }
-.set-reliquary .card-face-front .card-sub {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 4px;
-  color: #cbac6a;
-  letter-spacing: 0.16em;
+.rlq-team {
+  position: absolute;
+  z-index: 3;
+  top: 93%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Oswald', var(--font-display);
+  font-weight: 300;
+  font-size: 7px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  font-size: 9px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  color: #b08d2c;
 }
-.set-reliquary .card-face-front .card-sub::before,
-.set-reliquary .card-face-front .card-sub::after {
-  content: '';
-  height: 1px;
-  width: 20px;
-  background: linear-gradient(90deg, transparent, #c79a3e);
-}
-.set-reliquary .card-face-front .card-sub::after {
-  background: linear-gradient(90deg, #c79a3e, transparent);
+.card-sm .rlq-wordmark { font-size: 12px; }
+.card-sm .rlq-name { font-size: 14px; }
+.card-lg .rlq-wordmark { font-size: 19px; }
+.card-lg .rlq-name { font-size: 22px; }
+.card-lg .rlq-team { font-size: 9px; }
+@keyframes rlq-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 /* ---- back: serif gold wordmark + gold serial pill ---- */
