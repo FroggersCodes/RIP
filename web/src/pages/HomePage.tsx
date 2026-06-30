@@ -6,7 +6,17 @@ import { useApi } from '../lib/useApi';
 import { RipReveal, type RevealCard } from '../components/RipReveal';
 import { division } from '@rip/shared';
 import { countdown, num } from '../lib/format';
-import type { ClockInfo, DailyStatus, DailyClaimResult, FeedEvent, Mission, User } from '../api/types';
+import type {
+  ClockInfo,
+  DailyStatus,
+  DailyClaimResult,
+  DailyRewardResult,
+  FeedEvent,
+  HourlyClaimResult,
+  Mission,
+  RewardsStatus,
+  User,
+} from '../api/types';
 
 interface LeagueCurrent {
   current: { season: number; weekNumber: number } | null;
@@ -16,6 +26,7 @@ interface LeagueCurrent {
 export function HomePage() {
   const { user, setUser } = useAuth();
   const daily = useApi(() => api<DailyStatus>('/daily/status'), []);
+  const rewards = useApi(() => api<RewardsStatus>('/rewards'), []);
   const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
   const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
   const missions = useApi(() => api<{ missions: Mission[] }>('/missions'), []);
@@ -45,6 +56,9 @@ export function HomePage() {
   const [reveal, setReveal] = useState<RevealCard[] | null>(null);
   const [revealTitle, setRevealTitle] = useState('');
   const [claiming, setClaiming] = useState(false);
+  const [claimingHourly, setClaimingHourly] = useState(false);
+  const [claimingReward, setClaimingReward] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -68,10 +82,48 @@ export function HomePage() {
   };
 
 
+  const claimHourly = async () => {
+    setClaimingHourly(true);
+    try {
+      const r = await api<HourlyClaimResult>('/rewards/hourly/claim', { method: 'POST' });
+      setUser(r.user);
+      setToast(`+${num(r.coins)} coins`);
+      rewards.reload();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed');
+    } finally {
+      setClaimingHourly(false);
+    }
+  };
+
+  const claimDailyReward = async () => {
+    setClaimingReward(true);
+    try {
+      const r = await api<DailyRewardResult>('/rewards/daily/claim', { method: 'POST' });
+      setUser(r.user);
+      const bits = [`+${num(r.reward.coins)} coins`, r.reward.cases && `+${r.reward.cases} case`].filter(Boolean);
+      setToast(`Day ${r.streak} · ${bits.join(' · ')}`);
+      rewards.reload();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed');
+    } finally {
+      setClaimingReward(false);
+    }
+  };
+
+  // Auto-dismiss the little reward toast.
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2600);
+    return () => clearTimeout(t);
+  }, [toast]);
+
   const ds = daily.data;
+  const rs = rewards.data;
   return (
     <>
       {reveal && <RipReveal cards={reveal} title={revealTitle} onClose={() => setReveal(null)} />}
+      {toast && <div className="reward-toast">{toast}</div>}
       <div className="page-head between">
         <div>
           <h1>Welcome back, {user?.username}</h1>
@@ -132,6 +184,83 @@ export function HomePage() {
             <div className="muted" style={{ fontSize: 13 }}>
               Reach a {ds.nextTier.atStreak}-day streak to unlock {ds.nextTier.name}.
             </div>
+          )}
+        </div>
+      </div>
+
+      <div className="rewards-grid">
+        <div className="panel panel-p reward-card">
+          <div className="between">
+            <div className="section-title">Hourly Coins</div>
+            <span className="tag">{rs ? `${rs.hourly.ratePerHour}/hr` : '—'}</span>
+          </div>
+          {rs ? (
+            <>
+              <div className="reward-amt">
+                <span className="coin-ic">🪙</span>
+                <span className="kpi gold">{num(rs.hourly.coins)}</span>
+                <span className="muted" style={{ fontSize: 13 }}>ready</span>
+              </div>
+              {rs.hourly.canClaim ? (
+                <button className="btn btn-gold btn-lg" onClick={claimHourly} disabled={claimingHourly}>
+                  {claimingHourly ? 'Claiming…' : `Collect ${num(rs.hourly.coins)} coins`}
+                </button>
+              ) : (
+                <button className="btn" disabled>
+                  Next coin in {countdown(rs.hourly.nextClaimAt)}
+                </button>
+              )}
+              <div className="muted" style={{ fontSize: 12 }}>
+                {rs.hourly.maxedOut ? (
+                  <b style={{ color: 'var(--gold)' }}>Bank full — collect before it caps out.</b>
+                ) : (
+                  <>Earns {rs.hourly.ratePerHour} coins/hour, banking up to {num(rs.hourly.maxCoins)} ({rs.hourly.capHours}h).</>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="spin" />
+          )}
+        </div>
+
+        <div className="panel panel-p reward-card">
+          <div className="between">
+            <div className="section-title">Daily Reward</div>
+            {rs && <span className="tag">🔥 {rs.daily.streak}-day streak</span>}
+          </div>
+          {rs ? (
+            rs.daily.canClaim ? (
+              <>
+                <div className="reward-amt">
+                  <span className="coin-ic">🪙</span>
+                  <span className="kpi gold">{num(rs.daily.reward.coins)}</span>
+                  {rs.daily.reward.cases > 0 && <span className="tag">+{rs.daily.reward.cases} case</span>}
+                </div>
+                <button className="btn btn-gold btn-lg" onClick={claimDailyReward} disabled={claimingReward}>
+                  {claimingReward ? 'Claiming…' : 'Claim daily reward'}
+                </button>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Keep the streak alive — tomorrow pays {num(rs.daily.nextReward.coins)} coins
+                  {rs.daily.nextReward.cases > 0 ? ' + a case' : ''}.
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="reward-amt">
+                  <span className="muted">Next reward in </span>
+                  <span className="mono" style={{ color: 'var(--text)' }}>{countdown(rs.daily.nextClaimAt)}</span>
+                </div>
+                <button className="btn" disabled>
+                  Claimed today
+                </button>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Come back tomorrow for day {rs.daily.streak + 1} · {num(rs.daily.nextReward.coins)} coins
+                  {rs.daily.nextReward.cases > 0 ? ' + a case' : ''}.
+                </div>
+              </>
+            )
+          ) : (
+            <div className="spin" />
           )}
         </div>
       </div>

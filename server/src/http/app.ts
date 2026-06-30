@@ -9,6 +9,7 @@ import authRouter from './routes/auth';
 import productsRouter from './routes/products';
 import ripRouter from './routes/rip';
 import dailyRouter from './routes/daily';
+import rewardsRouter from './routes/rewards';
 import adminRouter from './routes/admin';
 import leagueRouter from './routes/league';
 import teamsRouter from './routes/teams';
@@ -46,6 +47,7 @@ export function createApp() {
   app.use('/api/products', productsRouter);
   app.use('/api/rip', ripRouter);
   app.use('/api/daily', dailyRouter);
+  app.use('/api/rewards', rewardsRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/league', leagueRouter);
   app.use('/api/teams', teamsRouter);

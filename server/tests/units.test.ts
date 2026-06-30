@@ -2,6 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { computeMarketValue, isEligibleForRole, serialPremium } from '@rip/shared';
 import { applyValueChange, WEEKLY_CAP } from '../src/league/valuation';
 import { tierForStreak } from '../src/daily/dailyConfig';
+import {
+  HOURLY_CAP_HOURS,
+  HOURLY_MAX_COINS,
+  HOURLY_RATE,
+  HOUR_MS,
+  LOGIN_MAX_COINS,
+  hourlyState,
+  loginReward,
+  nextLoginStreak,
+} from '../src/rewards/rewardsConfig';
 
 describe('valuation caps', () => {
   it('caps weekly gains at +15%', () => {
@@ -47,5 +57,57 @@ describe('market value', () => {
     expect(serialPremium(null, null)).toBe(1);
     expect(computeMarketValue(10, 15, 1, 250)).toBe(225); // 10 * 15 * 1.5
     expect(computeMarketValue(10, 1, null, null)).toBe(10);
+  });
+});
+
+describe('hourly coins', () => {
+  const base = new Date('2026-06-30T00:00:00Z');
+
+  it('pays nothing until a whole hour passes', () => {
+    expect(hourlyState(base, new Date(base.getTime() + 59 * 60 * 1000)).canClaim).toBe(false);
+    const oneHour = hourlyState(base, new Date(base.getTime() + HOUR_MS));
+    expect(oneHour.canClaim).toBe(true);
+    expect(oneHour.coins).toBe(HOURLY_RATE);
+  });
+
+  it('accrues per whole hour and preserves the sub-hour remainder', () => {
+    const s = hourlyState(base, new Date(base.getTime() + 3 * HOUR_MS + 40 * 60 * 1000));
+    expect(s.bankedHours).toBe(3);
+    expect(s.coins).toBe(3 * HOURLY_RATE);
+    // baseline advances exactly 3h, leaving the 40m remainder still counting.
+    expect(s.newBaseline.getTime()).toBe(base.getTime() + 3 * HOUR_MS);
+    expect(s.maxedOut).toBe(false);
+  });
+
+  it('caps the bank and forfeits overflow by restarting the clock at now', () => {
+    const now = new Date(base.getTime() + 30 * HOUR_MS);
+    const s = hourlyState(base, now);
+    expect(s.bankedHours).toBe(HOURLY_CAP_HOURS);
+    expect(s.coins).toBe(HOURLY_MAX_COINS);
+    expect(s.maxedOut).toBe(true);
+    expect(s.newBaseline.getTime()).toBe(now.getTime());
+    expect(s.nextClaimAt).toBeNull();
+  });
+});
+
+describe('daily login reward', () => {
+  it('grows with the streak and caps the coins', () => {
+    expect(loginReward(1).coins).toBe(100);
+    expect(loginReward(2).coins).toBe(125);
+    expect(loginReward(100).coins).toBe(LOGIN_MAX_COINS);
+  });
+
+  it('drops a case every 7th day', () => {
+    expect(loginReward(1).cases).toBe(0);
+    expect(loginReward(7).cases).toBe(1);
+    expect(loginReward(14).cases).toBe(1);
+    expect(loginReward(8).cases).toBe(0);
+  });
+
+  it('continues the streak within the window and resets after a missed day', () => {
+    const last = new Date('2026-06-30T00:00:00Z');
+    expect(nextLoginStreak(null, 0, last)).toBe(1);
+    expect(nextLoginStreak(last, 4, new Date(last.getTime() + 25 * HOUR_MS))).toBe(5); // next day
+    expect(nextLoginStreak(last, 4, new Date(last.getTime() + 50 * HOUR_MS))).toBe(1); // missed a day
   });
 });

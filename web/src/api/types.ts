@@ -10,6 +10,9 @@ export interface User {
   rating: number;
   dailyStreak: number;
   lastDailyClaimAt: string | null;
+  loginStreak: number;
+  lastLoginRewardAt: string | null;
+  lastHourlyClaimAt: string | null;
   createdAt: string;
 }
 
@@ -150,6 +153,44 @@ export interface DailyStatus {
   streak: number;
   currentTier: { name: string; cards: number; tokenReward: number; caseReward: number };
   nextTier: { name: string; atStreak: number } | null;
+}
+
+export interface RewardCoins {
+  coins: number;
+  cases: number;
+}
+
+export interface RewardsStatus {
+  hourly: {
+    canClaim: boolean;
+    coins: number;
+    ratePerHour: number;
+    capHours: number;
+    maxCoins: number;
+    bankedHours: number;
+    maxedOut: boolean;
+    nextClaimAt: string | null;
+  };
+  daily: {
+    canClaim: boolean;
+    streak: number;
+    nextClaimAt: string | null;
+    reward: RewardCoins;
+    nextReward: RewardCoins;
+  };
+}
+
+export interface HourlyClaimResult {
+  claimed: boolean;
+  coins: number;
+  user: User;
+}
+
+export interface DailyRewardResult {
+  claimed: boolean;
+  streak: number;
+  reward: RewardCoins;
+  user: User;
 }
 
 export interface TeamSummary {
