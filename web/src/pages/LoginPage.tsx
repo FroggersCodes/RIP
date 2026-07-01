@@ -30,7 +30,7 @@ export function LoginPage() {
         <div className="auth-brand">
           RIP<span className="gold">.</span>
         </div>
-        <div className="auth-tag">rip · battle · build</div>
+        <div className="auth-tag">rip · build · win the week</div>
         <form onSubmit={submit} className="col" style={{ gap: 14, marginTop: 20 }}>
           <div className="col" style={{ gap: 6 }}>
             <label className="label">{mode === 'login' ? 'Username or email' : 'Username'}</label>

@@ -4,13 +4,14 @@ import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { Card } from '../components/Card';
 import { money, countdown } from '../lib/format';
-import type { ClockInfo, Collection, Lineup, LeaderboardEntry, LineupSlotView } from '../api/types';
+import type { ClockInfo, Collection, Lineup, LeagueMe, LeaderboardEntry, LineupSlotView } from '../api/types';
 
 export function LineupPage() {
   const { user } = useAuth();
   const lineup = useApi(() => api<Lineup>('/lineup'), []);
   const collection = useApi(() => api<Collection>('/cards'), []);
   const lb = useApi(() => api<{ week: { weekNumber: number } | null; entries: LeaderboardEntry[] }>('/league/leaderboard'), []);
+  const leagueMe = useApi(() => api<LeagueMe>('/league/me'), []);
   const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
   const locked = clock.data?.locked ?? false;
   const [picking, setPicking] = useState<LineupSlotView | null>(null);
@@ -23,6 +24,7 @@ export function LineupPage() {
       lineup.setData(r);
       setPicking(null);
       collection.reload();
+      leagueMe.reload();
     } finally {
       setBusy(false);
     }
@@ -32,6 +34,7 @@ export function LineupPage() {
     const r = await api<Lineup>(`/lineup/${role}`, { method: 'DELETE' });
     lineup.setData(r);
     collection.reload();
+    leagueMe.reload();
   };
 
   const myScore = lb.data?.entries.find((e) => e.username === user?.username);
@@ -61,6 +64,49 @@ export function LineupPage() {
           )}
         </div>
       </div>
+
+      {leagueMe.data && (() => {
+        const lm = leagueMe.data;
+        return (
+          <div className="lineup-stakes">
+            <div className="ls-stat ls-live">
+              <span className="ls-label">This week · projected</span>
+              {lm.currentWeek ? (
+                <>
+                  <span className="ls-stat-v">
+                    #{lm.currentWeek.projectedRank}
+                    <span className="ls-of"> of {Math.max(lm.currentWeek.totalPlayers, 1)}</span>
+                  </span>
+                  <span className="ls-sub">
+                    {lm.currentWeek.projectedPoints.toFixed(1)} proj pts · {lm.currentWeek.filledSlots}/{lm.currentWeek.totalSlots} slots
+                  </span>
+                </>
+              ) : (
+                <span className="ls-sub">Season starting soon</span>
+              )}
+            </div>
+            <div className="ls-stat">
+              <span className="ls-label">Last week</span>
+              {lm.lastWeek ? (
+                <>
+                  <span className="ls-stat-v">
+                    #{lm.lastWeek.rank}
+                    <span className="ls-of"> of {lm.lastWeek.totalPlayers}</span>
+                  </span>
+                  <span className="ls-sub">{lm.lastWeek.points.toFixed(1)} pts · won {lm.lastWeek.payoutLabel}</span>
+                </>
+              ) : (
+                <span className="ls-sub">No lineup scored — don't miss this week.</span>
+              )}
+            </div>
+            <div className="ls-stat">
+              <span className="ls-label">Win the week</span>
+              <span className="ls-stat-v gold-num">1,000🪙</span>
+              <span className="ls-sub">+3 cases +3💎 · top 3 all earn gems</span>
+            </div>
+          </div>
+        );
+      })()}
 
       {locked && (
         <div className="lock-banner">

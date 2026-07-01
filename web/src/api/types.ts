@@ -258,19 +258,6 @@ export interface PlayerDetail {
   totals: { season: PlayerTotals; career: PlayerTotals };
 }
 
-export interface BattleResult {
-  battleId: string;
-  result: 'win' | 'loss' | 'tie';
-  challengerCards: PulledCard[];
-  opponentCards: PulledCard[];
-  challengerTotal: number;
-  opponentTotal: number;
-  rewardTokens: number;
-  rewardCases: number;
-  ratingDelta: number;
-  user: User;
-}
-
 export interface LeaderboardEntry {
   rank: number;
   username: string;
@@ -318,6 +305,38 @@ export interface StandingRow {
 export interface Standings {
   season: number;
   standings: StandingRow[];
+}
+
+export interface LeaguePayout {
+  tokens: number;
+  cases: number;
+  gems: number;
+}
+export interface LeagueMe {
+  season: number;
+  rating: number;
+  division: string;
+  lastWeek: {
+    weekNumber: number;
+    points: number;
+    rank: number;
+    totalPlayers: number;
+    payout: LeaguePayout;
+    payoutLabel: string;
+  } | null;
+  currentWeek: {
+    weekNumber: number;
+    projectedPoints: number;
+    projectedRank: number;
+    totalPlayers: number;
+    filledSlots: number;
+    totalSlots: number;
+  } | null;
+  seasonStanding: {
+    points: number;
+    rank: number;
+    totalPlayers: number;
+  } | null;
 }
 
 export interface BracketGame {

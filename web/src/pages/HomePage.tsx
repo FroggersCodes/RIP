@@ -13,21 +13,17 @@ import type {
   DailyRewardResult,
   FeedEvent,
   HourlyClaimResult,
+  LeagueMe,
   Mission,
   RewardsStatus,
   User,
 } from '../api/types';
 
-interface LeagueCurrent {
-  current: { season: number; weekNumber: number } | null;
-  lastSimulated: { season: number; weekNumber: number; simulatedAt: string } | null;
-}
-
 export function HomePage() {
   const { user, setUser } = useAuth();
   const daily = useApi(() => api<DailyStatus>('/daily/status'), []);
   const rewards = useApi(() => api<RewardsStatus>('/rewards'), []);
-  const league = useApi(() => api<LeagueCurrent>('/league/current'), []);
+  const leagueMe = useApi(() => api<LeagueMe>('/league/me'), []);
   const clock = useApi(() => api<ClockInfo>('/league/clock'), []);
   const missions = useApi(() => api<{ missions: Mission[] }>('/missions'), []);
   const feed = useApi(() => api<{ events: FeedEvent[] }>('/feed'), []);
@@ -60,11 +56,28 @@ export function HomePage() {
   const [claimingReward, setClaimingReward] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [, setTick] = useState(0);
+  // Weekly recap: pop a one-time summary of your finish the first time you see a
+  // newly-simulated week. A per-season+week marker in localStorage gates it.
+  const [recap, setRecap] = useState<LeagueMe['lastWeek']>(null);
 
   useEffect(() => {
     const i = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(i);
   }, []);
+
+  const weekMarker = (season: number, week: number) => season * 100 + week;
+  useEffect(() => {
+    const lm = leagueMe.data;
+    if (!lm?.lastWeek) return;
+    const seen = Number(localStorage.getItem('rip.seenLeagueWeek') ?? 0);
+    if (weekMarker(lm.season, lm.lastWeek.weekNumber) > seen) setRecap(lm.lastWeek);
+  }, [leagueMe.data]);
+
+  const dismissRecap = () => {
+    const lm = leagueMe.data;
+    if (lm?.lastWeek) localStorage.setItem('rip.seenLeagueWeek', String(weekMarker(lm.season, lm.lastWeek.weekNumber)));
+    setRecap(null);
+  };
 
   const claim = async () => {
     setClaiming(true);
@@ -139,6 +152,29 @@ export function HomePage() {
     <>
       {reveal && <RipReveal cards={reveal} title={revealTitle} onClose={() => setReveal(null)} />}
       {toast && <div className="reward-toast">{toast}</div>}
+      {recap && (
+        <div className="modal-overlay" onClick={dismissRecap}>
+          <div className="modal panel recap-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="section-title">Week {recap.weekNumber} results are in</div>
+            <div className={`recap-rank ${recap.rank <= 3 ? 'podium' : ''}`}>
+              {recap.rank === 1 ? '🥇' : recap.rank === 2 ? '🥈' : recap.rank === 3 ? '🥉' : '#' + recap.rank}
+            </div>
+            <div className="recap-line">
+              You finished <b>#{recap.rank}</b> of {recap.totalPlayers} with{' '}
+              <b className="mono">{recap.points.toFixed(1)}</b> lineup pts.
+            </div>
+            <div className="recap-prize">🏆 Prize banked: <b>{recap.payoutLabel}</b></div>
+            <div className="row" style={{ gap: 10, marginTop: 16 }}>
+              <Link to="/standings" className="btn btn-ghost" onClick={dismissRecap}>
+                See standings
+              </Link>
+              <button className="btn btn-gold" onClick={dismissRecap}>
+                {recap.rank <= 3 ? 'Defend my spot' : 'Set my lineup'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="page-head between">
         <div>
           <h1>Welcome back, {user?.username}</h1>
@@ -150,6 +186,67 @@ export function HomePage() {
           <div className="muted mono" style={{ fontSize: 11 }}>{num(user?.rating ?? 1000)} rating</div>
         </div>
       </div>
+
+      {leagueMe.data && (() => {
+        const lm = leagueMe.data;
+        return (
+          <div className="panel panel-p league-spot">
+            <div className="between league-spot-head">
+              <div className="section-title">
+                Your league week{lm.currentWeek ? ` · Week ${lm.currentWeek.weekNumber}` : ''}
+              </div>
+              <span className="tag division-tag">{lm.division} · {num(lm.rating)}</span>
+            </div>
+            <div className="league-spot-grid">
+              <div className="ls-cell">
+                <div className="ls-label">Last week</div>
+                {lm.lastWeek ? (
+                  <>
+                    <div className="ls-rank">
+                      #{lm.lastWeek.rank}
+                      <span className="ls-of"> of {lm.lastWeek.totalPlayers}</span>
+                    </div>
+                    <div className="ls-sub">{lm.lastWeek.points.toFixed(1)} lineup pts</div>
+                    <div className="ls-prize">🏆 won {lm.lastWeek.payoutLabel}</div>
+                  </>
+                ) : (
+                  <div className="ls-empty">No lineup last week — you left prizes on the table.</div>
+                )}
+              </div>
+              <div className="ls-cell ls-live">
+                <div className="ls-label">This week · live projection</div>
+                {lm.currentWeek ? (
+                  <>
+                    <div className="ls-rank">
+                      #{lm.currentWeek.projectedRank}
+                      <span className="ls-of"> of {Math.max(lm.currentWeek.totalPlayers, 1)}</span>
+                    </div>
+                    <div className="ls-sub">
+                      {lm.currentWeek.projectedPoints.toFixed(1)} projected pts · {lm.currentWeek.filledSlots}/{lm.currentWeek.totalSlots} slots set
+                    </div>
+                    {clock.data &&
+                      (clock.data.locked ? (
+                        <div className="ls-lock">🔒 Locked — kickoff imminent</div>
+                      ) : (
+                        <div className="ls-sub">
+                          Lock in <span className="mono" style={{ color: 'var(--text)' }}>{countdown(clock.data.nextAdvanceAt)}</span>
+                        </div>
+                      ))}
+                  </>
+                ) : (
+                  <div className="ls-empty">Season starting soon.</div>
+                )}
+                <Link to="/lineup" className="btn btn-gold" style={{ marginTop: 12, alignSelf: 'flex-start' }}>
+                  {lm.currentWeek && lm.currentWeek.filledSlots < lm.currentWeek.totalSlots ? 'Finish your lineup →' : 'Manage lineup →'}
+                </Link>
+              </div>
+            </div>
+            <div className="ls-ladder muted">
+              Win the week and bank <b style={{ color: 'var(--gold)' }}>1,000🪙 · 3 cases · 3💎</b>. Top 3 all earn gems — the league is the fastest way to premium currency.
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="home-hero">
         <div className="hero-bals">
@@ -309,10 +406,10 @@ export function HomePage() {
           <div className="qt-title">Rip packs</div>
           <div className="qt-sub">Chase finite serials</div>
         </Link>
-        <Link to="/battle" className="quick-tile">
+        <Link to="/standings" className="quick-tile">
           <div className="section-title">Compete</div>
-          <div className="qt-title">Head to head</div>
-          <div className="qt-sub">Beat the house</div>
+          <div className="qt-title">League standings</div>
+          <div className="qt-sub">Win the week</div>
         </Link>
         <Link to="/lineup" className="quick-tile">
           <div className="section-title">Build</div>
@@ -378,21 +475,24 @@ export function HomePage() {
 
       <div className="home-cols">
         <div className="panel panel-p">
-          <div className="section-title">League status</div>
-          <div className="between" style={{ marginTop: 10 }}>
-            <div>
-              <div className="muted">Current week</div>
-              <div className="kpi" style={{ fontSize: 26 }}>
-                {league.data?.current ? `Week ${league.data.current.weekNumber}` : '—'}
+          <div className="section-title">Season race</div>
+          {leagueMe.data?.seasonStanding ? (
+            <div className="between" style={{ marginTop: 10 }}>
+              <div>
+                <div className="muted">Your season rank</div>
+                <div className="kpi gold" style={{ fontSize: 26 }}>
+                  #{leagueMe.data.seasonStanding.rank}
+                  <span className="muted" style={{ fontSize: 14 }}> of {leagueMe.data.seasonStanding.totalPlayers}</span>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div className="muted">Season pts</div>
+                <div className="kpi" style={{ fontSize: 26 }}>{leagueMe.data.seasonStanding.points.toFixed(1)}</div>
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div className="muted">Last simulated</div>
-              <div className="kpi" style={{ fontSize: 26 }}>
-                {league.data?.lastSimulated ? `Week ${league.data.lastSimulated.weekNumber}` : '—'}
-              </div>
-            </div>
-          </div>
+          ) : (
+            <div className="muted" style={{ marginTop: 10 }}>Field a lineup and score a week to join the season race.</div>
+          )}
           {clock.data && (
             <div style={{ marginTop: 10 }}>
               {clock.data.locked ? (
@@ -406,6 +506,9 @@ export function HomePage() {
               )}
             </div>
           )}
+          <Link to="/standings" className="btn btn-ghost" style={{ marginTop: 10, alignSelf: 'flex-start' }}>
+            View standings →
+          </Link>
         </div>
         <div className="panel panel-p">
           <div className="section-title">Around the league</div>
