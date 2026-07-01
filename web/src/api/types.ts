@@ -164,6 +164,10 @@ export interface LoginRewardView {
   packLabel: string | null;
 }
 
+export interface ScheduledRewardDay extends LoginRewardView {
+  day: number;
+}
+
 export interface RewardsStatus {
   hourly: {
     canClaim: boolean;
@@ -181,6 +185,7 @@ export interface RewardsStatus {
     nextClaimAt: string | null;
     reward: LoginRewardView;
     nextReward: LoginRewardView;
+    schedule: ScheduledRewardDay[];
   };
 }
 

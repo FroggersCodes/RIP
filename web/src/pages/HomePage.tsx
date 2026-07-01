@@ -279,6 +279,30 @@ export function HomePage() {
         </div>
       </div>
 
+      {rs && rs.daily.schedule.length > 0 && (
+        <div className="panel panel-p reward-schedule">
+          <div className="between">
+            <div className="section-title">Upcoming daily rewards</div>
+            <span className="muted" style={{ fontSize: 12 }}>🔥 keep your streak going</span>
+          </div>
+          <div className="sched-strip">
+            {rs.daily.schedule.map((d, i) => (
+              <div className={`sched-day${i === 0 ? ' next' : ''}`} key={d.day}>
+                <div className="sched-daynum">Day {d.day}</div>
+                <div className="sched-coins">
+                  <span className="coin-ic">🪙</span> {num(d.coins)}
+                </div>
+                <div className="sched-badges">
+                  {d.gems > 0 && <span className="tag gem-tag">{d.gems} 💎</span>}
+                  {d.packLabel && <span className="tag">🎁 {d.packLabel}</span>}
+                </div>
+                {i === 0 && <div className="sched-flag">{rs.daily.canClaim ? 'Today' : 'Next'}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="quick-grid">
         <Link to="/rip" className="quick-tile">
           <div className="section-title">Open</div>

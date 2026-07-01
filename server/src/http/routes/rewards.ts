@@ -19,6 +19,7 @@ import {
   hourlyState,
   loginReward,
   nextLoginStreak,
+  upcomingLoginRewards,
   type LoginReward,
 } from '../../rewards/rewardsConfig';
 
@@ -65,6 +66,11 @@ function statusFor(user: User) {
       // What claiming right now would award, and the day-after that to tease the streak.
       reward: serializeReward(loginReward(upcomingStreak)),
       nextReward: serializeReward(loginReward(upcomingStreak + 1)),
+      // The next several streak days so the player can see gems/packs coming up.
+      schedule: upcomingLoginRewards(upcomingStreak).map(({ day, reward }) => ({
+        day,
+        ...serializeReward(reward),
+      })),
     },
   };
 }
