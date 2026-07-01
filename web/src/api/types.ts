@@ -155,9 +155,13 @@ export interface DailyStatus {
   nextTier: { name: string; atStreak: number } | null;
 }
 
-export interface RewardCoins {
+export interface LoginRewardView {
   coins: number;
-  cases: number;
+  gems: number;
+  /** Set key of the free pack this day awards, or null on non-pack days. */
+  packSetKey: string | null;
+  /** Display label for the pack (e.g. "Artistry"), or null. */
+  packLabel: string | null;
 }
 
 export interface RewardsStatus {
@@ -175,8 +179,8 @@ export interface RewardsStatus {
     canClaim: boolean;
     streak: number;
     nextClaimAt: string | null;
-    reward: RewardCoins;
-    nextReward: RewardCoins;
+    reward: LoginRewardView;
+    nextReward: LoginRewardView;
   };
 }
 
@@ -189,7 +193,9 @@ export interface HourlyClaimResult {
 export interface DailyRewardResult {
   claimed: boolean;
   streak: number;
-  reward: RewardCoins;
+  reward: LoginRewardView;
+  cards: PulledCard[];
+  packValue: number;
   user: User;
 }
 

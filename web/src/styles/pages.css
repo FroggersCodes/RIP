@@ -150,6 +150,13 @@
   font-size: 22px;
   line-height: 1;
 }
+.reward-amt .tag {
+  align-self: center;
+}
+.gem-tag {
+  color: var(--gem, #7ad6c4);
+  border-color: currentColor;
+}
 .reward-toast {
   position: fixed;
   top: 18px;

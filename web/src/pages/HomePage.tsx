@@ -101,8 +101,17 @@ export function HomePage() {
     try {
       const r = await api<DailyRewardResult>('/rewards/daily/claim', { method: 'POST' });
       setUser(r.user);
-      const bits = [`+${num(r.reward.coins)} coins`, r.reward.cases && `+${r.reward.cases} case`].filter(Boolean);
+      const bits = [
+        `+${num(r.reward.coins)} coins`,
+        r.reward.gems > 0 && `+${r.reward.gems} 💎`,
+        r.reward.packLabel && `${r.reward.packLabel} pack`,
+      ].filter(Boolean);
       setToast(`Day ${r.streak} · ${bits.join(' · ')}`);
+      // A pack day rolls real cards — show the reveal like the daily pack does.
+      if (r.cards.length) {
+        setRevealTitle(`Daily reward · day ${r.streak}${r.reward.packLabel ? ` · ${r.reward.packLabel}` : ''}`);
+        setReveal(r.cards as RevealCard[]);
+      }
       rewards.reload();
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Failed');
@@ -110,6 +119,12 @@ export function HomePage() {
       setClaimingReward(false);
     }
   };
+
+  // A short "Coins · +5 💎 · Artistry pack" line describing a login-reward day.
+  const rewardSummary = (rw: { coins: number; gems: number; packLabel: string | null }) =>
+    [`${num(rw.coins)} coins`, rw.gems > 0 && `${rw.gems} 💎`, rw.packLabel && `${rw.packLabel} pack`]
+      .filter(Boolean)
+      .join(' · ');
 
   // Auto-dismiss the little reward toast.
   useEffect(() => {
@@ -234,14 +249,14 @@ export function HomePage() {
                 <div className="reward-amt">
                   <span className="coin-ic">🪙</span>
                   <span className="kpi gold">{num(rs.daily.reward.coins)}</span>
-                  {rs.daily.reward.cases > 0 && <span className="tag">+{rs.daily.reward.cases} case</span>}
+                  {rs.daily.reward.gems > 0 && <span className="tag gem-tag">+{rs.daily.reward.gems} 💎</span>}
+                  {rs.daily.reward.packLabel && <span className="tag">🎁 {rs.daily.reward.packLabel} pack</span>}
                 </div>
                 <button className="btn btn-gold btn-lg" onClick={claimDailyReward} disabled={claimingReward}>
                   {claimingReward ? 'Claiming…' : 'Claim daily reward'}
                 </button>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Keep the streak alive — tomorrow pays {num(rs.daily.nextReward.coins)} coins
-                  {rs.daily.nextReward.cases > 0 ? ' + a case' : ''}.
+                  Keep the streak alive — tomorrow: {rewardSummary(rs.daily.nextReward)}.
                 </div>
               </>
             ) : (
@@ -254,8 +269,7 @@ export function HomePage() {
                   Claimed today
                 </button>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Come back tomorrow for day {rs.daily.streak + 1} · {num(rs.daily.nextReward.coins)} coins
-                  {rs.daily.nextReward.cases > 0 ? ' + a case' : ''}.
+                  Day {rs.daily.streak + 1} tomorrow: {rewardSummary(rs.daily.nextReward)}.
                 </div>
               </>
             )

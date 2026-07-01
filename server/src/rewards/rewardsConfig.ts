@@ -10,7 +10,7 @@ export const HOUR_MS = 60 * 60 * 1000;
 // ---- Hourly coins -------------------------------------------------------------
 // You earn HOURLY_RATE coins per elapsed hour, accruing while you're away up to
 // HOURLY_CAP_HOURS so logging back in feels rewarding without being farmable.
-export const HOURLY_RATE = 50;
+export const HOURLY_RATE = 100;
 export const HOURLY_CAP_HOURS = 12;
 export const HOURLY_MAX_COINS = HOURLY_RATE * HOURLY_CAP_HOURS;
 
@@ -66,20 +66,45 @@ export const LOGIN_STREAK_RESET_MS = 48 * HOUR_MS;
 export const LOGIN_BASE_COINS = 100;
 export const LOGIN_COINS_PER_DAY = 25;
 export const LOGIN_MAX_COINS = 500;
-// Every 7th consecutive day also drops a case.
-export const LOGIN_CASE_EVERY = 7;
+
+// Gems land every 7th consecutive day, starting at 5 and climbing by 5 each
+// milestone (day 7 → 5, 14 → 10, 21 → 15, 28 → 20) and then holding flat once
+// the streak passes 30 days.
+export const GEM_EVERY = 7;
+export const GEM_STEP = 5;
+export const GEM_ESCALATE_UNTIL_DAY = 30;
+const GEM_MAX_STEPS = Math.floor(GEM_ESCALATE_UNTIL_DAY / GEM_EVERY); // 4 → caps at 20 gems
+
+// A free pack drops every 4th consecutive day. The set escalates with the streak
+// but never climbs past Artistry: day 4 → Spark, day 8 → Momentum, day 12+ → Artistry.
+export const PACK_EVERY = 4;
+export const PACK_LADDER = ['spark', 'momentum', 'artistry'] as const;
 
 export interface LoginReward {
   coins: number;
-  cases: number;
+  gems: number;
+  /** Set key of the free pack this day awards, or null on non-pack days. */
+  packSetKey: string | null;
 }
 
-/** Coins (and the occasional case) for landing on a given streak day. */
+/** Gems awarded on a given streak day (0 on non-milestone days). */
+export function loginGems(day: number): number {
+  if (day <= 0 || day % GEM_EVERY !== 0) return 0;
+  return GEM_STEP * Math.min(day / GEM_EVERY, GEM_MAX_STEPS);
+}
+
+/** The set key of the free pack for a given streak day, or null on non-pack days. */
+export function loginPackSetKey(day: number): string | null {
+  if (day <= 0 || day % PACK_EVERY !== 0) return null;
+  const rung = Math.min(day / PACK_EVERY - 1, PACK_LADDER.length - 1);
+  return PACK_LADDER[rung]!;
+}
+
+/** Coins, gems, and any free pack for landing on a given streak day. */
 export function loginReward(streak: number): LoginReward {
   const day = Math.max(1, streak);
   const coins = Math.min(LOGIN_BASE_COINS + (day - 1) * LOGIN_COINS_PER_DAY, LOGIN_MAX_COINS);
-  const cases = day % LOGIN_CASE_EVERY === 0 ? 1 : 0;
-  return { coins, cases };
+  return { coins, gems: loginGems(day), packSetKey: loginPackSetKey(day) };
 }
 
 /** The streak you'd land on by claiming now, given your last claim + streak. */

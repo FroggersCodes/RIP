@@ -97,11 +97,24 @@ describe('daily login reward', () => {
     expect(loginReward(100).coins).toBe(LOGIN_MAX_COINS);
   });
 
-  it('drops a case every 7th day', () => {
-    expect(loginReward(1).cases).toBe(0);
-    expect(loginReward(7).cases).toBe(1);
-    expect(loginReward(14).cases).toBe(1);
-    expect(loginReward(8).cases).toBe(0);
+  it('drops gems every 7th day, escalating by 5 then holding past 30 days', () => {
+    expect(loginReward(6).gems).toBe(0);
+    expect(loginReward(7).gems).toBe(5);
+    expect(loginReward(14).gems).toBe(10);
+    expect(loginReward(21).gems).toBe(15);
+    expect(loginReward(28).gems).toBe(20);
+    expect(loginReward(35).gems).toBe(20); // past 30 days -> holds flat
+    expect(loginReward(70).gems).toBe(20);
+  });
+
+  it('awards an escalating pack every 4th day, never past Artistry', () => {
+    expect(loginReward(1).packSetKey).toBeNull();
+    expect(loginReward(3).packSetKey).toBeNull();
+    expect(loginReward(4).packSetKey).toBe('spark');
+    expect(loginReward(8).packSetKey).toBe('momentum');
+    expect(loginReward(12).packSetKey).toBe('artistry');
+    expect(loginReward(16).packSetKey).toBe('artistry'); // capped at artistry
+    expect(loginReward(100).packSetKey).toBe('artistry');
   });
 
   it('continues the streak within the window and resets after a missed day', () => {
