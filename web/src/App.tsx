@@ -4,7 +4,6 @@ import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { RipPage } from './pages/RipPage';
-import { BattlePage } from './pages/BattlePage';
 import { LineupPage } from './pages/LineupPage';
 import { CollectionPage } from './pages/CollectionPage';
 import { SetsPage } from './pages/SetsPage';
@@ -41,7 +40,6 @@ export function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/rip" element={<RipPage />} />
-        <Route path="/battle" element={<BattlePage />} />
         <Route path="/lineup" element={<LineupPage />} />
         <Route path="/collection" element={<CollectionPage />} />
         <Route path="/sets" element={<SetsPage />} />

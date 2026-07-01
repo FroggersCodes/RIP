@@ -13,7 +13,6 @@ const GROUPS: Group[] = [
     label: 'Play',
     items: [
       { to: '/rip', label: 'Rip' },
-      { to: '/battle', label: 'Battle' },
       { to: '/lineup', label: 'Lineup' },
     ],
   },

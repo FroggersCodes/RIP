@@ -16,7 +16,6 @@ import teamsRouter from './routes/teams';
 import playersRouter from './routes/players';
 import lineupRouter from './routes/lineup';
 import cardsRouter from './routes/cards';
-import battlesRouter from './routes/battles';
 import missionsRouter from './routes/missions';
 import marketRouter from './routes/market';
 import feedRouter from './routes/feed';
@@ -54,7 +53,6 @@ export function createApp() {
   app.use('/api/players', playersRouter);
   app.use('/api/lineup', lineupRouter);
   app.use('/api/cards', cardsRouter);
-  app.use('/api/battles', battlesRouter);
   app.use('/api/missions', missionsRouter);
   app.use('/api/market', marketRouter);
   app.use('/api/feed', feedRouter);

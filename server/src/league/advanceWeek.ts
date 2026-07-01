@@ -6,6 +6,7 @@ import { applyValueChange, baselineValue, expectedFantasy, OFFSEASON_REGRESSION 
 import { grant } from '../economy/wallet';
 import { PLAYOFF_TEAMS, ROUND_LABEL, type Round, playoffRoundForWeek } from './constants';
 import { computeStandings, seedMap } from './standings';
+import { weeklyPayout, payoutLabel, ratingDelta } from './payouts';
 
 interface StatRow {
   weekId: string;
@@ -201,20 +202,15 @@ export async function advanceWeek(): Promise<AdvanceResult> {
           });
         }
 
-        // Ranked: weekly token/case payouts + rating-ladder movement.
+        // Ranked: weekly token/case/gem payouts + rating-ladder movement. Finishing
+        // near the top is the main skill-based way to earn gems and cases.
         const ranked = [...pointsByUser.entries()].sort((a, b) => b[1] - a[1]);
-        const PAYOUTS = [
-          { tokens: 600, cases: 2 },
-          { tokens: 350, cases: 1 },
-          { tokens: 200, cases: 1 },
-        ];
         for (let i = 0; i < ranked.length; i++) {
           const [uid] = ranked[i]!;
-          const pay = PAYOUTS[i] ?? (i < 10 ? { tokens: 80, cases: 0 } : { tokens: 0, cases: 0 });
-          if (pay.tokens || pay.cases) await grant(tx, uid, pay);
-          const frac = ranked.length > 1 ? i / (ranked.length - 1) : 0;
-          const dr = frac <= 0.34 ? 12 : frac >= 0.66 ? -8 : 2;
-          await tx.user.update({ where: { id: uid }, data: { rating: { increment: dr } } });
+          const rank = i + 1;
+          const pay = weeklyPayout(rank, ranked.length);
+          if (pay.tokens || pay.cases || pay.gems) await grant(tx, uid, pay);
+          await tx.user.update({ where: { id: uid }, data: { rating: { increment: ratingDelta(rank, ranked.length) } } });
         }
         if (ranked.length > 0) {
           const [winnerId, winPts] = ranked[0]!;
@@ -224,7 +220,7 @@ export async function advanceWeek(): Promise<AdvanceResult> {
               data: {
                 type: 'WEEK',
                 username: w.username,
-                text: `${w.username} won week ${week.weekNumber} with ${Math.round(winPts * 10) / 10} lineup pts`,
+                text: `${w.username} won week ${week.weekNumber} with ${Math.round(winPts * 10) / 10} lineup pts — banked ${payoutLabel(weeklyPayout(1, ranked.length))}`,
               },
             });
           }
