@@ -12,6 +12,9 @@ export function publicUser(u: User) {
     rating: u.rating,
     dailyStreak: u.dailyStreak,
     lastDailyClaimAt: u.lastDailyClaimAt,
+    loginStreak: u.loginStreak,
+    lastLoginRewardAt: u.lastLoginRewardAt,
+    lastHourlyClaimAt: u.lastHourlyClaimAt,
     createdAt: u.createdAt,
   };
 }

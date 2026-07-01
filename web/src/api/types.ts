@@ -10,6 +10,9 @@ export interface User {
   rating: number;
   dailyStreak: number;
   lastDailyClaimAt: string | null;
+  loginStreak: number;
+  lastLoginRewardAt: string | null;
+  lastHourlyClaimAt: string | null;
   createdAt: string;
 }
 
@@ -150,6 +153,50 @@ export interface DailyStatus {
   streak: number;
   currentTier: { name: string; cards: number; tokenReward: number; caseReward: number };
   nextTier: { name: string; atStreak: number } | null;
+}
+
+export interface LoginRewardView {
+  coins: number;
+  gems: number;
+  /** Set key of the free pack this day awards, or null on non-pack days. */
+  packSetKey: string | null;
+  /** Display label for the pack (e.g. "Artistry"), or null. */
+  packLabel: string | null;
+}
+
+export interface RewardsStatus {
+  hourly: {
+    canClaim: boolean;
+    coins: number;
+    ratePerHour: number;
+    capHours: number;
+    maxCoins: number;
+    bankedHours: number;
+    maxedOut: boolean;
+    nextClaimAt: string | null;
+  };
+  daily: {
+    canClaim: boolean;
+    streak: number;
+    nextClaimAt: string | null;
+    reward: LoginRewardView;
+    nextReward: LoginRewardView;
+  };
+}
+
+export interface HourlyClaimResult {
+  claimed: boolean;
+  coins: number;
+  user: User;
+}
+
+export interface DailyRewardResult {
+  claimed: boolean;
+  streak: number;
+  reward: LoginRewardView;
+  cards: PulledCard[];
+  packValue: number;
+  user: User;
 }
 
 export interface TeamSummary {
