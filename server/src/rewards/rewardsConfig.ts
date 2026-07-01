@@ -107,6 +107,22 @@ export function loginReward(streak: number): LoginReward {
   return { coins, gems: loginGems(day), packSetKey: loginPackSetKey(day) };
 }
 
+/** How many upcoming streak days the Home page previews. */
+export const DAILY_SCHEDULE_DAYS = 7;
+
+export interface ScheduledDay {
+  day: number;
+  reward: LoginReward;
+}
+
+/** The reward for each of the next `count` streak days, starting at `fromDay`. */
+export function upcomingLoginRewards(fromDay: number, count = DAILY_SCHEDULE_DAYS): ScheduledDay[] {
+  return Array.from({ length: count }, (_, i) => {
+    const day = fromDay + i;
+    return { day, reward: loginReward(day) };
+  });
+}
+
 /** The streak you'd land on by claiming now, given your last claim + streak. */
 export function nextLoginStreak(last: Date | null, currentStreak: number, now: Date): number {
   if (!last) return 1;

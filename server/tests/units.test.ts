@@ -11,6 +11,7 @@ import {
   hourlyState,
   loginReward,
   nextLoginStreak,
+  upcomingLoginRewards,
 } from '../src/rewards/rewardsConfig';
 
 describe('valuation caps', () => {
@@ -122,5 +123,13 @@ describe('daily login reward', () => {
     expect(nextLoginStreak(null, 0, last)).toBe(1);
     expect(nextLoginStreak(last, 4, new Date(last.getTime() + 25 * HOUR_MS))).toBe(5); // next day
     expect(nextLoginStreak(last, 4, new Date(last.getTime() + 50 * HOUR_MS))).toBe(1); // missed a day
+  });
+
+  it('previews the upcoming days starting from the next claim', () => {
+    const days = upcomingLoginRewards(3, 5); // days 3,4,5,6,7
+    expect(days.map((d) => d.day)).toEqual([3, 4, 5, 6, 7]);
+    expect(days[1]!.reward.packSetKey).toBe('spark'); // day 4
+    expect(days[4]!.reward.gems).toBe(5); // day 7
+    expect(days).toHaveLength(5);
   });
 });

@@ -157,6 +157,68 @@
   color: var(--gem, #7ad6c4);
   border-color: currentColor;
 }
+.reward-schedule {
+  margin-bottom: 16px;
+}
+.sched-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(120px, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.sched-day {
+  position: relative;
+  padding: 12px 10px 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 96px;
+}
+.sched-day.next {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-dim), 0 8px 22px rgba(245, 181, 61, 0.12);
+  background: radial-gradient(120% 120% at 100% 0%, rgba(245, 181, 61, 0.12), transparent 55%), var(--surface);
+}
+.sched-daynum {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--muted);
+}
+.sched-coins {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--gold);
+}
+.sched-coins .coin-ic {
+  font-size: 14px;
+}
+.sched-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: auto;
+}
+.sched-flag {
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #1a1206;
+}
 .reward-toast {
   position: fixed;
   top: 18px;
