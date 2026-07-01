@@ -3,6 +3,7 @@ import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useApi } from '../lib/useApi';
 import { RipReveal, type RevealCard } from '../components/RipReveal';
+import { PackArt } from '../components/PackArt';
 import { money, num } from '../lib/format';
 import type { Product, RipResult } from '../api/types';
 
@@ -17,7 +18,7 @@ export function RipPage() {
   const [error, setError] = useState<string | null>(null);
 
   const products = data?.products ?? [];
-  const sel = products.find((p) => p.id === selected) ?? products[0] ?? null;
+  const sel = selected ? products.find((p) => p.id === selected) ?? null : null;
 
   const costLabel = (p: Product) =>
     p.gemCost > 0 ? `${num(p.gemCost)} 💎` : `${num(p.entryCost)} tokens${p.caseCost ? ` + ${p.caseCost} case` : ''}`;
@@ -68,94 +69,111 @@ export function RipPage() {
           onClose={() => setReveal(null)}
         />
       )}
-      <div className="page-head">
-        <h1>Rip packs</h1>
-        <p>Server-rolled odds. Every numbered pull is a unique, owned serial — once it's gone, it's gone.</p>
-      </div>
 
-      {loading ? (
-        <div className="center" style={{ padding: 60 }}>
-          <div className="spin" />
-        </div>
-      ) : (
+      {sel ? (
+        /* ---------- pack detail: picture · cost · odds ---------- */
         <>
-          <div className="product-grid">
-            {products.map((p) => {
-              return (
-                <div
-                  key={p.id}
-                  className={`product-card ${sel?.id === p.id ? 'selected' : ''}`}
-                  onClick={() => setSelected(p.id)}
-                >
-                  <div className="between">
-                    <div className="product-name">{p.name}</div>
-                    <span className="tag">{p.tier}</span>
-                  </div>
-                  <div className="muted" style={{ fontSize: 13, marginTop: 4, minHeight: 36 }}>
-                    {p.description}
-                  </div>
-                  <div className="between" style={{ marginTop: 8 }}>
-                    <span className={`product-cost ${p.gemCost > 0 ? 'gem-text' : ''}`}>{costLabel(p)}</span>
-                    <span className="muted mono" style={{ fontSize: 12 }}>
-                      {p.packsPerBox > 1 ? `${p.packsPerBox} packs · ${p.cardsPerPack * p.packsPerBox} cards` : `${p.cardsPerPack} cards`}
-                    </span>
-                  </div>
-                  {p.guaranteeNumbered && (
-                    <div className="tag" style={{ color: 'var(--gold)', borderColor: 'var(--gold-dim)', marginTop: 6, display: 'inline-block' }}>
-                      📦 guaranteed numbered
-                    </div>
-                  )}
-                  {p.totalBoxes != null && (
-                    <div className="box-supply">
-                      <div className="box-supply-head">
-                        <span className={`box-supply-label ${p.soldOut ? 'sold-out' : ''}`}>
-                          {p.soldOut ? 'SOLD OUT' : `${num(p.boxesRemaining ?? 0)} / ${num(p.totalBoxes)} boxes left`}
-                        </span>
-                        <span className="muted mono" style={{ fontSize: 11 }}>{num(p.boxesOpened)} opened</span>
-                      </div>
-                      <span className={`box-supply-bar ${p.soldOut ? 'sold-out' : ''}`}>
-                        <span style={{ width: `${Math.max(2, ((p.boxesRemaining ?? 0) / p.totalBoxes) * 100)}%` }} />
-                      </span>
-                    </div>
-                  )}
-                  <div className="odds">
-                    {p.odds.map((o) => (
-                      <div className="odds-row" key={o.parallel}>
-                        <span className="odds-name" style={{ color: o.parallel === 'BLACK' ? '#cfd6e2' : o.color }}>
-                          {o.displayName.replace(/\s*1\/1/, '')}
-                        </span>
-                        <span className="odds-pct">{packRate(o.perPack)}</span>
-                      </div>
-                    ))}
-                  </div>
+          <button className="btn btn-ghost btn-sm pack-back" onClick={() => { setSelected(null); setError(null); }}>
+            ← All packs
+          </button>
+
+          <div className="pack-detail">
+            <div className="pack-detail-art">
+              <PackArt setKey={sel.setKey} name={sel.name} size="lg" />
+            </div>
+
+            <div className="pack-detail-info">
+              <div className="between">
+                <h1 style={{ margin: 0 }}>{sel.name}</h1>
+                <span className="tag">{sel.tier}</span>
+              </div>
+              <div className="muted" style={{ marginTop: 6 }}>{sel.description}</div>
+
+              <div className="pack-detail-meta">
+                <div className="pack-meta-cell">
+                  <span className="pack-meta-k">Cost</span>
+                  <span className={`pack-meta-v ${isGem ? 'gem-text' : ''}`}>{costLabel(sel)}</span>
                 </div>
-              );
-            })}
+                <div className="pack-meta-cell">
+                  <span className="pack-meta-k">Contents</span>
+                  <span className="pack-meta-v">
+                    {sel.packsPerBox > 1
+                      ? `${sel.packsPerBox} packs · ${sel.cardsPerPack * sel.packsPerBox} cards`
+                      : `${sel.cardsPerPack} cards`}
+                  </span>
+                </div>
+              </div>
+
+              {sel.guaranteeNumbered && (
+                <div className="tag" style={{ color: 'var(--gold)', borderColor: 'var(--gold-dim)', marginTop: 12, display: 'inline-block' }}>
+                  📦 guaranteed numbered
+                </div>
+              )}
+
+              {sel.totalBoxes != null && (
+                <div className="box-supply" style={{ marginTop: 14 }}>
+                  <div className="box-supply-head">
+                    <span className={`box-supply-label ${sel.soldOut ? 'sold-out' : ''}`}>
+                      {sel.soldOut ? 'SOLD OUT' : `${num(sel.boxesRemaining ?? 0)} / ${num(sel.totalBoxes)} boxes left`}
+                    </span>
+                    <span className="muted mono" style={{ fontSize: 11 }}>{num(sel.boxesOpened)} opened</span>
+                  </div>
+                  <span className={`box-supply-bar ${sel.soldOut ? 'sold-out' : ''}`}>
+                    <span style={{ width: `${Math.max(2, ((sel.boxesRemaining ?? 0) / sel.totalBoxes) * 100)}%` }} />
+                  </span>
+                </div>
+              )}
+
+              <div className="section-title" style={{ marginTop: 18 }}>Card odds</div>
+              <div className="odds pack-detail-odds">
+                {sel.odds.map((o) => (
+                  <div className="odds-row" key={o.parallel}>
+                    <span className="odds-name" style={{ color: o.parallel === 'BLACK' ? '#cfd6e2' : o.color }}>
+                      {o.displayName.replace(/\s*1\/1/, '')}
+                    </span>
+                    <span className="odds-pct">{packRate(o.perPack)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {error && <div className="error-text" style={{ marginTop: 10 }}>{error}</div>}
+
+              <button className="btn btn-gold btn-lg pack-detail-rip" onClick={rip} disabled={busy || !canAfford}>
+                {busy
+                  ? 'Opening…'
+                  : sel.soldOut
+                    ? 'SOLD OUT'
+                    : !canAfford
+                      ? isGem ? 'Not enough gems' : 'Not enough'
+                      : sel.packsPerBox > 1 ? `OPEN BOX · ${costLabel(sel)}` : `RIP PACK · ${costLabel(sel)}`}
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        /* ---------- gallery: every pack as a picture with its name below ---------- */
+        <>
+          <div className="page-head">
+            <h1>Rip packs</h1>
+            <p>Pick a pack to see its cost and odds. Every numbered pull is a unique, owned serial — once it's gone, it's gone.</p>
           </div>
 
-          {sel && (
-            <div className="rip-bar">
-              <div>
-                <div className="section-title">Selected</div>
-                <div className="row" style={{ gap: 8 }}>
-                  <span className="product-name" style={{ fontSize: 17 }}>
-                    {sel.name}
-                  </span>
-                  <span className={`product-cost ${isGem ? 'gem-text' : ''}`}>{costLabel(sel)}</span>
-                </div>
-                {error && <div className="error-text" style={{ marginTop: 4 }}>{error}</div>}
-              </div>
-              <div className="row">
-                <button className="btn btn-gold btn-lg" onClick={rip} disabled={busy || !canAfford}>
-                  {busy
-                    ? 'Opening…'
-                    : sel.soldOut
-                      ? 'SOLD OUT'
-                      : !canAfford
-                        ? isGem ? 'Not enough gems' : 'Not enough'
-                        : sel.packsPerBox > 1 ? 'OPEN BOX' : 'RIP PACK'}
+          {loading ? (
+            <div className="center" style={{ padding: 60 }}>
+              <div className="spin" />
+            </div>
+          ) : (
+            <div className="pack-gallery">
+              {products.map((p) => (
+                <button key={p.id} className="pack-tile" onClick={() => setSelected(p.id)}>
+                  <PackArt setKey={p.setKey} name={p.name} size="sm" />
+                  {p.soldOut && <span className="pack-tile-flag sold-out">SOLD OUT</span>}
+                  <div className="pack-tile-name">{p.name}</div>
+                  <div className="pack-tile-cost">
+                    <span className={p.gemCost > 0 ? 'gem-text' : ''}>{costLabel(p)}</span>
+                  </div>
                 </button>
-              </div>
+              ))}
             </div>
           )}
         </>
